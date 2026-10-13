@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import {
   ShieldCheckIcon,
-  CurrencyDollarIcon,
+  CurrencyEuroIcon,
   BoltIcon,
+  ArrowRightIcon,
 } from '../victron-icons';
 
 export function EnergyBondFlowDiagram() {
@@ -24,20 +25,19 @@ export function EnergyBondFlowDiagram() {
   };
 
   return (
-    <div className="rounded-3xl border border-black/10 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+    <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 sm:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.03)] space-y-6">
       {/* 1. Diagram Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-black/5 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-100 pb-4">
         <div>
-          <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#183d89]">
+          <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[#183d89]">
             Visual Capital & Energy Flow
           </span>
-          <h3 className="text-lg sm:text-xl font-medium text-zinc-950">
+          <h3 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-950 mt-0.5">
             How You Earn 14.2% – 18.5% APY in 3 Steps
           </h3>
         </div>
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 font-mono text-[11px] font-semibold text-emerald-700 border border-emerald-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-mono text-xs text-zinc-500">
             100% Physical Asset Backed
           </span>
         </div>
@@ -56,23 +56,23 @@ export function EnergyBondFlowDiagram() {
               setActiveStep(activeStep === 1 ? null : 1);
             }
           }}
-          className={`group relative rounded-2xl border p-5 transition-all cursor-pointer ${
+          className={`group relative rounded-2xl border p-5 sm:p-6 transition-all cursor-pointer ${
             activeStep === 1
-              ? 'border-[#183d89] bg-blue-50/40 shadow-sm ring-2 ring-[#183d89]/20'
-              : 'border-black/10 bg-zinc-50/60 hover:bg-zinc-50 hover:border-black/20'
+              ? 'border-[#183d89] bg-blue-50/30 shadow-sm ring-2 ring-[#183d89]/15'
+              : 'border-zinc-200/80 bg-zinc-50/40 hover:bg-white hover:border-zinc-300 hover:shadow-md'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-bold text-[#183d89] bg-white border border-black/10 px-2 py-0.5 rounded-md shadow-2xs">
+            <span className="font-mono text-xs font-bold text-[#183d89]">
               01 / PLEDGE
             </span>
-            <span className="font-mono text-[11px] font-semibold text-zinc-500">
+            <span className="font-mono text-[11px] font-medium text-zinc-500">
               From €50
             </span>
           </div>
 
-          <div className="my-4 flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#183d89] text-white shadow-xs group-hover:scale-105 transition-transform">
+          <div className="my-4 flex items-center gap-3.5">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-zinc-950 text-white group-hover:bg-[#183d89] shadow-xs group-hover:scale-105 transition-all">
               <ShieldCheckIcon className="h-6 w-6" />
             </div>
             <div>
@@ -85,14 +85,14 @@ export function EnergyBondFlowDiagram() {
             </div>
           </div>
 
-          <p className="text-xs text-zinc-600 font-light leading-relaxed">
+          <p className="text-xs text-zinc-600 font-normal leading-relaxed">
             Co-own patented solar trees, batteries, and charging plazas.
             Non-custodial escrow guarantees zero dilution.
           </p>
 
-          <div className="mt-4 flex items-center justify-between border-t border-black/5 pt-3 text-[11px] font-mono text-zinc-400">
+          <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 text-[11px] font-mono text-zinc-400">
             <span>Anchor PDA Escrow</span>
-            <span className="text-[#183d89] group-hover:translate-x-0.5 transition-transform">
+            <span className="text-[#183d89] group-hover:translate-x-0.5 transition-transform font-medium">
               Details ↓
             </span>
           </div>
@@ -100,9 +100,9 @@ export function EnergyBondFlowDiagram() {
           {/* Desktop Pipeline Arrow */}
           <div
             aria-hidden="true"
-            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 h-6 w-6 items-center justify-center rounded-full bg-white border border-black/15 shadow-xs text-xs font-mono text-zinc-600 pointer-events-none"
+            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 h-6 w-6 items-center justify-center rounded-full bg-white border border-zinc-200 shadow-xs pointer-events-none"
           >
-            ➔
+            <ArrowRightIcon className="h-3 w-3 text-zinc-400" />
           </div>
         </div>
 
@@ -117,43 +117,43 @@ export function EnergyBondFlowDiagram() {
               setActiveStep(activeStep === 2 ? null : 2);
             }
           }}
-          className={`group relative rounded-2xl border p-5 transition-all cursor-pointer ${
+          className={`group relative rounded-2xl border p-5 sm:p-6 transition-all cursor-pointer ${
             activeStep === 2
-              ? 'border-[#183d89] bg-blue-50/40 shadow-sm ring-2 ring-[#183d89]/20'
-              : 'border-black/10 bg-zinc-50/60 hover:bg-zinc-50 hover:border-black/20'
+              ? 'border-[#183d89] bg-blue-50/30 shadow-sm ring-2 ring-[#183d89]/15'
+              : 'border-zinc-200/80 bg-zinc-50/40 hover:bg-white hover:border-zinc-300 hover:shadow-md'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+            <span className="font-mono text-xs font-bold text-[#183d89]">
               02 / GENERATE
             </span>
-            <span className="font-mono text-[11px] font-semibold text-emerald-700">
+            <span className="font-mono text-[11px] font-semibold text-zinc-700">
               15-Year PPA
             </span>
           </div>
 
-          <div className="my-4 flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-xs group-hover:scale-105 transition-transform">
+          <div className="my-4 flex items-center gap-3.5">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-zinc-950 text-white group-hover:bg-[#183d89] shadow-xs group-hover:scale-105 transition-all">
               <BoltIcon className="h-6 w-6" />
             </div>
             <div>
               <h4 className="text-base font-semibold text-zinc-950">
                 Electricity Sold 24/7
               </h4>
-              <p className="text-xs font-mono text-amber-700 font-medium">
+              <p className="text-xs font-mono text-[#183d89] font-medium">
                 Factories & Grid Off-Takers
               </p>
             </div>
           </div>
 
-          <p className="text-xs text-zinc-600 font-light leading-relaxed">
+          <p className="text-xs text-zinc-600 font-normal leading-relaxed">
             Hardware produces power around the clock. Victron Cerbo GX meters
             kilowatt-hours and signs telemetry on-chain.
           </p>
 
-          <div className="mt-4 flex items-center justify-between border-t border-black/5 pt-3 text-[11px] font-mono text-zinc-400">
+          <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 text-[11px] font-mono text-zinc-400">
             <span>Cerbo GX Oracle</span>
-            <span className="text-[#183d89] group-hover:translate-x-0.5 transition-transform">
+            <span className="text-[#183d89] group-hover:translate-x-0.5 transition-transform font-medium">
               Details ↓
             </span>
           </div>
@@ -161,9 +161,9 @@ export function EnergyBondFlowDiagram() {
           {/* Desktop Pipeline Arrow */}
           <div
             aria-hidden="true"
-            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 h-6 w-6 items-center justify-center rounded-full bg-white border border-black/15 shadow-xs text-xs font-mono text-zinc-600 pointer-events-none"
+            className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 h-6 w-6 items-center justify-center rounded-full bg-white border border-zinc-200 shadow-xs pointer-events-none"
           >
-            ➔
+            <ArrowRightIcon className="h-3 w-3 text-zinc-400" />
           </div>
         </div>
 
@@ -178,74 +178,77 @@ export function EnergyBondFlowDiagram() {
               setActiveStep(activeStep === 3 ? null : 3);
             }
           }}
-          className={`group relative rounded-2xl border p-5 transition-all cursor-pointer ${
+          className={`group relative rounded-2xl border p-5 sm:p-6 transition-all cursor-pointer ${
             activeStep === 3
-              ? 'border-emerald-600 bg-emerald-50/40 shadow-sm ring-2 ring-emerald-500/20'
-              : 'border-black/10 bg-zinc-50/60 hover:bg-zinc-50 hover:border-black/20'
+              ? 'border-[#183d89] bg-blue-50/30 shadow-sm ring-2 ring-[#183d89]/15'
+              : 'border-zinc-200/80 bg-zinc-50/40 hover:bg-white hover:border-zinc-300 hover:shadow-md'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+            <span className="font-mono text-xs font-bold text-[#183d89]">
               03 / YIELD
             </span>
-            <span className="font-mono text-[11px] font-bold text-emerald-700">
+            <span className="font-mono text-[11px] font-semibold text-[#183d89]">
               14.2% – 18.5% APY
             </span>
           </div>
 
-          <div className="my-4 flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-xs group-hover:scale-105 transition-transform">
-              <CurrencyDollarIcon className="h-6 w-6" />
+          <div className="my-4 flex items-center gap-3.5">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-zinc-950 text-white group-hover:bg-[#183d89] shadow-xs group-hover:scale-105 transition-all">
+              <CurrencyEuroIcon className="h-6 w-6" />
             </div>
             <div>
               <h4 className="text-base font-semibold text-zinc-950">
                 Direct Cash Flow
               </h4>
-              <p className="text-xs font-mono text-emerald-700 font-medium">
+              <p className="text-xs font-mono text-[#183d89] font-medium">
                 1:1 Stable Daily Payout
               </p>
             </div>
           </div>
 
-          <p className="text-xs text-zinc-600 font-light leading-relaxed">
+          <p className="text-xs text-zinc-600 font-normal leading-relaxed">
             Off-takers pay commercial invoices. Automated smart contracts stream
             bond yields to your wallet with zero crypto volatility.
           </p>
 
-          <div className="mt-4 flex items-center justify-between border-t border-black/5 pt-3 text-[11px] font-mono text-zinc-400">
+          <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 text-[11px] font-mono text-zinc-400">
             <span>O(1) Accumulator</span>
-            <span className="text-emerald-700 group-hover:translate-x-0.5 transition-transform">
+            <span className="text-[#183d89] group-hover:translate-x-0.5 transition-transform font-medium">
               Details ↓
             </span>
           </div>
         </div>
       </div>
 
-      {/* 3. Animated Energy & Cash Flow Pipeline Banner */}
-      <div className="rounded-2xl border border-black/10 bg-zinc-950 p-4 text-white overflow-hidden relative">
+      {/* 3. Closed-Loop Banner with Signature Gradient */}
+      <div className="rounded-2xl border border-zinc-900 bg-zinc-950 p-4 sm:p-5 text-white overflow-hidden relative shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs font-mono">
           <div className="flex items-center gap-3">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 shrink-0">
+              <span className="h-2 w-2 rounded-full bg-blue-400" />
             </div>
             <div>
-              <span className="text-zinc-400">AUTOMATED CLOSED-LOOP:</span>{' '}
-              <span className="text-white font-medium">
-                Pledge Capital ➔ Solar & Battery Generation ➔ 1:1 Stable Payouts
+              <span className="text-zinc-400 uppercase tracking-wider text-[11px]">
+                AUTOMATED CLOSED-LOOP:
+              </span>{' '}
+              <span className="text-white font-normal">
+                Pledge Capital &rarr; Solar &amp; Battery Generation &rarr; 1:1
+                Stable Payouts
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-zinc-400 text-[11px] shrink-0">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#183d89]" />
             <span>Zero Speculative Crypto Volatility</span>
           </div>
         </div>
 
-        {/* Animated Pipeline Graphic */}
-        <div className="mt-3 relative h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+        {/* Animated Pipeline Graphic using the ONE signature gradient */}
+        <div className="mt-3.5 relative h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
           <div
-            className="absolute inset-y-0 w-1/3 rounded-full bg-gradient-to-r from-sky-400 via-emerald-400 to-teal-300 animate-pulse"
+            className="absolute inset-y-0 w-1/3 rounded-full bg-gradient-to-r from-[#183d89] to-[#2563eb] animate-pulse"
             style={{
               animationDuration: '2.5s',
               animationIterationCount: 'infinite',
@@ -254,9 +257,9 @@ export function EnergyBondFlowDiagram() {
         </div>
       </div>
 
-      {/* 4. Interactive Step Detail Drawer (Quick 1-Line Explanation on Click) */}
+      {/* 4. Interactive Step Detail Drawer */}
       {activeStep && (
-        <div className="rounded-xl border border-black/10 bg-zinc-50 p-4 text-xs space-y-1.5 animate-fade-in">
+        <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50/80 p-4 sm:p-5 text-xs space-y-1.5 animate-fade-in shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="font-mono font-bold text-[#183d89] uppercase tracking-wider">
               Step {activeStep}: {stepDetails[activeStep].tag}
@@ -266,10 +269,10 @@ export function EnergyBondFlowDiagram() {
               onClick={() => setActiveStep(null)}
               className="text-zinc-400 hover:text-zinc-700 cursor-pointer font-mono text-[11px]"
             >
-              ✕ Close
+              Close
             </button>
           </div>
-          <p className="text-zinc-700 font-light leading-relaxed">
+          <p className="text-zinc-700 font-normal leading-relaxed">
             {stepDetails[activeStep].desc}
           </p>
         </div>

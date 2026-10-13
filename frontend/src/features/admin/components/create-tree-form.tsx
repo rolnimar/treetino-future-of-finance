@@ -43,7 +43,7 @@ const PRESETS: ArchetypePreset[] = [
     city: 'Poprad',
     country: 'Slovakia',
     projectedApy: '12.8%',
-    tariffRate: '$0.32 / kWh corporate PPA (MKovo s.r.o.)',
+    tariffRate: '€0.32 / kWh corporate PPA (MKovo s.r.o.)',
     offTakerName: 'MKovo s.r.o.',
     target: '250000',
     narrative:
@@ -97,7 +97,7 @@ const PRESETS: ArchetypePreset[] = [
     city: 'Queensland',
     country: 'Australia',
     projectedApy: '8.5%',
-    tariffRate: '$0.40 / kWh metered consumer consumption',
+    tariffRate: '€0.40 / kWh metered consumer consumption',
     offTakerName: 'Outback Queensland Property',
     target: '20000',
     narrative:
@@ -140,7 +140,7 @@ export function CreateTreeForm() {
       city: 'Queensland',
       country: 'Australia',
       projectedApy: '8.5%',
-      tariffRate: '$0.40 / kWh metered consumer consumption',
+      tariffRate: '€0.40 / kWh metered consumer consumption',
       offTakerName: 'Queensland Rural Resident',
       narrative:
         'Community microgrid enabling permissionless clean power. Backers fund rooftop solar and lithium battery storage replacing expensive off-grid diesel generation.',
@@ -363,7 +363,7 @@ export function CreateTreeForm() {
                 error={errors.projectedApy?.message}
               />
               <Field
-                label="Tariff Rate (e.g. $0.40/kWh)"
+                label="Tariff Rate (e.g. €0.40/kWh)"
                 {...register('tariffRate')}
                 error={errors.tariffRate?.message}
               />
@@ -373,7 +373,7 @@ export function CreateTreeForm() {
                 error={errors.offTakerName?.message}
               />
               <Field
-                label="Funding Target (mockUSDC)"
+                label="Funding Target (EURTree)"
                 {...register('target')}
                 error={errors.target?.message}
               />

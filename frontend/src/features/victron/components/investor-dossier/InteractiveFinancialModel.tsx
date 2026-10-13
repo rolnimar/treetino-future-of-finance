@@ -357,8 +357,8 @@ export function InteractiveFinancialModel({
       ) && (
         <div className="rounded-2xl border border-blue-500/20 bg-blue-50/50 p-5 text-xs text-zinc-800 space-y-3">
           <div className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-t-blue text-[11px] font-bold text-white">
-              ★
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#183d89] text-[10px] font-bold text-white">
+              P2
             </span>
             <h4 className="font-bold text-zinc-950 text-sm">
               Strategic Phased Expansion – Self-Funding Phase II via Operational
@@ -513,12 +513,12 @@ export function InteractiveFinancialModel({
 
         <div className="flex flex-wrap items-center justify-between text-[11px] text-zinc-500 pt-1">
           <span>
-            ★ Breakeven without subsidy:{' '}
+            Breakeven without subsidy:{' '}
             <strong className="text-zinc-900">
               {variant.scenarios.realistic.paybackYearsNoSubsidy} Years
             </strong>{' '}
             | With 30% Grant:{' '}
-            <strong className="text-emerald-700">
+            <strong className="text-[#183d89]">
               {variant.scenarios.realistic.paybackYearsWithSubsidy} Years
             </strong>
           </span>

@@ -1,4 +1,5 @@
 import type { CapexBudgetItem } from '../../types/investor-dossier';
+import { CheckIcon } from '../../victron-icons';
 
 interface ItemizedBudgetExplorerProps {
   budget: CapexBudgetItem[];
@@ -199,7 +200,7 @@ export function ItemizedBudgetExplorer({
             className="rounded-2xl border border-black/10 bg-zinc-50/70 p-5 space-y-2"
           >
             <div className="flex items-center gap-2">
-              <span className="text-emerald-600 font-bold">✓</span>
+              <CheckIcon className="h-4 w-4 text-[#183d89]" />
               <h5 className="font-bold text-xs uppercase tracking-wider text-zinc-950">
                 {adv.title}
               </h5>

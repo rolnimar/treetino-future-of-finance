@@ -30,22 +30,10 @@ export function PublicTreeCard({
 }) {
   const { setVisible } = useWalletModal();
 
-  const phaseColors: Record<string, string> = {
-    funding: 'bg-t-blue/10 text-t-blue border-t-blue/20',
-    active: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    purchased: 'bg-amber-50 text-amber-800 border-amber-200',
-    funded: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-  };
-
   return (
     <Card title={`Energy Tree #${tree.treeId}`}>
       <div className="mb-4 flex items-center justify-between">
-        <span
-          className={`inline-block rounded-full border px-3 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider ${
-            phaseColors[tree.phase] ||
-            'bg-zinc-100 text-zinc-700 border-zinc-200'
-          }`}
-        >
+        <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#183d89]">
           {tree.phase}
         </span>
         <span className="text-xs text-zinc-400 font-mono">On-chain Pool</span>
@@ -64,7 +52,7 @@ export function PublicTreeCard({
         <div className="mt-4 rounded-xl border border-black/5 bg-zinc-50 p-4">
           <p className="mb-3 text-xs text-zinc-600">
             <strong className="text-zinc-900 font-semibold font-mono">
-              {formatTokenAmount(tree.remaining)} mockUSDC
+              {formatTokenAmount(tree.remaining)} EURTree
             </strong>{' '}
             remaining to fully fund this tree pool.
           </p>

@@ -39,7 +39,7 @@ export function TelemetrySidepanel({
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             Live Telemetry
           </span>
-          <span className="rounded-full bg-t-blue/10 px-2.5 py-0.5 font-mono text-[9px] font-bold text-t-blue uppercase tracking-wider">
+          <span className="font-mono text-[10px] font-bold text-[#183d89] uppercase tracking-wider">
             Uncoupled
           </span>
         </div>

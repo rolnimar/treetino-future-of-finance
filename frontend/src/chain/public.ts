@@ -22,7 +22,7 @@ import {
 } from '../features/marketplace/schemas';
 
 /** Reads only the payment mint and the connected wallet's token account. */
-export async function readMockUsdcBalance(
+export async function readEurTreeBalance(
   connection: Connection,
   address: string,
 ) {
@@ -42,7 +42,7 @@ export async function readMockUsdcBalance(
     !mint.mintAuthority?.equals(mintAddress) ||
     mint.freezeAuthority
   )
-    throw new Error('The payment mint is not the expected mockUSDC');
+    throw new Error('The payment mint is not the expected EURTree');
   if (!tokenAccount) return { initialized: true, balance: '0' };
   const token = unpackAccount(ata, tokenAccount, TOKEN_PROGRAM_ID);
   if (
@@ -51,9 +51,11 @@ export async function readMockUsdcBalance(
     !token.isInitialized ||
     token.isFrozen
   )
-    throw new Error('Invalid mockUSDC wallet account');
+    throw new Error('Invalid EURTree wallet account');
   return { initialized: true, balance: token.amount.toString() };
 }
+
+export const readMockUsdcBalance = readEurTreeBalance;
 
 export async function buildPublicTransaction(
   connection: Connection,
@@ -62,7 +64,7 @@ export async function buildPublicTransaction(
 ) {
   const input = publicActionSchema.parse(value);
   const owner = new PublicKey(address);
-  const state = await readMockUsdcBalance(connection, address);
+  const state = await readEurTreeBalance(connection, address);
   if (!state.initialized)
     throw new Error('The demo payment token has not been initialized yet');
   const transaction = new Transaction();
@@ -105,7 +107,7 @@ export async function buildPublicTransaction(
     )
       throw new Error('Amount exceeds the unpaid invoice');
     if (BigInt(input.amount) > BigInt(state.balance))
-      throw new Error('Insufficient mockUSDC balance');
+      throw new Error('Insufficient EURTree balance');
     transaction.add(payInvoiceInstruction(owner, tree, report, input.amount));
     return transaction;
   }
@@ -122,7 +124,7 @@ export async function buildPublicTransaction(
   if (BigInt(input.amount) > target - raised)
     throw new Error('Amount exceeds remaining tree funding');
   if (BigInt(input.amount) > BigInt(state.balance))
-    throw new Error('Insufficient mockUSDC balance');
+    throw new Error('Insufficient EURTree balance');
   transaction.add(buySharesInstruction(owner, tree, input.amount));
   return transaction;
 }

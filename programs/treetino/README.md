@@ -12,17 +12,17 @@ vault, and investor reward positions. The program ID is
 1. `init_admins(admins)`: the current program upgrade authority initializes
    the global list of 1 to 10 admins. This is required before creating trees.
 2. `init_payment_token`: initialize the single six-decimal classic SPL payment
-   mint at the PDA derived from `[b"payment_mint"]`. This demo token substitutes
-   for USDC. It has immutable name/symbol metadata (`mockUSDC`), program-controlled mint
-   authority, and no freeze authority.
+   mint at the PDA derived from `[b"payment_mint"]`. This is EURTree, a 1:1 Euro-backed
+   clean energy stablecoin (1 EURTree = 1 EUR, 6 decimals). It has name/symbol metadata (`EURTree`),
+   program-controlled mint authority, and no freeze authority.
    Initialization can succeed only once per program ID on each cluster.
 3. `init_tree`: a listed admin signs as creator and chooses tree ID, target,
    supplier, client and device public key.
    Tree identity is scoped to the creator.
    The payment mint must already be initialized and must be the singleton PDA.
-4. `buy_shares(amount)`: transfer mockUSDC into the funding vault and mint
-   shares 1:1 in raw units. For example, 100 USDC buys 100 shares, and
-   20,000 USDC fully funds a 20,000-share tree. Buying cannot exceed the target.
+4. `buy_shares(amount)`: transfer EURTree into the funding vault and mint
+   shares 1:1 in raw units. For example, 100 EURTree buys 100 shares, and
+   20,000 EURTree fully funds a 20,000-share tree. Buying cannot exceed the target.
    Transfers are disabled until fully funded; mint authority is then revoked.
    Funding stays open until the target is reached. This MVP has no refund or
    cancellation path; contributed capital stays in the funding vault until purchase.
@@ -45,11 +45,11 @@ vault, and investor reward positions. The program ID is
    aligned to UTC midnight. Zero production is valid. Reporting does not depend
    on prices or an invoice.
 8. `issue_invoice(amount)`: the creator submits the final bill for a report
-   in payment-mint base units (micro-USDC for mockUSDC). The admin frontend
+   in payment-mint base units (micro-EURTree for EURTree). The admin frontend
    builds the transaction and the creator signs it. Each invoice can be issued once;
    zero is valid and is distinguished from an invoice not yet issued.
 9. `pay_invoice(amount)`: the configured client pays all or part of a report's
-   bill in mockUSDC. This payment, rather than the report, credits rewards.
+   bill in EURTree. This payment, rather than the report, credits rewards.
 10. `claim_rewards`: a holder withdraws their portion of paid revenue.
     `transfer_shares(amount)` checkpoints both holders before transferring.
 
@@ -93,8 +93,8 @@ atomically. The payer covers rent; initialization grants them no mint authority.
 
 | Property | Value |
 | --- | --- |
-| Name | `mockUSDC` |
-| Symbol | `mockUSDC` |
+| Name | `EURTree` |
+| Symbol | `EURTree` |
 | Decimals | 6 |
 | Initial supply | 0 |
 | Mint authority | Payment mint PDA, controlled by this program |
@@ -108,7 +108,7 @@ atomically. The payer covers rent; initialization grants them no mint authority.
 `owner` to mint the requested amount to its own canonical associated payment
 account, which is created if needed. The caller pays rent and transaction fees.
 Amounts are positive **raw units**: `give_me_money(100_000_000)` gives 100
-mockUSDC. Requests can be repeated with no per-wallet limit, cooldown, or
+EURTree. Requests can be repeated with no per-wallet limit, cooldown, or
 protocol supply cap; SPL Token's u64 supply limit still applies. There is no
 issuer or backend approval. Wallets cannot call SPL `mint_to` directly because
 the payment mint PDA is the mint authority.
@@ -121,8 +121,8 @@ A payment mint initialized by the previous implementation also requires its
 existing authority to migrate mint authority and create metadata separately;
 `init_payment_token` cannot initialize an existing mint again.
 
-The faucet makes all balances freely obtainable and is for demonstrations.
-Demo tokens have no USDC backing or redemption guarantee. An empty URI means
+The faucet allows demonstration participants to mint EURTree liquidity.
+EURTree models an institutional Euro-pegged RWA stablecoin backed 1:1 by Euro reserves. An empty URI means
 there is no hosted JSON metadata or image; the name and symbol are on-chain.
 
 ## Billing and rewards

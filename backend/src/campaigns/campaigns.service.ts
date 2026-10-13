@@ -12,28 +12,28 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     id: 'demo-campaign-209689',
     treeAddress: '48e7da86e0d9_victron_offgrid',
     treeId: '1',
-    title: 'Off-Grid Solar Microgrid',
-    subtitle: 'Queensland Rural Clean Energy Transition',
-    category: 'Off-Grid Solar',
-    categoryBadge: 'Off-Grid Solar',
+    title: 'Wind Park Kryry 4.0 MW (Vestas V80)',
+    subtitle: 'Two 2.0 MW Vestas V80 Industrial Turbines',
+    category: 'Utility Wind Turbines',
+    categoryBadge: 'Wind Turbines · 14.2% APY',
     narrative:
-      'Community microgrid enabling permissionless clean power. Backers fund rooftop solar and lithium battery storage replacing expensive off-grid diesel generation in rural Queensland. Repayments stream continuously as solar power is consumed.',
+      'Two 2.0 MW Vestas V80 utility-scale wind turbines in Kryry, Czech Republic. Generates clean power fed directly into the 22 kV regional distribution network under a guaranteed 20-year concession agreement with ČEZ Distribuce.',
     story:
-      'In remote regional Queensland, off-grid homeowners currently rely on costly diesel gensets running at up to $0.65/kWh. By tokenizing a high-capacity Victron MultiPlus-II inverter and lithium battery bank, investors fund the upfront hardware installation. The homeowner pays an indexed $0.40/kWh microgrid tariff, generating an estimated 8.5% annual return with zero diesel emissions.',
+      'Located in Kryry (Ústí nad Labem region, Czech Republic), this 4.0 MW wind park consists of two Vestas V80-2.0 MW turbines with 80m hub height and 80m rotor diameter. Supplying electricity directly into the ČEZ 22 kV medium-voltage distribution grid under a guaranteed long-term feed-in tariff (€88.00/MWh), it delivers 14.2% APY with on-site maintenance by certified Czech technicians.',
     investorHighlight:
-      'Direct consumer payback model replacing expensive off-grid diesel generators with clean solar equity.',
+      '4.0 MW industrial wind power on Solana: 20-year ČEZ concession, 22 kV grid feed-in, and 14.2% APY distributed on-chain.',
     victronSiteId: 209689,
-    city: 'Queensland',
-    country: 'Australia',
-    projectedApy: '8.5%',
+    city: 'Kryry',
+    country: 'Czech Republic',
+    projectedApy: '14.2%',
     tariffRate:
-      '$0.40 / kWh metered consumer consumption (vs $0.65/kWh diesel baseline)',
-    offTakerName: 'Queensland Rural Resident (10-Yr Agreement)',
+      '€88.00 / MWh guaranteed grid feed-in tariff (Vestas V80 2× 2.0 MW)',
+    offTakerName: 'ČEZ Distribuce a.s. (20-Year Concession)',
     offTakerDescription:
-      'Guaranteed microgrid PPA contract with automated Cerbo GX smart metering.',
-    supplierName: 'Victron Certified Integrator Australia',
-    targetUsdc: '10000',
-    raisedUsdc: '7850',
+      'High-voltage 22 kV utility distribution network purchasing all metered wind output.',
+    supplierName: 'Vestas Wind Systems / EcoPower Solution',
+    targetUsdc: '1850000',
+    raisedUsdc: '1245000',
     phase: 'funding',
     canBuy: true,
     createdAt: 1728000000000,
@@ -46,22 +46,22 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     title: 'BESS Přeštice 8.6 MW (WATTINO hBESS)',
     subtitle: '22 kV Grid Frequency Regulation (ČEPS) & Spot Arbitrage',
     category: 'Battery Storage (BESS)',
-    categoryBadge: 'BESS 8.6 MW · Ancillary + Spot',
+    categoryBadge: 'BESS 8.6 MW · 35% APY',
     narrative:
-      'High-capacity 8.6 MW / 10.0–17.2 MWh battery energy storage system (BESS) directly connected to the 110/22 kV Přeštice substation. Monetizes automated grid frequency containment (ČEPS SVR) and algorithmic day-ahead/intraday spot power arbitrage.',
+      'High-capacity 8.6 MW / 10.0–17.2 MWh battery energy storage system (BESS) directly connected to the 110/22 kV Přeštice substation. Monetizes negative midday solar prices (20% spot arbitrage) and ČEPS transmission grid standby availability fees (15%), pushing total yield to 35.0% APY.',
     story:
-      'Located on parcel 472 in Dolni Lukavice with direct 22 kV interconnection into Substation 110/22 kV Přeštice, this utility-scale installation holds 2 signed Connection Agreements (ČEZ Distribuce: Přeštice I 6.2 MW and Chlumčany II 2.4 MW). Powered by European ChinaFree technology WATTINO hBESS with Tier-1 Samsung SDI EU automotive cells (NCM 622), it operates dual revenue streams: ČEPS ancillary services (FCR, aFRR+, aFRR-) yielding €860k–€1.07M/yr (21.5M–26.8M CZK) and OTE spot market arbitrage yielding €380k–€725k/yr (9.4M–18.1M CZK). With clean annual EBITDA of €1.02M–€1.48M (25.6M–37.0M CZK), simple payback is achieved in 2.95–4.22 years with 21.8%–31.5% IRR and a 10-year replacement warranty.',
+      'Located on parcel 472 in Dolni Lukavice with direct 22 kV interconnection into Substation 110/22 kV Přeštice, this utility-scale installation holds 2 signed Connection Agreements (ČEZ Distribuce: Přeštice I 6.2 MW and Chlumčany II 2.4 MW). Powered by European ChinaFree technology WATTINO hBESS with Tier-1 Samsung SDI EU automotive cells (NCM 622), it operates dual revenue streams: ČEPS ancillary services (FCR, aFRR+, aFRR-) yielding standby fees plus automated 15-minute intraday spot power arbitrage on negative midday prices, achieving up to 35% projected APY.',
     investorHighlight:
-      'High-yield grid infrastructure with 2 signed utility connection contracts, 4.2y payback (2.95y w/ subsidy), 21.8%–31.5% IRR, and 10-year EU replacement warranty.',
+      'Dual-engine grid battery: 20% spot arbitrage from negative prices + 15% ČEPS standby fee = 35% APY. 2 signed ČEZ connection agreements and 10-year EU warranty.',
     victronSiteId: 219742,
     city: 'Dolni Lukavice (Prestice)',
     country: 'Czech Republic',
-    projectedApy: '21.8%',
+    projectedApy: '35.0%',
     tariffRate:
-      '2× Signed Connection Agreements (#4122602318 & #4122623464) · ČEPS Ancillary + OTE Arbitrage',
+      '2× Signed Connection Agreements (#4122602318 & #4122623464) · ČEPS Standby (15%) + OTE Arbitrage (20%)',
     offTakerName: 'ČEPS a.s. (TSO) & OTE Spot Market (22 kV Grid)',
     offTakerDescription:
-      'Dual monetization: regulated grid balancing capacity payments plus automated day-ahead and 15-min intraday power arbitrage.',
+      'Dual monetization: regulated grid balancing standby payments plus automated day-ahead and 15-min intraday power arbitrage.',
     supplierName: 'WATTINO / Treetino corp s.r.o. × EcoPower Solution',
     targetUsdc: '108000',
     raisedUsdc: '84200',
@@ -81,7 +81,7 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     narrative:
       'Multi-bay commercial EV charging plaza buffered with solar and storage. Processes high daily energy throughput, laying the foundation for autonomous vehicle micro-billing and native energy stablecoins.',
     story:
-      'Located at a high-traffic logistics hub near Paris, this installation deploys 10 high-power Victron EV Charging Stations backed by a 150 kW rooftop canopy and 200 kWh buffer storage. Retail drivers and fleet vehicles charge daily, paying $0.42/kWh plus connection fees directly into the protocol.',
+      'Located at a high-traffic logistics hub near Paris, this installation deploys 10 high-power Victron EV Charging Stations backed by a 150 kW rooftop canopy and 200 kWh buffer storage. Retail drivers and fleet vehicles charge daily, paying €0.42/kWh plus connection fees directly into the protocol.',
     investorHighlight:
       'High-velocity recurring transaction volume directly from EV fleet operators and retail drivers.',
     victronSiteId: 374891,
@@ -89,7 +89,7 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     country: 'France',
     projectedApy: '18.5%',
     tariffRate:
-      '$0.42 / kWh delivered + $2.50 session connection fee per charge',
+      '€0.42 / kWh delivered + €2.50 session connection fee per charge',
     offTakerName: 'Commercial Fleet Operators & Retail EV Drivers',
     offTakerDescription:
       'Automated point-of-sale micro-transactions across 10 commercial charging bays.',
@@ -119,7 +119,7 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     city: 'Prague / Central Bohemia',
     country: 'Czech Republic',
     projectedApy: '12.8%',
-    tariffRate: '$0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
+    tariffRate: '€0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
     offTakerName: 'MKovo s.r.o. (Precision Manufacturing)',
     offTakerDescription:
       'Long-term corporate power purchase agreement indexed to European industrial tariffs.',
@@ -163,8 +163,24 @@ export class CampaignsService {
       return def;
     });
 
-    // Add or merge any DB-stored custom campaigns
+    const defaultIds = new Set(DEFAULT_FLAGSHIP_CAMPAIGNS.map((d) => d.id));
+    const defaultAddresses = new Set(
+      DEFAULT_FLAGSHIP_CAMPAIGNS.map((d) => d.treeAddress),
+    );
+    const defaultSiteIds = new Set(
+      DEFAULT_FLAGSHIP_CAMPAIGNS.map((d) => d.victronSiteId).filter(Boolean),
+    );
+
+    // Add or merge any DB-stored custom campaigns (skipping stale default campaign seeds)
     for (const c of dbCampaigns) {
+      if (
+        defaultIds.has(c.id) ||
+        defaultAddresses.has(c.treeAddress) ||
+        (c.victronSiteId && defaultSiteIds.has(c.victronSiteId))
+      ) {
+        continue;
+      }
+
       const matched = treeMap.get(c.treeAddress);
       const existingIdx = result.findIndex(
         (r) =>

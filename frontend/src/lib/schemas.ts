@@ -30,7 +30,7 @@ export const positiveU64Schema = u64Schema.refine(
   (value) => value !== '0',
   'Must be greater than zero',
 );
-/** Converts human mockUSDC input into exact six-decimal base units. */
+/** Converts human EURTree input into exact six-decimal base units. */
 export const tokenAmountInput = (zero = false) =>
   z
     .string()

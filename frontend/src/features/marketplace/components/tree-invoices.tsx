@@ -70,11 +70,11 @@ export function TreeInvoices({
                           disabled={disabled || !sufficientBalance}
                           onClick={() => onPay(report, remaining.toString())}
                         >
-                          Pay {formatTokenAmount(remaining.toString())} mockUSDC
+                          Pay {formatTokenAmount(remaining.toString())} EURTree
                         </Button>
                         {!sufficientBalance && (
                           <p className="text-xs text-red-700">
-                            Insufficient mockUSDC balance. Use the demo faucet
+                            Insufficient EURTree balance. Use the demo faucet
                             below.
                           </p>
                         )}

@@ -19,6 +19,7 @@ export const SEEDS = {
   revenue: 'revenue',
   report: 'report',
   position: 'position',
+  kamino: 'kamino_vault',
 } as const;
 
 function derive(seed: string, ...parts: Buffer[]) {
@@ -53,6 +54,8 @@ export const fundingVaultAddress = (tree: PublicKey) =>
   derive(SEEDS.funding, tree.toBuffer());
 export const revenueVaultAddress = (tree: PublicKey) =>
   derive(SEEDS.revenue, tree.toBuffer());
+export const kaminoVaultAddress = (tree: PublicKey) =>
+  derive(SEEDS.kamino, tree.toBuffer());
 export const reportAddress = (tree: PublicKey, dayStartTs: bigint | string) =>
   derive(SEEDS.report, tree.toBuffer(), i64Seed(dayStartTs));
 export const paymentMetadataAddress = () =>

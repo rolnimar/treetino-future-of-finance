@@ -1,4 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { useConnectedWallet } from '../wallet/use-connected-wallet';
+import { requestWalletApproval } from '../../chain/wallet-action';
+import { useVictronInvestments } from './use-victron-investments';
 import type { VictronDemoItem } from './victron-types';
 import { OffgridLayout } from './layouts/offgrid-layout';
 import { EssLayout } from './layouts/ess-layout';
@@ -18,6 +23,7 @@ import {
   CheckIcon,
   ShieldCheckIcon,
 } from './victron-icons';
+import { CompoundingYieldCalculator } from './components/CompoundingYieldCalculator';
 
 interface VictronAssetPageProps {
   demo: VictronDemoItem;
@@ -36,9 +42,69 @@ export function VictronAssetPage({
   onBackProject,
   onOpenDeposit,
 }: VictronAssetPageProps) {
+  const { connection } = useConnection();
+  const { setVisible: openWalletModal } = useWalletModal();
+  const wallet = useConnectedWallet();
+  const { investments, claimYield } = useVictronInvestments(walletAddress);
+
+  const [claimingSiteId, setClaimingSiteId] = useState<number | null>(null);
+  const [claimSuccessText, setClaimSuccessText] = useState<string | null>(null);
+  const [claimErrorText, setClaimErrorText] = useState<string | null>(null);
+
+  const handleClaimTicker = async (
+    siteId: number,
+    baseAmount: number,
+    kaminoBonus: number,
+  ) => {
+    if (
+      !wallet &&
+      typeof window !== 'undefined' &&
+      !(window as unknown as { solana?: unknown }).solana
+    ) {
+      openWalletModal(true);
+      return;
+    }
+
+    setClaimingSiteId(siteId);
+    setClaimErrorText(null);
+    setClaimSuccessText(null);
+
+    try {
+      const res = await requestWalletApproval({
+        connection,
+        wallet,
+        actionName: 'claim_kilowatt_dividend',
+        memoPayload: {
+          site_id: siteId,
+          asset_title: demo.title,
+          claimed_amount_eurtree: Number((baseAmount + kaminoBonus).toFixed(4)),
+          base_dividend: Number(baseAmount.toFixed(4)),
+          kamino_pool_bonus: Number(kaminoBonus.toFixed(4)),
+        },
+      });
+
+      claimYield(siteId, baseAmount, kaminoBonus);
+
+      setClaimSuccessText(
+        `Claim confirmed on Solana Devnet (tx: ${res.signature.slice(0, 8)}…). Unclaimed dividend reset.`,
+      );
+      setTimeout(() => setClaimSuccessText(null), 6000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes('cancelled') || msg.includes('rejected')) {
+        setClaimErrorText('Signing was cancelled in wallet.');
+      } else {
+        setClaimErrorText(`Claim failed: ${msg}`);
+      }
+      setTimeout(() => setClaimErrorText(null), 4000);
+    } finally {
+      setClaimingSiteId(null);
+    }
+  };
+
   const [activeTab, setActiveTab] = useState<
-    'story' | 'topology' | 'chart' | 'money' | 'hardware'
-  >('story');
+    'topology' | 'portu' | 'story' | 'chart' | 'money' | 'hardware'
+  >('topology');
 
   const projectDossier = getProjectDossier(demo.key);
 
@@ -66,15 +132,15 @@ export function VictronAssetPage({
   return (
     <div className="py-4 space-y-8 animate-fade-in">
       {/* 1. TOP BREADCRUMB & BACK ACTION BAR */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-black/10 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200/80 pb-5">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3.5 py-2 font-medium text-xs text-zinc-800 shadow-2xs hover:bg-black/5 hover:border-black/20 transition active:scale-[0.98] cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white/90 px-4 py-2 font-mono text-xs font-medium text-zinc-800 shadow-xs hover:bg-zinc-50 hover:border-zinc-300 transition active:scale-[0.98] cursor-pointer"
           >
-            <ArrowLeftIcon className="h-4 w-4" />
-            <span>Back to Funding Opportunities</span>
+            <ArrowLeftIcon className="h-3.5 w-3.5" />
+            <span>Back to Opportunities</span>
           </button>
 
           <nav
@@ -84,7 +150,9 @@ export function VictronAssetPage({
             <span>/</span>
             <span>Campaigns</span>
             <span>/</span>
-            <span className="font-bold text-zinc-900">{demo.title}</span>
+            <span className="font-semibold text-zinc-900 truncate max-w-[200px]">
+              {demo.title}
+            </span>
           </nav>
         </div>
 
@@ -95,10 +163,10 @@ export function VictronAssetPage({
               download={projectDossier.pdfFilename ?? 'Investor_Prospectus.pdf'}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-600/30 bg-emerald-50 px-3.5 py-2 font-mono text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100 transition"
+              className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50/80 px-4 py-2 font-mono text-xs font-semibold text-zinc-900 shadow-xs hover:bg-zinc-100 transition"
             >
               <svg
-                className="h-3.5 w-3.5 text-emerald-700"
+                className="h-3.5 w-3.5 text-zinc-700"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -117,7 +185,7 @@ export function VictronAssetPage({
             href={demo.vrmUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-black/10 bg-white px-3.5 py-2 font-mono text-xs font-semibold text-t-blue shadow-2xs hover:bg-black/5 transition"
+            className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-white/90 px-4 py-2 font-mono text-xs font-semibold text-[#183d89] shadow-xs hover:bg-zinc-50 transition"
           >
             <span>Victron VRM Live</span>
             <ExternalLinkIcon className="h-3.5 w-3.5" />
@@ -125,89 +193,75 @@ export function VictronAssetPage({
         </div>
       </div>
 
-      {/* 2. KICKSTARTER ASSET HEADER & 2-COLUMN HERO */}
+      {/* 2. ASSET HEADER & 2-COLUMN HERO */}
       <div className="space-y-6">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-semibold tracking-[0.2em] text-t-blue uppercase">
-              {demo.categoryBadge} · Site #{demo.siteId}
-            </span>
-          </div>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl lg:text-5xl">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[#183d89]">
+            {demo.categoryBadge} · SITE #{demo.siteId}
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl lg:text-5xl">
             {demo.title}
           </h1>
-          <p className="mt-2 text-sm text-zinc-600 max-w-3xl leading-relaxed sm:text-base">
+          <p className="mt-2.5 text-sm text-zinc-500 max-w-3xl leading-relaxed sm:text-base font-normal">
             {demo.narrative}
           </p>
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-zinc-500 font-medium">
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-zinc-500 font-medium">
             <span>
               By{' '}
-              <strong className="text-zinc-950 font-bold">
+              <strong className="text-zinc-900 font-semibold">
                 {demo.key === 'ess'
                   ? 'WATTINO × EcoPower Solution'
                   : meta.creator}
               </strong>
             </span>
-            <span>·</span>
+            <span className="text-zinc-300">·</span>
             <span>
               {demo.location.city}, {demo.location.country}
             </span>
-            <span>·</span>
-            <span className="font-mono text-t-blue font-semibold">
+            <span className="text-zinc-300">·</span>
+            <span className="font-mono text-[#183d89] font-semibold">
               Cerbo GX Verified SCADA
             </span>
           </div>
         </div>
 
-        {/* 2-Column Split: Image Left (60%), Kickstarter Funding Box Right (40%) */}
+        {/* 2-Column Split: Image Left (60%), Funding Box Right (40%) */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* Left Column: Big Cover Image */}
           <div className="lg:col-span-7">
-            <div className="relative aspect-16/10 w-full overflow-hidden rounded-3xl border border-black/10 bg-zinc-100 shadow-sm sm:aspect-16/9">
+            <div className="relative aspect-16/10 w-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-zinc-100 shadow-[0_4px_24px_rgba(0,0,0,0.04)] sm:aspect-16/9">
               <img
                 src={getCampaignCoverImage(demo.key)}
                 alt={demo.title}
                 className="h-full w-full object-cover"
               />
-              <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-zinc-950/80 px-3 py-1 font-mono text-[11px] font-bold text-white backdrop-blur-md">
-                  {demo.categoryBadge}
-                </span>
-                <span className="flex items-center gap-1.5 rounded-full bg-t-blue/90 px-3 py-1 font-mono text-[11px] font-bold text-white shadow-xs backdrop-blur-md">
-                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 animate-pulse" />
-                  {demo.key === 'treetino-v1'
-                    ? '42.8 kW Cerbo GX Live'
-                    : `${(demo.currentPower.solarYieldWatts / 1000).toFixed(1)} kW Live`}
-                </span>
-              </div>
-              <div className="absolute bottom-4 left-4 rounded-xl bg-zinc-950/80 px-3.5 py-1.5 font-mono text-xs text-white backdrop-blur-md">
+              <div className="absolute bottom-4 left-4 rounded-2xl border border-white/10 bg-zinc-950/80 px-4 py-2 font-mono text-xs text-white backdrop-blur-md shadow-md">
                 <span>Gateway: {gatewayName}</span>
-                <span className="mx-2 text-cyan-400">·</span>
+                <span className="mx-2 text-zinc-400">·</span>
                 <span>Mode: {demo.systemInfo.systemState}</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Kickstarter Funding Box */}
-          <div className="lg:col-span-5 flex flex-col justify-between rounded-3xl border border-black/10 bg-white p-6 shadow-sm sm:p-8">
+          {/* Right Column: Funding Box */}
+          <div className="lg:col-span-5 flex flex-col justify-between rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-[0_4px_24px_rgba(0,0,0,0.04)] sm:p-8">
             <div className="space-y-6">
-              {/* Progress bar */}
+              {/* Progress bar using the ONE signature gradient */}
               <div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
                   <div
-                    className="h-full bg-linear-to-r from-t-blue to-t-accent rounded-full transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-[#183d89] to-[#2563eb] rounded-full transition-all duration-500"
                     style={{
                       width: `${Math.min(demo.financials.fundedPercent, 100)}%`,
                     }}
                   />
                 </div>
-                <div className="mt-2 flex items-baseline justify-between font-mono text-xs">
-                  <span className="font-bold text-t-blue">
+                <div className="mt-2.5 flex items-baseline justify-between font-mono text-xs">
+                  <span className="font-semibold text-[#183d89]">
                     {demo.financials.fundedPercent}% funded
                   </span>
                   <span className="text-zinc-500">
-                    $
+                    €
                     {(
                       demo.financials.targetUsdc - demo.financials.fundedUsdc
                     ).toLocaleString()}{' '}
@@ -219,35 +273,35 @@ export function VictronAssetPage({
               {/* Big Metrics */}
               <div className="space-y-4">
                 <div>
-                  <span className="font-mono text-3xl font-black text-zinc-950 sm:text-4xl">
-                    ${demo.financials.fundedUsdc.toLocaleString()}
+                  <span className="font-mono text-3xl font-semibold text-zinc-950 sm:text-4xl tracking-tight">
+                    €{demo.financials.fundedUsdc.toLocaleString()}
                   </span>
-                  <span className="ml-1.5 text-xs text-zinc-500">
-                    pledged of ${demo.financials.targetUsdc.toLocaleString()}{' '}
+                  <span className="ml-2 text-xs text-zinc-500 font-normal">
+                    pledged of €{demo.financials.targetUsdc.toLocaleString()}{' '}
                     goal
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 border-t border-black/10 pt-4">
+                <div className="grid grid-cols-2 gap-4 border-t border-zinc-200/80 pt-4">
                   <div>
-                    <span className="font-mono text-2xl font-black text-t-blue">
+                    <span className="font-mono text-2xl font-semibold text-[#183d89]">
                       {demo.financials.projectedApy}%
                     </span>
-                    <span className="block text-xs text-zinc-500">
+                    <span className="block text-xs text-zinc-500 font-normal">
                       projected yield (APY)
                     </span>
                   </div>
                   <div>
-                    <span className="font-mono text-2xl font-black text-zinc-950">
+                    <span className="font-mono text-2xl font-semibold text-zinc-950">
                       {meta.daysLeft}
                     </span>
-                    <span className="block text-xs text-zinc-500">
+                    <span className="block text-xs text-zinc-500 font-normal">
                       days to go
                     </span>
                   </div>
                 </div>
 
-                <div className="border-t border-black/10 pt-3 flex items-center justify-between text-xs text-zinc-600">
+                <div className="border-t border-zinc-200/80 pt-3 flex items-center justify-between text-xs text-zinc-600">
                   <span>Active Backers:</span>
                   <strong className="font-mono text-zinc-950">
                     {meta.backers} backers
@@ -255,25 +309,28 @@ export function VictronAssetPage({
                 </div>
                 <div className="flex items-center justify-between text-xs text-zinc-600">
                   <span>Contracted PPA Tariff:</span>
-                  <strong className="font-mono text-t-blue">
+                  <strong className="font-mono text-[#183d89]">
                     {demo.financials.tariffRate}
                   </strong>
                 </div>
               </div>
 
               {/* Escrow Badge */}
-              <div className="rounded-xl border border-t-blue/20 bg-t-blue/5 p-3.5 text-xs text-zinc-800 flex items-start gap-2.5">
-                <ShieldCheckIcon className="h-4 w-4 text-t-blue shrink-0 mt-0.5" />
-                <p className="leading-snug">
-                  <strong>Hardware Escrow Guarantee:</strong> Backing funds are
-                  held in programmatic escrow on Solana and released only
-                  against cryptographically verified on-site Cerbo GX telemetry.
+              <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4 text-xs text-zinc-800 flex items-start gap-3">
+                <ShieldCheckIcon className="h-4 w-4 text-[#183d89] shrink-0 mt-0.5" />
+                <p className="leading-snug text-zinc-700">
+                  <strong className="font-semibold text-zinc-900">
+                    Hardware Escrow Guarantee:
+                  </strong>{' '}
+                  Backing funds are held in programmatic escrow on Solana and
+                  released only against cryptographically verified on-site Cerbo
+                  GX telemetry.
                 </p>
               </div>
             </div>
 
             {/* Back CTA Button */}
-            <div className="mt-6 pt-4 border-t border-black/10 space-y-2.5">
+            <div className="mt-6 pt-5 border-t border-zinc-200/80 space-y-2.5">
               {projectDossier && (
                 <a
                   href={projectDossier.downloadPdfPath}
@@ -282,10 +339,10 @@ export function VictronAssetPage({
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-600/30 bg-emerald-50 hover:bg-emerald-100 px-4 py-3 text-xs font-bold text-emerald-900 transition shadow-2xs cursor-pointer group"
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-zinc-200/80 bg-zinc-50 hover:bg-zinc-100 px-4 py-3 text-xs font-semibold text-zinc-900 transition shadow-xs cursor-pointer group"
                 >
                   <svg
-                    className="h-4 w-4 text-emerald-700 group-hover:translate-y-0.5 transition"
+                    className="h-4 w-4 text-zinc-700 group-hover:translate-y-0.5 transition"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -309,9 +366,9 @@ export function VictronAssetPage({
                     setActiveTab('money');
                   }
                 }}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-t-blue hover:bg-t-blue/90 px-6 py-4 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] cursor-pointer"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#183d89] to-[#2563eb] hover:from-[#1d4bb5] hover:to-[#3b82f6] px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] cursor-pointer"
               >
-                <span>Back this project with mockUSDC</span>
+                <span>Back this project with EURTree</span>
                 <ArrowRightIcon className="h-4 w-4" />
               </button>
             </div>
@@ -319,85 +376,115 @@ export function VictronAssetPage({
         </div>
       </div>
 
-      {/* 3. SECTION TABS */}
-      <div className="flex flex-wrap border-b border-black/10 text-xs font-semibold">
-        <button
-          type="button"
-          onClick={() => setActiveTab('story')}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3.5 transition cursor-pointer ${
-            activeTab === 'story'
-              ? 'border-t-blue text-t-blue bg-t-blue/5'
-              : 'border-transparent text-zinc-500 hover:text-zinc-950'
-          }`}
-        >
-          <span>Investor Dossier & Financial Model</span>
-        </button>
-
+      {/* 3. SECTION TABS (4 Clean, Purposeful Sections) */}
+      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl border border-zinc-200/80 bg-zinc-100/70 text-xs font-medium overflow-x-auto scrollbar-none">
         <button
           type="button"
           onClick={() => setActiveTab('topology')}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3.5 transition cursor-pointer ${
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 transition cursor-pointer shrink-0 ${
             activeTab === 'topology'
-              ? 'border-t-blue text-t-blue bg-t-blue/5'
-              : 'border-transparent text-zinc-500 hover:text-zinc-950'
+              ? 'bg-white text-zinc-950 font-semibold shadow-xs'
+              : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/50'
           }`}
         >
-          <BoltIcon className="h-4 w-4" />
-          Real Hardware Power Flow
+          <BoltIcon className="h-3.5 w-3.5 text-[#183d89]" />
+          <span>Live Power & SCADA</span>
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveTab('chart')}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3.5 transition cursor-pointer ${
-            activeTab === 'chart'
-              ? 'border-t-blue text-t-blue bg-t-blue/5'
-              : 'border-transparent text-zinc-500 hover:text-zinc-950'
+          onClick={() => setActiveTab('portu')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 transition cursor-pointer shrink-0 ${
+            activeTab === 'portu'
+              ? 'bg-white text-[#183d89] font-semibold shadow-xs'
+              : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/50'
           }`}
         >
-          24-Hour Energy Data
+          <TrendUpIcon className="h-3.5 w-3.5 text-[#183d89]" />
+          <span>Yield Projections & Compounding</span>
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveTab('money')}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3.5 transition cursor-pointer ${
-            activeTab === 'money'
-              ? 'border-t-blue text-t-blue bg-t-blue/5 font-bold'
-              : 'border-transparent text-zinc-500 hover:text-zinc-950'
+          onClick={() => setActiveTab('story')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 transition cursor-pointer shrink-0 ${
+            activeTab === 'story'
+              ? 'bg-white text-zinc-950 font-semibold shadow-xs'
+              : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/50'
           }`}
         >
-          <TrendUpIcon className="h-4 w-4" />
-          Back Project & Yield Share
+          <span>Investor Prospectus & Contracts</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('hardware')}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3.5 transition cursor-pointer ${
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 transition cursor-pointer shrink-0 ${
             activeTab === 'hardware'
-              ? 'border-t-blue text-t-blue bg-t-blue/5'
-              : 'border-transparent text-zinc-500 hover:text-zinc-950'
+              ? 'bg-white text-zinc-950 font-semibold shadow-xs'
+              : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/50'
           }`}
         >
-          Physical Devices ({demo.devices.length})
+          <span>Physical Devices ({demo.devices.length})</span>
         </button>
       </div>
 
       {/* 4. ACTIVE TAB CONTENT */}
-      {/* TAB 0: INVESTOR DOSSIER & FINANCIAL MODEL */}
-      {activeTab === 'story' && (
-        <ProjectInvestorDossier dossier={projectDossier} />
-      )}
-
-      {/* TAB 1: TOPOLOGY POWER FLOW */}
+      {/* TAB 1: TOPOLOGY POWER FLOW (Default) */}
       {activeTab === 'topology' && (
-        <div className="space-y-6">
-          {/* Distinct Hardware Layout based on site key */}
-          {demo.key === 'treetino-v1' && <TreetinoLayout demo={demo} />}
-          {demo.key === 'offgrid' && <OffgridLayout demo={demo} />}
-          {demo.key === 'ess' && <EssLayout demo={demo} />}
-          {demo.key === 'ev' && <EvLayout demo={demo} />}
+        <div className="space-y-8">
+          {/* Distinct Hardware Layout based on site key (WATTINO hBESS, ČEZ Distribuce, ČEPS dispatch, Samsung SDI EU, Cerbo-S GX Venus OS) */}
+          {demo.key === 'treetino-v1' && (
+            <TreetinoLayout
+              demo={demo}
+              holding={investments[demo.siteId]}
+              onClaim={handleClaimTicker}
+              isClaiming={claimingSiteId === demo.siteId}
+              claimSuccessText={claimSuccessText}
+              claimErrorText={claimErrorText}
+              onBackProject={() => onBackProject?.(demo)}
+            />
+          )}
+          {demo.key === 'offgrid' && (
+            <OffgridLayout
+              demo={demo}
+              holding={investments[demo.siteId]}
+              onClaim={handleClaimTicker}
+              isClaiming={claimingSiteId === demo.siteId}
+              claimSuccessText={claimSuccessText}
+              claimErrorText={claimErrorText}
+              onBackProject={() => onBackProject?.(demo)}
+            />
+          )}
+          {demo.key === 'ess' && (
+            <EssLayout
+              demo={demo}
+              holding={investments[demo.siteId]}
+              onClaim={handleClaimTicker}
+              isClaiming={claimingSiteId === demo.siteId}
+              claimSuccessText={claimSuccessText}
+              claimErrorText={claimErrorText}
+              onBackProject={() => onBackProject?.(demo)}
+            />
+          )}
+          {demo.key === 'ev' && (
+            <EvLayout
+              demo={demo}
+              holding={investments[demo.siteId]}
+              onClaim={handleClaimTicker}
+              isClaiming={claimingSiteId === demo.siteId}
+              claimSuccessText={claimSuccessText}
+              claimErrorText={claimErrorText}
+              onBackProject={() => onBackProject?.(demo)}
+            />
+          )}
+
+          {/* Portu-inspired Compounding DePIN Yield Projection Model */}
+          <CompoundingYieldCalculator
+            initialApy={demo.financials.projectedApy}
+            assetTitle={demo.title}
+            onBackProject={() => onBackProject?.(demo)}
+          />
 
           {/* 24-Hour Energy Data Chart integrated directly underneath */}
           <VictronEnergyChart
@@ -406,6 +493,22 @@ export function VictronAssetPage({
             isEv={demo.key === 'ev'}
           />
         </div>
+      )}
+
+      {/* TAB 2: PORTU COMPOUNDING MODEL */}
+      {activeTab === 'portu' && (
+        <div className="space-y-6">
+          <CompoundingYieldCalculator
+            initialApy={demo.financials.projectedApy}
+            assetTitle={demo.title}
+            onBackProject={() => onBackProject?.(demo)}
+          />
+        </div>
+      )}
+
+      {/* TAB 3: INVESTOR DOSSIER & FINANCIAL MODEL */}
+      {activeTab === 'story' && (
+        <ProjectInvestorDossier dossier={projectDossier} />
       )}
 
       {/* TAB 2: 24-HOUR ENERGY DATA HISTORY */}
@@ -429,13 +532,13 @@ export function VictronAssetPage({
 
       {/* TAB 4: PHYSICAL HARDWARE DEVICES */}
       {activeTab === 'hardware' && (
-        <div className="rounded-3xl border border-black/10 bg-white p-6 sm:p-8 shadow-xs">
-          <div className="border-b border-black/10 pb-4">
-            <h3 className="text-xl font-bold text-zinc-950">
+        <div className="rounded-3xl border border-zinc-200/80 bg-white p-6 sm:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
+          <div className="border-b border-zinc-200/80 pb-5">
+            <h3 className="text-xl font-semibold text-zinc-950">
               Venus OS D-Bus Connected Hardware ({demo.devices.length} Physical
               Components)
             </h3>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-zinc-500 font-normal">
               Verified physical devices communicating via VE.Can, VE.Direct, and
               Modbus TCP with the Cerbo GX gateway.
             </p>
@@ -445,19 +548,19 @@ export function VictronAssetPage({
             {demo.devices.map((device, idx) => (
               <div
                 key={idx}
-                className="flex flex-col justify-between rounded-2xl border border-black/10 bg-zinc-50/70 p-4 text-xs shadow-2xs"
+                className="flex flex-col justify-between rounded-2xl border border-zinc-200/80 bg-zinc-50/60 p-4 text-xs shadow-xs hover:border-zinc-300 hover:bg-white transition-all"
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] text-zinc-400 uppercase font-bold">
+                    <span className="font-mono text-[10px] text-zinc-400 uppercase font-semibold">
                       {device.name}
                     </span>
-                    <span className="flex items-center gap-1 text-emerald-700 font-bold text-[10px]">
+                    <span className="flex items-center gap-1 text-[#183d89] font-semibold text-[10px]">
                       <CheckIcon className="h-3 w-3" />
                       Online
                     </span>
                   </div>
-                  <h4 className="mt-2 font-bold text-zinc-950 text-sm">
+                  <h4 className="mt-2 font-semibold text-zinc-950 text-sm">
                     {device.modelName}
                   </h4>
                   <p className="mt-0.5 text-zinc-500 text-xs">
@@ -466,7 +569,7 @@ export function VictronAssetPage({
                 </div>
 
                 {device.firmwareVersion && (
-                  <div className="mt-3 border-t border-black/5 pt-2 font-mono text-[11px] text-zinc-400">
+                  <div className="mt-3 border-t border-zinc-200/60 pt-2 font-mono text-[11px] text-zinc-400">
                     Firmware: {device.firmwareVersion}
                   </div>
                 )}
@@ -475,6 +578,28 @@ export function VictronAssetPage({
           </div>
         </div>
       )}
+
+      {/* Mobile Sticky Backing Bar */}
+      <div className="fixed bottom-16 sm:bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200/80 p-3 sm:hidden shadow-lg">
+        <div className="flex items-center justify-between gap-3 max-w-md mx-auto">
+          <div>
+            <div className="font-mono text-xs font-bold text-emerald-600">
+              +{demo.financials.projectedApy}% APY
+            </div>
+            <div className="font-mono text-[10px] text-zinc-500">
+              {demo.financials.fundedPercent}% funded · Min €50
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onBackProject?.(demo)}
+            className="flex items-center gap-1.5 rounded-full bg-[#183d89] hover:bg-[#2052b0] active:scale-95 text-white px-5 py-2.5 font-mono text-xs font-bold shadow-md cursor-pointer"
+          >
+            <span>Back Project</span>
+            <ArrowRightIcon className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

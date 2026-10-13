@@ -18,7 +18,7 @@ export function FundingBar({
           <strong className="text-zinc-950 font-bold">
             {formatTokenAmount(raised)}
           </strong>{' '}
-          / {formatTokenAmount(target)} mockUSDC
+          / {formatTokenAmount(target)} EURTree
         </span>
         <span className="font-bold text-t-blue">{percent}% funded</span>
       </div>

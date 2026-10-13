@@ -39,6 +39,14 @@ export function usePublicTransactions(wallet: ConnectedWallet | null) {
         queryClient.invalidateQueries({
           queryKey: [
             'wallet',
+            'eurTree',
+            connection.rpcEndpoint,
+            wallet?.address,
+          ],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [
+            'wallet',
             'mockUsdc',
             connection.rpcEndpoint,
             wallet?.address,

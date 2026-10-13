@@ -76,7 +76,7 @@ export function TreeCard({ tree }: { tree: IndexedTree }) {
           <dt className="text-zinc-500">Funding</dt>
           <dd>
             {formatTokenAmount(tree.raised)} / {formatTokenAmount(tree.target)}{' '}
-            mockUSDC
+            EURTree
           </dd>
         </div>
         <div>

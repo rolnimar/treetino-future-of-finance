@@ -6,7 +6,7 @@ import { AdminAccess } from './AdminAccess';
 import { VictronAssetPage } from './features/victron/victron-asset-page';
 import { useEnrichedCampaigns } from './features/victron/use-enriched-campaigns';
 import { useConnectedWallet } from './features/wallet/use-connected-wallet';
-import { useMockUsdc } from './features/marketplace/hooks/use-mock-usdc';
+import { useEurTree } from './features/marketplace/hooks/use-mock-usdc';
 import { usePublicTransactions } from './features/marketplace/hooks/use-public-transactions';
 import { formatTokenAmount } from './chain/amounts';
 import { InvestorPortfolio } from './features/investor/investor-portfolio';
@@ -15,10 +15,10 @@ import { TreetinoHeader } from './components/TreetinoHeader';
 import { TreetinoFooter } from './components/TreetinoFooter';
 import { TreetinoHeroCinematic } from './components/TreetinoHeroCinematic';
 import { TreetinoBlueprintBanner } from './components/TreetinoBlueprintBanner';
-import { TreetinoHardwareShowcase } from './components/TreetinoHardwareShowcase';
 import { DepositModal } from './features/fintech/DepositModal';
 import { BackProjectModal } from './features/fintech/BackProjectModal';
 import { PitchDeck } from './features/pitch/pitch-deck';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import type { VictronDemoItem } from './features/victron/victron-types';
 
 const Marketplace = lazy(() =>
@@ -58,7 +58,7 @@ export function App() {
   });
 
   const wallet = useConnectedWallet();
-  const balance = useMockUsdc(wallet?.address);
+  const balance = useEurTree(wallet?.address);
   const publicTransactions = usePublicTransactions(wallet);
   const formattedBalance = balance.data
     ? formatTokenAmount(balance.data.balance)
@@ -104,6 +104,7 @@ export function App() {
         else if (hash === '#admin') setCurrentView('admin');
         else setCurrentView('explore');
       }
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     };
 
     window.addEventListener('hashchange', handleRouteSync);
@@ -125,10 +126,10 @@ export function App() {
         window.history.pushState(null, '', '/');
       }
       window.location.hash = '';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     } else {
       window.location.hash = view;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
   };
 
@@ -172,7 +173,7 @@ export function App() {
   }
 
   return (
-    <div className="treetino-app-shell min-h-screen flex flex-col bg-[#fdfdfd] text-zinc-900 selection:bg-[#183d89] selection:text-white">
+    <div className="treetino-app-shell min-h-screen flex flex-col bg-[#fcfcfd] text-zinc-900 selection:bg-[#183d89] selection:text-white">
       {/* Floating Modern Translucent Pill Header */}
       <TreetinoHeader
         currentView={currentView}
@@ -194,10 +195,10 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full pb-20 md:pb-0">
         {/* VIEW 1: DEDICATED FRESH PAGE VIEW IF AN ASSET IS SELECTED */}
         {selectedSiteId !== null ? (
-          <div className="mx-auto flex w-full max-w-7xl flex-col px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-24">
+          <div className="mx-auto flex w-full max-w-7xl flex-col px-3 sm:px-6 lg:px-8 pt-16 md:pt-32 pb-24">
             {selectedDemo ? (
               <VictronAssetPage
                 demo={selectedDemo}
@@ -221,7 +222,7 @@ export function App() {
           </div>
         ) : currentView === 'portfolio' ? (
           /* VIEW 2: INVESTOR PORTFOLIO DASHBOARD */
-          <div className="mx-auto flex w-full max-w-7xl flex-col px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-24">
+          <div className="mx-auto flex w-full max-w-7xl flex-col px-3 sm:px-6 lg:px-8 pt-16 md:pt-32 pb-24">
             <InvestorPortfolio
               onSelectAsset={(id) => {
                 window.location.hash = `asset/${id}`;
@@ -234,7 +235,7 @@ export function App() {
           </div>
         ) : currentView === 'client' ? (
           /* VIEW 3: CLIENT BILLING WORKSPACE */
-          <div className="mx-auto flex w-full max-w-7xl flex-col px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-24">
+          <div className="mx-auto flex w-full max-w-7xl flex-col px-3 sm:px-6 lg:px-8 pt-16 md:pt-32 pb-24">
             <Suspense
               fallback={
                 <div className="py-24 text-center">
@@ -250,38 +251,41 @@ export function App() {
           </div>
         ) : currentView === 'admin' ? (
           /* VIEW 4: ADMIN PROTOCOL WORKSPACE */
-          <div className="mx-auto flex w-full max-w-7xl flex-col px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-24">
+          <div className="mx-auto flex w-full max-w-7xl flex-col px-3 sm:px-6 lg:px-8 pt-16 md:pt-32 pb-24">
             <AdminAccess />
           </div>
         ) : (
           /* VIEW 5: KICKSTARTER RWA PLATFORM CROWDFUNDING ARCHITECTURE */
           <>
-            {/* 1. Featured Crowdfunding Campaign Spotlight Hero */}
-            <TreetinoHeroCinematic
-              onSelectAsset={(id) => {
-                window.location.hash = `asset/${id}`;
-                setSelectedSiteId(id);
-              }}
-              onBackProject={(siteId) => {
-                const target = demos.find((d) => d.siteId === siteId);
-                if (target) {
-                  setBackingModalDemo(target);
-                } else {
-                  window.location.hash = `asset/${siteId}`;
-                  setSelectedSiteId(siteId);
-                }
-              }}
-              onExploreCampaigns={() => {
-                document
-                  .getElementById('campaigns')
-                  ?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            />
+            {/* 1. Featured Crowdfunding Campaign Spotlight Hero (Desktop only) */}
+            <div className="hidden md:block">
+              <TreetinoHeroCinematic
+                onSelectAsset={(id) => {
+                  window.location.hash = `asset/${id}`;
+                  setSelectedSiteId(id);
+                }}
+                onBackProject={(siteId) => {
+                  const target = demos.find((d) => d.siteId === siteId);
+                  if (target) {
+                    setBackingModalDemo(target);
+                  } else {
+                    window.location.hash = `asset/${siteId}`;
+                    setSelectedSiteId(siteId);
+                  }
+                }}
+                onExploreCampaigns={() => {
+                  const el =
+                    document.getElementById('kickstarter-campaigns') ??
+                    document.getElementById('campaigns');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              />
+            </div>
 
-            {/* 3. Kickstarter Campaigns Directory & Crowdfunding Discovery */}
+            {/* 2. Kickstarter Campaigns Directory & Crowdfunding Discovery */}
             <section
-              id="campaigns"
-              className="bg-[#fafafb] py-20 sm:py-28 lg:py-32 border-b border-black/5"
+              id="marketplace-section"
+              className="bg-[#fafafb] pt-14 pb-16 md:py-20 sm:py-28 lg:py-32 border-b border-zinc-200/80"
             >
               <div className="mx-auto flex w-full max-w-7xl flex-col px-4 sm:px-6 lg:px-8">
                 <Suspense
@@ -307,29 +311,13 @@ export function App() {
               </div>
             </section>
 
-            {/* 3. Physical Hardware 3D Showcase & Specifications */}
-            <TreetinoHardwareShowcase
-              onSelectAsset={(id) => {
-                window.location.hash = `asset/${id}`;
-                setSelectedSiteId(id);
-              }}
-              onBackProject={(siteId) => {
-                const target = demos.find((d) => d.siteId === siteId);
-                if (target) {
-                  setBackingModalDemo(target);
-                } else {
-                  window.location.hash = `asset/${siteId}`;
-                  setSelectedSiteId(siteId);
-                }
-              }}
-            />
-
-            {/* 4. How RWA Tokenization Works & Faucet */}
+            {/* 3. How RWA Tokenization Works & Faucet */}
             <TreetinoBlueprintBanner
               onExplorePools={() => {
-                document
-                  .getElementById('campaigns')
-                  ?.scrollIntoView({ behavior: 'smooth' });
+                const el =
+                  document.getElementById('kickstarter-campaigns') ??
+                  document.getElementById('campaigns');
+                el?.scrollIntoView({ behavior: 'smooth' });
               }}
               onFaucetClick={() => setIsDepositModalOpen(true)}
               faucetPending={publicTransactions.isPending}
@@ -363,6 +351,14 @@ export function App() {
           setBackingModalDemo(null);
           handleNavigate('portfolio');
         }}
+      />
+
+      {/* Mobile Bottom Dock Navigation (Phantom / Revolut Style) */}
+      <MobileBottomNav
+        currentView={currentView}
+        selectedSiteId={selectedSiteId}
+        backedCount={backedCount}
+        onNavigate={handleNavigate}
       />
     </div>
   );

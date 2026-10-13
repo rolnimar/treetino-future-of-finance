@@ -7,7 +7,7 @@ import { treesResponseSchema, type ClientSession } from '../../lib/schemas';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { AddressLink, ErrorMessage } from '../../components/ui/feedback';
-import { useMockUsdc } from '../marketplace/hooks/use-mock-usdc';
+import { useEurTree } from '../marketplace/hooks/use-mock-usdc';
 import { usePublicTransactions } from '../marketplace/hooks/use-public-transactions';
 import { TreeInvoices } from '../marketplace/components/tree-invoices';
 
@@ -20,7 +20,7 @@ export function ClientWorkspace({
   wallet: ConnectedWallet;
 }) {
   const [page, setPage] = useState(0);
-  const balance = useMockUsdc(wallet.address);
+  const balance = useEurTree(wallet.address);
   const transaction = usePublicTransactions(wallet);
   const query = useQuery({
     queryKey: ['client', wallet.address, session.accessToken, 'trees', page],
@@ -41,7 +41,7 @@ export function ClientWorkspace({
       <p className="text-sm">
         Your balance:{' '}
         {balance.data
-          ? `${formatTokenAmount(balance.data.balance)} mockUSDC`
+          ? `${formatTokenAmount(balance.data.balance)} EURTree`
           : 'Loading…'}
         . Use the demo faucet in the marketplace to top up.
       </p>

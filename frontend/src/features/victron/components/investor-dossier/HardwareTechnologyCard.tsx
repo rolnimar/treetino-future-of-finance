@@ -1,4 +1,5 @@
 import type { HardwareSpec } from '../../types/investor-dossier';
+import { CheckIcon } from '../../victron-icons';
 
 interface HardwareTechnologyCardProps {
   spec?: HardwareSpec;
@@ -154,15 +155,15 @@ export function HardwareTechnologyCard({ spec }: HardwareTechnologyCardProps) {
             <div className="space-y-2">
               {activeSpec.safetyCertifications.map((cert, cIdx) => (
                 <div key={cIdx} className="flex items-start gap-2 text-xs">
-                  <span className="text-emerald-600 font-bold mt-0.5">✓</span>
+                  <CheckIcon className="h-3.5 w-3.5 text-[#183d89] shrink-0 mt-0.5" />
                   <span className="text-zinc-800 font-mono">{cert}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-xl border border-emerald-500/20 bg-emerald-50/50 p-4 space-y-1.5">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+          <div className="rounded-xl border border-blue-200/80 bg-blue-50/60 p-4 space-y-1.5">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#183d89]">
               Warranty & Availability SLA
             </span>
             <p className="text-xs text-zinc-700 leading-relaxed">

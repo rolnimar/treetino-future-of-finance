@@ -110,44 +110,25 @@ export const PITCH_SLIDES: PitchSlide[] = [
     number: 4,
     timeRange: '1:15 - 1:40',
     category: 'financials',
-    title: '8.6 MW Battery Opportunity',
-    subtitle: 'BESS Přeštice: €1.02M–€1.48M Net EBITDA with 2.95-Year Payback',
-    script:
-      'And our pipeline immediately scales from sculptural trees into utility-grade storage:\n\n(Lock eyes with the lead investor)\n\nThis is BESS Přeštice—our flagship eight-point-six megawatt utility storage facility with interconnection contracts already signed with ČEZ Distribuce.\n\nIt generates over one million euros in net annual EBITDA by balancing the national grid for ČEPS and capturing negative-price spot power arbitrage.\n\nThe payback? Two-point-nine-five years. A project IRR over thirty percent. That proves clean energy RWAs generate returns that blow Wall Street out of the water.',
-    presenterNotes: [
-      'Bridge directly from Treetino V1 to utility scale: "Our pipeline immediately scales into utility-grade storage."',
-      'Cite hard verified metrics: 8.6 MW signed ČEZ connection contracts (Agreements 4122602318 & 4122623464).',
-      'Explain the dual engine: ČEPS grid balancing fees + negative-price spot power arbitrage.',
-      'Hit the punchlines: 2.95-year payback, 21.8%–31.5% project IRR.',
-      'Deliver the comparative punchline with confidence: "That blows Wall Street out of the water."',
-    ],
-    keyTakeaway:
-      'BESS Přeštice delivers institutional-grade €1.02M–€1.48M EBITDA with 2.95y payback and 21%+ IRR.',
-  },
-  {
-    id: 'victron-integration',
-    number: 5,
-    timeRange: '1:40 - 2:05',
-    category: 'victron',
-    title: 'Live Victron SCADA Integration',
+    title: 'Utility Battery Storage',
     subtitle:
-      'Industrial Cerbo-S GX Gateway Running Venus OS D-Bus and Cryptographic On-Chain Telemetry',
+      'Europe’s Volatility Engine: <3Y Payback, 25%–35% IRR, €1M–€1.5M EBITDA',
     script:
-      'How does physical hardware actually talk to Web3?\n\n(Point to the central node on the diagram)\n\nLook at this topology—this is our live operational architecture running across both our trees and our utility batteries.\n\nAt the edge, we deploy industrial Victron Cerbo-S GX controllers running Venus OS on an internal D-Bus. Over Modbus TCP, CAN bus, and RS-485, the controller polls inverters and battery racks in real time.\n\nWhen the national grid operator ČEPS demands frequency containment, our automated system responds in under ten milliseconds.\n\nEvery single day, the Victron gateway cryptographically signs ninety-six telemetry snapshots and commits them directly to Solana. Every kilowatt-hour you see on your screen is physically measured, hardware-signed, and mathematically immutable.',
+      'However a design energy producing tree is not the most interesting financial product in the market. But we can use the experience learned from it in some of the most lucrative business opportunities available in Europe right now.\n\n(Lean in, speak with fast authority)\n\nUtility battery storage is the single most lucrative cash-flow engine in European infrastructure.\n\nWhy? Renewable volatility has broken the grid. Midday solar drives power prices into negative territory, followed by extreme evening price spikes.\n\nBatteries capture dual revenue streams: grid operators like ČEPS pay 24/7 capacity fees just for standby frequency balancing, and we get paid to charge when power prices are negative, dumping power at peak spreads.\n\nThe numbers are unmatched:\nAn 8 to 10 megawatt battery generates over one to one-point-five million euros in clean net EBITDA every year.\nThe capital payback? Two-point-nine-five years.\nProject IRR is over thirty percent.\n\nOur flagship site—BESS Přeštice—has already secured its 8.6 megawatt interconnection with ČEZ Distribuce. Treetino tokenizes these institutional cash flows so anyone can co-own this yield on Solana.',
     presenterNotes: [
-      'Direct attention to the interactive circuit graph on screen.',
-      'Explain the physical edge stack: Cerbo-S GX hardware running Venus OS on internal D-Bus.',
-      'Industrial protocols: Modbus TCP, CAN bus, and RS-485 communicating across inverters and battery racks.',
-      'Highlight grid-speed execution: Under 10 ms response time for ČEPS FCR and aFRR.',
-      'Cryptographic trust: 96 signed hardware readings per day broadcast directly to Solana.',
+      'Deliver exact opener: "However a design energy producing tree is not the most interesting financial product in the market. But we can use the experience learned from it in some of the most lucrative business opportunities available in Europe right now."',
+      'Explain the macro opportunity: Renewable volatility creates negative power prices midday and massive evening spreads.',
+      'Highlight dual revenue streams: 24/7 grid balancing standby fees (ČEPS) + negative spot arbitrage.',
+      'Drop the hard numbers fast: €1.0M–€1.5M net annual EBITDA, <3 year payback, 25%–35% project IRR.',
+      'Anchor to pipeline: Signed 8.6 MW ČEZ interconnection in Přeštice.',
     ],
     keyTakeaway:
-      'Industrial Victron Cerbo hardware running Venus OS bridges heavy grid assets directly to Solana with cryptographic signatures.',
+      'Utility battery storage delivers institutional-grade €1.0M–€1.5M EBITDA with 2.95y payback and 25%–35% IRR.',
   },
   {
     id: 'defi-financial-engine',
-    number: 6,
-    timeRange: '2:05 - 2:35',
+    number: 5,
+    timeRange: '1:40 - 2:05',
     category: 'defi',
     title: 'Multi-Layer Financial Engine',
     subtitle:
@@ -163,6 +144,26 @@ export const PITCH_SLIDES: PitchSlide[] = [
     ],
     keyTakeaway:
       'Base 9%–21% clean energy yields are secured by host Marinade SOL collateral and compounded via Kamino USDC pools.',
+  },
+  {
+    id: 'victron-integration',
+    number: 6,
+    timeRange: '2:05 - 2:35',
+    category: 'victron',
+    title: 'Live Victron SCADA Integration',
+    subtitle:
+      'Industrial Cerbo-S GX Gateway Running Venus OS D-Bus and Cryptographic On-Chain Telemetry',
+    script:
+      'How does physical hardware actually talk to Web3?\n\n(Point to the central node on the diagram)\n\nLook at this topology—this is our live operational architecture running across both our trees and our utility batteries.\n\nAt the edge, we deploy industrial Victron Cerbo-S GX controllers running Venus OS on an internal D-Bus. Over Modbus TCP, CAN bus, and RS-485, the controller polls inverters and battery racks in real time.\n\nWhen the national grid operator ČEPS demands frequency containment, our automated system responds in under ten milliseconds.\n\nEvery single day, the Victron gateway cryptographically signs ninety-six telemetry snapshots and commits them directly to Solana. Every kilowatt-hour you see on your screen is physically measured, hardware-signed, and mathematically immutable.',
+    presenterNotes: [
+      'Direct attention to the interactive circuit graph on screen.',
+      'Explain the physical edge stack: Cerbo-S GX hardware running Venus OS on internal D-Bus.',
+      'Industrial protocols: Modbus TCP, CAN bus, and RS-485 communicating across inverters and battery racks.',
+      'Highlight grid-speed execution: Under 10 ms response time for ČEPS FCR and aFRR.',
+      'Cryptographic trust: 96 signed hardware readings per day broadcast directly to Solana.',
+    ],
+    keyTakeaway:
+      'Industrial Victron Cerbo hardware running Venus OS bridges heavy grid assets directly to Solana with cryptographic signatures.',
   },
   {
     id: 'vision-round',

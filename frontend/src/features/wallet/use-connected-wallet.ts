@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import type { ConnectedWallet } from '../../chain/wallet';
+import { getActivePersona, getPersonaConnectedWallet } from './demo-personas';
 
-export function useConnectedWallet() {
+export function useConnectedWallet(): ConnectedWallet | null {
   const {
     connected,
     publicKey,
@@ -10,16 +11,41 @@ export function useConnectedWallet() {
     signTransaction,
     sendTransaction,
   } = useWallet();
-  return useMemo<ConnectedWallet | null>(
-    () =>
-      connected && publicKey
-        ? {
-            address: publicKey.toBase58(),
-            signMessage,
-            signTransaction,
-            sendTransaction,
-          }
-        : null,
-    [connected, publicKey, signMessage, signTransaction, sendTransaction],
-  );
+
+  const [persona, setPersona] = useState(() => getActivePersona());
+
+  useEffect(() => {
+    const handlePersonaChange = () => {
+      setPersona(getActivePersona());
+    };
+    window.addEventListener('treetino-persona-changed', handlePersonaChange);
+    return () => {
+      window.removeEventListener(
+        'treetino-persona-changed',
+        handlePersonaChange,
+      );
+    };
+  }, []);
+
+  return useMemo<ConnectedWallet | null>(() => {
+    if (connected && publicKey) {
+      return {
+        address: publicKey.toBase58(),
+        signMessage,
+        signTransaction,
+        sendTransaction,
+      };
+    }
+    if (persona) {
+      return getPersonaConnectedWallet(persona);
+    }
+    return null;
+  }, [
+    persona,
+    connected,
+    publicKey,
+    signMessage,
+    signTransaction,
+    sendTransaction,
+  ]);
 }

@@ -10,8 +10,8 @@ describe('Investor Pitch Deck & 3-Minute Presentation Specification', () => {
       'why-solana',
       'hardware-gateway',
       'financial-engine',
-      'victron-integration',
       'defi-financial-engine',
+      'victron-integration',
       'vision-round',
     ]);
   });
@@ -75,28 +75,28 @@ describe('Investor Pitch Deck & 3-Minute Presentation Specification', () => {
     expect(slide4.script).toContain('Two-point-nine-five years');
   });
 
-  it('covers the live Victron SCADA integration and edge telemetry on Slide 5', () => {
+  it('covers additional financial tools, Marinade SOL collateral, and Kamino USDC earning pool on Slide 5', () => {
     const slide5 = PITCH_SLIDES[4];
-    expect(slide5.id).toBe('victron-integration');
+    expect(slide5.id).toBe('defi-financial-engine');
     expect(slide5.number).toBe(5);
     expect(slide5.timeRange).toBe('1:40 - 2:05');
-    expect(slide5.script).toContain('Victron Cerbo');
-    expect(slide5.script).toContain('Venus OS');
-    expect(slide5.script).toContain('Modbus TCP');
-    expect(slide5.script).toContain('ČEPS');
-    expect(slide5.script).toContain('ninety-six');
+    expect(slide5.script).toContain('Nine to twenty-one percent');
+    expect(slide5.script).toContain('Marinade SOL');
+    expect(slide5.script).toContain('Kamino');
+    expect(slide5.script).toContain('RockawayX');
+    expect(slide5.script).toContain('zero-capex');
   });
 
-  it('covers additional financial tools, Marinade SOL collateral, and Kamino USDC earning pool on Slide 6', () => {
+  it('covers the live Victron SCADA integration and edge telemetry on Slide 6', () => {
     const slide6 = PITCH_SLIDES[5];
-    expect(slide6.id).toBe('defi-financial-engine');
+    expect(slide6.id).toBe('victron-integration');
     expect(slide6.number).toBe(6);
     expect(slide6.timeRange).toBe('2:05 - 2:35');
-    expect(slide6.script).toContain('Nine to twenty-one percent');
-    expect(slide6.script).toContain('Marinade SOL');
-    expect(slide6.script).toContain('Kamino');
-    expect(slide6.script).toContain('RockawayX');
-    expect(slide6.script).toContain('zero-capex');
+    expect(slide6.script).toContain('Victron Cerbo');
+    expect(slide6.script).toContain('Venus OS');
+    expect(slide6.script).toContain('Modbus TCP');
+    expect(slide6.script).toContain('ČEPS');
+    expect(slide6.script).toContain('ninety-six');
   });
 
   it('closes on the $3 trillion hook and hackathon achievements on Slide 7', () => {

@@ -17,12 +17,33 @@ import {
   SchematicCard,
   ConduitLine,
 } from '../components';
+import { MobileEnergyFlowDiagram } from '../components/MobileEnergyFlowDiagram';
 
-interface EssLayoutProps {
+import type { InvestmentRecord } from '../use-victron-investments';
+
+export interface EssLayoutProps {
   demo: VictronDemoItem;
+  holding?: InvestmentRecord;
+  onClaim?: (
+    siteId: number,
+    baseAmount: number,
+    kaminoBonus: number,
+  ) => Promise<void>;
+  isClaiming?: boolean;
+  claimSuccessText?: string | null;
+  claimErrorText?: string | null;
+  onBackProject?: () => void;
 }
 
-export function EssLayout({ demo }: EssLayoutProps) {
+export function EssLayout({
+  demo,
+  holding,
+  onClaim,
+  isClaiming,
+  claimSuccessText,
+  claimErrorText,
+  onBackProject,
+}: EssLayoutProps) {
   const [flowMode, setFlowMode] = useState<'both' | 'power' | 'funds'>('both');
 
   const { currentPower, financials } = demo;
@@ -49,7 +70,7 @@ export function EssLayout({ demo }: EssLayoutProps) {
   const solarTrend = demo.hourlyData.map((d) => d.solarKwh);
 
   return (
-    <div className="rounded-3xl border border-black/10 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+    <div className="rounded-3xl border-none md:border md:border-black/10 bg-transparent md:bg-white p-0 sm:p-8 shadow-none md:shadow-xs space-y-6">
       {/* 0. LIVE INDUSTRIAL OPERATION ALERT BANNER ("ALREADY WORKING") */}
       <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/80 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-start gap-3">
@@ -60,8 +81,8 @@ export function EssLayout({ demo }: EssLayoutProps) {
                 OPERATIONAL STATUS: FULL COMMERCIAL OPERATION · ČEPS ANCILLARY
                 BALANCING CERTIFIED
               </span>
-              <span className="rounded-full bg-emerald-200/80 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-900">
-                22 kV MV Grid Synchronized
+              <span className="font-mono text-xs font-semibold text-emerald-900">
+                · 22 kV MV Grid Synchronized
               </span>
             </div>
             <p className="mt-1 text-xs text-zinc-700">
@@ -124,12 +145,12 @@ export function EssLayout({ demo }: EssLayoutProps) {
         }}
         revenueOrSavings={{
           label: 'Gross Daily Revenue Run-Rate',
-          value: '+$3,450 / day (€3,390/day)',
+          value: '+€3,390 / day',
           subtext: 'Combined ČEPS capacity & activation + OTE intraday spread',
         }}
         investorYield={{
           apyPercent: financials.projectedApy,
-          annualDistribution: '€1.02M / yr ($1.11M / 25.6M CZK)',
+          annualDistribution: '€1.02M / yr (25.6M CZK)',
           subtext: 'Clean net EBITDA after 12% aggregator success fee & OPEX',
         }}
       />
@@ -137,20 +158,27 @@ export function EssLayout({ demo }: EssLayoutProps) {
       {/* 3. REUSABLE STREAMING YIELD TICKER */}
       <StreamingYieldTicker
         assetName="BESS Přeštice 8.6 MW"
-        stakePercent="1.00%"
-        hourlyRate="+€144 / hr ($156 / hr)"
-        baseYieldUsdc={295.4 / 24}
-        incrementPerSecond={0.0034}
+        siteId={demo.siteId}
+        holding={holding}
+        financials={financials}
+        onBackProject={onBackProject}
+        onClaim={onClaim}
+        isClaiming={isClaiming}
+        claimSuccessText={claimSuccessText}
+        claimErrorText={claimErrorText}
       />
 
-      {/* 4. SCHEMATIC CANVAS + UNCOUPLED TELEMETRY SIDEPANEL */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
+      {/* 4. HARDWARE SCHEMATIC: MOBILE NATIVE VS DESKTOP DUAL VIEW */}
+      {/* 4a. Mobile-Native Vertical Architecture (< xl) */}
+      <div className="xl:hidden">
+        <MobileEnergyFlowDiagram demo={demo} />
+      </div>
+
+      {/* 4b. Desktop Circuit Canvas + Telemetry Sidepanel (>= xl) */}
+      <div className="hidden xl:grid grid-cols-12 gap-5 items-stretch">
         {/* LEFT 9 COLS: ELECTRICAL CIRCUIT SCHEMATIC CANVAS */}
-        <div className="xl:col-span-9 overflow-x-auto rounded-3xl border border-black/10 bg-zinc-50/50 p-4 sm:p-6 flex items-center shadow-xs">
-          <svg
-            viewBox="0 0 770 570"
-            className="w-full h-auto min-w-[720px] select-none"
-          >
+        <div className="col-span-9 rounded-3xl border border-black/10 bg-zinc-50/50 p-6 shadow-xs">
+          <svg viewBox="0 0 770 570" className="w-full h-auto select-none">
             {/* CONDUIT PIPES LAYER */}
             {/* 1. AC-In Conduit: Grid drop from (130, 170) down to (130, 285) */}
             <ConduitLine
@@ -465,7 +493,7 @@ export function EssLayout({ demo }: EssLayoutProps) {
             subtext: 'Equity IRR > 35%',
           },
         ]}
-        grossRevenueTitle="€1.24M / yr ($1.35M / 30.94M CZK) Gross Annual Run-Rate (Var. A Realistic)"
+        grossRevenueTitle="€1.24M / yr (30.94M CZK) Gross Annual Run-Rate (Var. A Realistic)"
         waterfallSteps={financials.cashFlowWaterfall}
       />
     </div>

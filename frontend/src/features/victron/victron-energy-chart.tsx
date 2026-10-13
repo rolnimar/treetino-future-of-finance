@@ -59,8 +59,8 @@ export function VictronEnergyChart({
             <h3 className="font-bold text-zinc-950 text-lg tracking-tight sm:text-xl">
               Installation Data · 24-Hour Energy Telemetry
             </h3>
-            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 font-mono text-[10px] text-emerald-800 font-bold">
-              Verified Venus OS History
+            <span className="font-mono text-xs text-emerald-700 font-semibold">
+              · Verified Venus OS History
             </span>
           </div>
           <p className="mt-0.5 text-xs text-zinc-500">

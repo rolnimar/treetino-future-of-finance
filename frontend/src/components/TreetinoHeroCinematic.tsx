@@ -28,11 +28,31 @@ interface HeroSlide {
 
 const HERO_SLIDES: HeroSlide[] = [
   {
+    id: 'battery',
+    tag: 'Dolní Lukavice / Přeštice',
+    title: 'BESS Přeštice 8.6 MW',
+    creator: 'WATTINO × ČEZ Distribuce',
+    tagline:
+      'Utility battery storage capturing negative solar prices & 24/7 grid standby fees.',
+    type: 'image',
+    media: '/campaigns/ess.jpg',
+    poster: '/campaigns/ess.jpg',
+    siteId: 219742,
+    raised: '€84,200',
+    target: '€108,000',
+    percent: 78,
+    apy: '35.0%',
+    backers: 46,
+    daysLeft: 21,
+    livePower: '6.2 MW live',
+  },
+  {
     id: 'tree',
     tag: 'Prague, Czech Republic',
-    title: 'Treetino Energy Tree',
+    title: 'Treetino V1 Energy Tree',
     creator: 'MKovo Engineering',
-    tagline: 'Solar-wind kinetic hardware generating 24/7 clean power.',
+    tagline:
+      'Signature kinetic solar & wind tree generating 24/7 clean power for industry.',
     type: 'video',
     media: '/video/hero-v1-cine-noaudio.webm',
     poster: '/img/hero-images/poster-v1_1.1.1.webp',
@@ -46,47 +66,12 @@ const HERO_SLIDES: HeroSlide[] = [
     livePower: '42.8 kW live',
   },
   {
-    id: 'battery',
-    tag: 'Amsterdam, Netherlands',
-    title: 'Commercial Battery BESS',
-    creator: 'EnergyHub Amsterdam',
-    tagline: 'Grid-scale battery storage capturing power market spreads.',
-    type: 'image',
-    media: '/campaigns/ess.jpg',
-    poster: '/campaigns/ess.jpg',
-    siteId: 219742,
-    raised: '€42,100',
-    target: '€50,000',
-    percent: 84,
-    apy: '14.2%',
-    backers: 36,
-    daysLeft: 21,
-    livePower: '12.4 kW live',
-  },
-  {
-    id: 'offgrid',
-    tag: 'Queensland, Australia',
-    title: 'Off-Grid Solar Microgrid',
-    creator: 'Outback Power QLD',
-    tagline: 'Remote community microgrid replacing diesel generators.',
-    type: 'image',
-    media: '/campaigns/offgrid.jpg',
-    poster: '/campaigns/offgrid.jpg',
-    siteId: 209689,
-    raised: '€7,850',
-    target: '€10,000',
-    percent: 79,
-    apy: '8.5%',
-    backers: 27,
-    daysLeft: 18,
-    livePower: '3.8 kW live',
-  },
-  {
     id: 'ev',
     tag: 'Paris, France',
     title: 'Ultra-Fast EV Plaza',
     creator: 'ChargeVolt Paris',
-    tagline: 'Commercial 150kW high-speed EV charging stations.',
+    tagline:
+      'Solar canopy & DC fast chargers with native energy-backed stablecoin settlement.',
     type: 'image',
     media: '/campaigns/ev.jpg',
     poster: '/campaigns/ev.jpg',
@@ -98,6 +83,25 @@ const HERO_SLIDES: HeroSlide[] = [
     backers: 82,
     daysLeft: 9,
     livePower: '18.2 kW live',
+  },
+  {
+    id: 'wind',
+    tag: 'Kryry Wind Corridor',
+    title: 'Wind Park Kryry 4.0 MW',
+    creator: 'EcoPower Solution',
+    tagline:
+      'Two 2.0 MW Vestas V80 turbines tokenizing industrial-scale wind power on Solana.',
+    type: 'image',
+    media: '/campaigns/wind.jpg',
+    poster: '/campaigns/wind.jpg',
+    siteId: 209689,
+    raised: '€142,000',
+    target: '€180,000',
+    percent: 79,
+    apy: '14.2%',
+    backers: 64,
+    daysLeft: 18,
+    livePower: '3.4 MW live',
   },
 ];
 
@@ -147,25 +151,29 @@ export function TreetinoHeroCinematic({
         {/* Soft, clean gradients so the hardware breathes while text is perfectly legible */}
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-zinc-950/70" />
 
-        {/* Ethereal Atmospheric Radial Spotlights for Dynamic Depth */}
+        {/* Ethereal Atmospheric Radial Spotlights for Dynamic Depth - Strictly Blue */}
         <div className="pointer-events-none absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[140px]" />
-        <div className="pointer-events-none absolute bottom-10 right-10 h-[400px] w-[400px] rounded-full bg-emerald-500/10 blur-[130px]" />
+        <div className="pointer-events-none absolute bottom-10 right-10 h-[400px] w-[400px] rounded-full bg-blue-500/10 blur-[130px]" />
       </div>
 
       {/* 2. Main High-Impact Hero Content */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col justify-end">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-end">
           {/* Left: Punchy Title & Pitch */}
-          <div className="lg:col-span-7 space-y-4 text-white">
-            <div className="font-mono text-xs text-zinc-400 tracking-wider uppercase">
-              {slide.tag}
+          <div className="lg:col-span-7 space-y-5 text-white">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+              <span className="font-semibold text-blue-300 uppercase tracking-widest">
+                {slide.tag}
+              </span>
+              <span className="text-zinc-500">·</span>
+              <span className="text-zinc-300">{slide.livePower}</span>
             </div>
 
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-medium tracking-tight text-white leading-[1.02]">
+            <h1 className="text-3xl sm:text-6xl lg:text-8xl font-normal tracking-tight text-white leading-[1.08]">
               {slide.title}
             </h1>
 
-            <p className="max-w-xl text-base sm:text-lg text-zinc-300 font-light leading-relaxed">
+            <p className="max-w-xl text-base sm:text-lg text-zinc-300 font-normal leading-relaxed">
               {slide.tagline}
             </p>
           </div>
@@ -173,30 +181,30 @@ export function TreetinoHeroCinematic({
           {/* Right: The High-Yield Investment Card */}
           <div className="lg:col-span-5">
             <div className="relative group">
-              {/* Subtle ambient back-glow */}
-              <div className="pointer-events-none absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-blue-500/20 via-indigo-500/10 to-emerald-500/20 blur-xl opacity-50 transition duration-500 group-hover:opacity-70" />
+              {/* Ambient back-glow - strictly blue */}
+              <div className="pointer-events-none absolute -inset-1 rounded-3xl bg-blue-600/15 blur-xl opacity-60 transition duration-500 group-hover:opacity-80" />
 
-              <div className="relative rounded-2xl border border-white/15 bg-zinc-950/75 p-6 sm:p-7 backdrop-blur-2xl text-white space-y-5 shadow-2xl">
+              <div className="relative rounded-3xl border border-white/15 bg-zinc-950/80 p-6 sm:p-7 backdrop-blur-2xl text-white space-y-5 shadow-2xl">
                 {/* Pledged Amount */}
                 <div>
                   <div className="flex items-baseline justify-between font-mono">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl sm:text-4xl font-light text-white tracking-tight">
+                      <span className="text-3xl sm:text-4xl font-semibold text-white tracking-tight">
                         {slide.raised}
                       </span>
-                      <span className="text-xs text-zinc-400">
+                      <span className="text-xs text-zinc-400 font-normal">
                         of {slide.target}
                       </span>
                     </div>
-                    <span className="text-xs font-mono text-zinc-400">
+                    <span className="text-xs font-mono font-medium text-sky-400">
                       {slide.percent}% funded
                     </span>
                   </div>
 
-                  {/* Luminous progress bar */}
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                  {/* Luminous progress bar - using the ONE signature gradient */}
+                  <div className="mt-3.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-500 via-indigo-400 to-emerald-400 transition-all duration-700 rounded-full shadow-[0_0_12px_rgba(52,211,153,0.35)]"
+                      className="h-full bg-gradient-to-r from-[#183d89] to-[#2563eb] transition-all duration-700 rounded-full shadow-[0_0_12px_rgba(37,99,235,0.5)]"
                       style={{ width: `${slide.percent}%` }}
                     />
                   </div>
@@ -205,10 +213,10 @@ export function TreetinoHeroCinematic({
                 {/* 3 Core Stats: APY · Days Left · Backers */}
                 <div className="grid grid-cols-3 gap-3 border-t border-white/10 pt-4 font-mono">
                   <div>
-                    <span className="block text-2xl sm:text-3xl font-light text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.25)]">
+                    <span className="block text-2xl sm:text-3xl font-semibold text-sky-400">
                       {slide.apy}
                     </span>
-                    <span className="mt-0.5 block text-[10px] text-zinc-400 uppercase tracking-wider">
+                    <span className="mt-1 block text-[10px] text-zinc-400 uppercase tracking-wider font-sans">
                       Fixed APY
                     </span>
                   </div>
@@ -216,7 +224,7 @@ export function TreetinoHeroCinematic({
                     <span className="block text-2xl sm:text-3xl font-light text-white">
                       {slide.daysLeft}d
                     </span>
-                    <span className="mt-0.5 block text-[10px] text-zinc-400 uppercase tracking-wider">
+                    <span className="mt-1 block text-[10px] text-zinc-400 uppercase tracking-wider font-sans">
                       Days Left
                     </span>
                   </div>
@@ -224,7 +232,7 @@ export function TreetinoHeroCinematic({
                     <span className="block text-2xl sm:text-3xl font-light text-white">
                       {slide.backers}
                     </span>
-                    <span className="mt-0.5 block text-[10px] text-zinc-400 uppercase tracking-wider">
+                    <span className="mt-1 block text-[10px] text-zinc-400 uppercase tracking-wider font-sans">
                       Backers
                     </span>
                   </div>
@@ -241,7 +249,7 @@ export function TreetinoHeroCinematic({
                         onSelectAsset?.(slide.siteId);
                       }
                     }}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#183d89] to-[#2563eb] hover:from-[#1d4bb5] hover:to-[#3b82f6] px-6 py-3.5 text-center text-sm font-semibold text-white shadow-lg shadow-blue-900/30 transition-all active:scale-[0.99] cursor-pointer"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#183d89] to-[#2563eb] hover:from-[#1d4bb5] hover:to-[#3b82f6] px-6 py-3.5 text-center text-sm font-semibold text-white shadow-lg shadow-blue-950/40 transition-all active:scale-[0.99] cursor-pointer"
                   >
                     <span>Back This Project</span>
                     <ArrowRightIcon className="h-4 w-4" />
@@ -250,7 +258,7 @@ export function TreetinoHeroCinematic({
                   <button
                     type="button"
                     onClick={() => onSelectAsset?.(slide.siteId)}
-                    className="flex items-center justify-center gap-1.5 w-full text-center text-xs font-mono text-zinc-400 hover:text-white transition cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 w-full text-center text-xs font-mono text-zinc-400 hover:text-white transition cursor-pointer py-1"
                   >
                     <span>Live SCADA Telemetry ↗</span>
                   </button>
@@ -265,10 +273,10 @@ export function TreetinoHeroCinematic({
           <div className="flex items-center gap-6 sm:gap-8">
             {HERO_SLIDES.map((s, idx) => {
               const shortNames = [
+                'Battery Storage (35%)',
                 'Energy Tree',
-                'Battery Storage',
-                'Solar Microgrid',
                 'EV Plaza',
+                'Wind Turbines',
               ];
               const isCurrent = idx === currentSlideIndex;
               return (
@@ -306,9 +314,10 @@ export function TreetinoHeroCinematic({
               if (onExploreCampaigns) {
                 onExploreCampaigns();
               } else {
-                document
-                  .getElementById('bond-explainer')
-                  ?.scrollIntoView({ behavior: 'smooth' });
+                const el =
+                  document.getElementById('kickstarter-campaigns') ??
+                  document.getElementById('campaigns');
+                el?.scrollIntoView({ behavior: 'smooth' });
               }
             }}
             className="flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition cursor-pointer"

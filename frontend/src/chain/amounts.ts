@@ -7,13 +7,18 @@ export function parseTokenAmount(value: string, allowZero = false): string {
     throw new Error('Amount must be positive and fit in u64');
   return raw.toString();
 }
-export function formatTokenAmount(value: string) {
-  const raw = BigInt(value);
-  const fraction = (raw % 1_000_000n)
-    .toString()
-    .padStart(6, '0')
-    .replace(/0+$/, '');
-  return `${raw / 1_000_000n}${fraction ? '.' + fraction : ''}`;
+export function formatTokenAmount(value?: string | null) {
+  if (!value) return '0';
+  try {
+    const raw = BigInt(value);
+    const fraction = (raw % 1_000_000n)
+      .toString()
+      .padStart(6, '0')
+      .replace(/0+$/, '');
+    return `${raw / 1_000_000n}${fraction ? '.' + fraction : ''}`;
+  } catch {
+    return '0';
+  }
 }
 export const nextUtcDay = () =>
   new Date((Math.floor(Date.now() / 86_400_000) + 1) * 86_400_000)

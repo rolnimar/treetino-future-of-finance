@@ -248,7 +248,7 @@ export function DocumentCenterViewer({ dossier }: DocumentCenterViewerProps) {
                 </div>
 
                 <div className="flex items-center gap-3 self-end sm:self-center">
-                  <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  <span className="font-mono text-xs uppercase font-semibold text-emerald-700">
                     {doc.status}
                   </span>
                   <a
@@ -346,7 +346,7 @@ export function DocumentCenterViewer({ dossier }: DocumentCenterViewerProps) {
                 onClick={() => setIsFullscreen(false)}
                 className="text-white hover:text-zinc-300 font-bold text-sm p-1.5 cursor-pointer"
               >
-                Close ✕
+                Close
               </button>
             </div>
           </div>

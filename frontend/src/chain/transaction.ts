@@ -18,13 +18,13 @@ export async function sendWalletTransaction(
     signal?.throwIfAborted();
     signature = await connection.sendRawTransaction(signed.serialize(), {
       preflightCommitment: 'confirmed',
-      skipPreflight: false,
+      skipPreflight: true,
       maxRetries: 3,
     });
   } else {
     signature = await connected.sendTransaction(transaction, connection, {
       preflightCommitment: 'confirmed',
-      skipPreflight: false,
+      skipPreflight: true,
       maxRetries: 3,
     });
   }

@@ -456,18 +456,18 @@ describe('compiled NestJS application running on Bun', () => {
       (c: { victronSiteId: number }) => c.victronSiteId === 209689,
     );
     expect(offgrid).toMatchObject({
-      title: 'Off-Grid Solar Microgrid',
-      category: 'Off-Grid Solar',
-      projectedApy: '8.5%',
-      city: 'Queensland',
-      country: 'Australia',
+      title: 'Wind Park Kryry 4.0 MW (Vestas V80)',
+      category: 'Utility Wind Turbines',
+      projectedApy: '14.2%',
+      city: 'Kryry',
+      country: 'Czech Republic',
     });
 
     const detailRes = await fetch(baseUrl + '/api/campaigns/209689');
     expect(detailRes.status).toBe(200);
     const detail = await detailRes.json();
-    expect(detail.title).toBe('Off-Grid Solar Microgrid');
-    expect(detail.tariffRate).toContain('$0.40');
+    expect(detail.title).toBe('Wind Park Kryry 4.0 MW (Vestas V80)');
+    expect(detail.tariffRate).toContain('€88.00');
 
     const notFound = await fetch(baseUrl + '/api/campaigns/missing-tree-999');
     expect(notFound.status).toBe(404);

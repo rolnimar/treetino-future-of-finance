@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { z } from 'zod';
+import { calculateAssetAccruedYield } from '../src/features/victron/yield-stream';
 
 const victronEnergyTotalsSchema = z.object({
   solarYieldKwh: z.number(),
@@ -824,7 +825,8 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     );
     expect(getCampaignCoverImage('ess')).toBe('/campaigns/ess.jpg');
     expect(getCampaignCoverImage('ev')).toBe('/campaigns/ev.jpg');
-    expect(getCampaignCoverImage('offgrid')).toBe('/campaigns/offgrid.jpg');
+    expect(getCampaignCoverImage('offgrid')).toBe('/campaigns/wind.jpg');
+    expect(getCampaignCoverImage('wind')).toBe('/campaigns/wind.jpg');
     expect(getCampaignCoverImage('unknown')).toBe('/campaigns/treetino-v1.jpg');
 
     // 2. Metadata includes creator, days left, and backers
@@ -832,9 +834,11 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     expect(CAMPAIGN_METADATA['treetino-v1'].daysLeft).toBeGreaterThan(0);
     expect(CAMPAIGN_METADATA['treetino-v1'].backers).toBeGreaterThan(0);
 
-    expect(CAMPAIGN_METADATA['ess'].creator).toBe('EnergyHub Amsterdam');
+    expect(CAMPAIGN_METADATA['ess'].creator).toBe('WATTINO × ČEZ Distribuce');
     expect(CAMPAIGN_METADATA['ev'].creator).toBe('ChargeVolt Paris');
-    expect(CAMPAIGN_METADATA['offgrid'].creator).toBe('Outback Power QLD');
+    expect(CAMPAIGN_METADATA['offgrid'].creator).toBe(
+      'ČEZ Concession / Vestas',
+    );
   });
 
   test('validates search and category filtering for Kickstarter campaigns', () => {
@@ -901,5 +905,88 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     // High yield filter (>14% APY)
     const highYield = campaigns.filter((c) => c.financials.projectedApy >= 14);
     expect(highYield.map((c) => c.key)).toEqual(['ess', 'offgrid']);
+  });
+
+  test('guarantees 100% identical yield amounts between Portfolio and Product Detail', () => {
+    const fixedNow = 1776000000000;
+    const holding = {
+      amountUsdc: 100,
+      investedAt: fixedNow - 30 * 60 * 1000, // backed 30 mins ago
+      lastClaimedAt: fixedNow - 30 * 60 * 1000,
+      totalClaimedUsdc: 0,
+    };
+    const financials = {
+      projectedApy: 18.5,
+      targetUsdc: 100000,
+      fundedUsdc: 85000,
+      estDailyRevenueUsdc: 50.68,
+    };
+
+    // Calculate on "Portfolio" view
+    const portfolioYield = calculateAssetAccruedYield(
+      holding,
+      financials,
+      fixedNow,
+    );
+
+    // Calculate on "Product Detail" view (same holding, same financials, same time)
+    const productDetailYield = calculateAssetAccruedYield(
+      holding,
+      financials,
+      fixedNow,
+    );
+
+    expect(portfolioYield.formattedTotal).toBe(
+      productDetailYield.formattedTotal,
+    );
+    expect(portfolioYield.totalAccrued).toBe(productDetailYield.totalAccrued);
+    expect(portfolioYield.baseDividend).toBe(productDetailYield.baseDividend);
+    expect(portfolioYield.kaminoBonus).toBe(productDetailYield.kaminoBonus);
+    expect(portfolioYield.poolSharePercent).toBe('0.10%');
+
+    // Unclaimed initial holding has accrued SCADA telemetry ~€0.078 - €0.082
+    expect(portfolioYield.totalAccrued).toBeGreaterThanOrEqual(0.078);
+    expect(portfolioYield.totalAccrued).toBeLessThanOrEqual(0.082);
+    expect(portfolioYield.formattedTotal).toMatch(/^\+€0\.0[78]\d\d$/);
+
+    // Simulating claiming in wallet: lastClaimedAt resets to fixedNow, totalClaimedUsdc records payout
+    const claimedHolding = {
+      ...holding,
+      lastClaimedAt: fixedNow,
+      totalClaimedUsdc: portfolioYield.totalAccrued,
+    };
+
+    const portfolioAfterClaim = calculateAssetAccruedYield(
+      claimedHolding,
+      financials,
+      fixedNow,
+    );
+    const detailAfterClaim = calculateAssetAccruedYield(
+      claimedHolding,
+      financials,
+      fixedNow,
+    );
+
+    // Immediate post-claim state is exactly 0.0000 EURTree on both pages
+    expect(portfolioAfterClaim.totalAccrued).toBe(0);
+    expect(portfolioAfterClaim.formattedTotal).toBe('+€0.0000');
+    expect(detailAfterClaim.totalAccrued).toBe(0);
+    expect(detailAfterClaim.formattedTotal).toBe('+€0.0000');
+
+    // 10 seconds later: continuous streaming continues synchronously
+    const streamPortfolio = calculateAssetAccruedYield(
+      claimedHolding,
+      financials,
+      fixedNow + 10_000,
+    );
+    const streamDetail = calculateAssetAccruedYield(
+      claimedHolding,
+      financials,
+      fixedNow + 10_000,
+    );
+
+    expect(streamPortfolio.totalAccrued).toBe(streamDetail.totalAccrued);
+    expect(streamPortfolio.totalAccrued).toBeGreaterThan(0);
+    expect(streamPortfolio.formattedTotal).toBe(streamDetail.formattedTotal);
   });
 });

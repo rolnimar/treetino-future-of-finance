@@ -7,7 +7,8 @@ export function getCampaignCoverImage(key: string): string {
     case 'ev':
       return '/campaigns/ev.jpg';
     case 'offgrid':
-      return '/campaigns/offgrid.jpg';
+    case 'wind':
+      return '/campaigns/wind.jpg';
     default:
       return '/campaigns/treetino-v1.jpg';
   }
@@ -31,25 +32,35 @@ export const CAMPAIGN_METADATA: Record<
     hardwareType: 'Dual-Modality Microgrid',
   },
   ess: {
-    creator: 'EnergyHub Amsterdam',
+    creator: 'WATTINO × ČEZ Distribuce',
     daysLeft: 21,
-    backers: 36,
-    tagline: 'High-voltage BESS trading automated day-ahead wholesale spreads',
-    hardwareType: 'Battery Arbitrage Hub',
+    backers: 46,
+    tagline:
+      '8.6 MW BESS capturing negative solar prices (20%) + ČEPS standby fees (15%)',
+    hardwareType: 'Battery Storage (35% APY)',
   },
   ev: {
     creator: 'ChargeVolt Paris',
     daysLeft: 9,
     backers: 82,
-    tagline: 'Solar canopy & DC fast chargers servicing delivery fleets',
+    tagline:
+      'Solar canopy & DC fast chargers with native energy stablecoin settlement',
     hardwareType: 'Fleet Charging Plaza',
   },
   offgrid: {
-    creator: 'Outback Power QLD',
+    creator: 'ČEZ Concession / Vestas',
     daysLeft: 18,
-    backers: 27,
+    backers: 64,
     tagline:
-      'Self-sufficient agricultural homestead microgrid with lithium storage',
-    hardwareType: 'Homestead Microgrid',
+      'Two 2.0 MW Vestas V80 turbines tokenizing industrial-scale wind power on Solana',
+    hardwareType: 'Utility Wind Turbines (14.2% APY)',
+  },
+  wind: {
+    creator: 'ČEZ Concession / Vestas',
+    daysLeft: 18,
+    backers: 64,
+    tagline:
+      'Two 2.0 MW Vestas V80 turbines tokenizing industrial-scale wind power on Solana',
+    hardwareType: 'Utility Wind Turbines (14.2% APY)',
   },
 };

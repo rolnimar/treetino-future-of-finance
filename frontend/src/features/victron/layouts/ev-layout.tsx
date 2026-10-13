@@ -18,11 +18,31 @@ import {
   ConduitLine,
 } from '../components';
 
-interface EvLayoutProps {
+import type { InvestmentRecord } from '../use-victron-investments';
+
+export interface EvLayoutProps {
   demo: VictronDemoItem;
+  holding?: InvestmentRecord;
+  onClaim?: (
+    siteId: number,
+    baseAmount: number,
+    kaminoBonus: number,
+  ) => Promise<void>;
+  isClaiming?: boolean;
+  claimSuccessText?: string | null;
+  claimErrorText?: string | null;
+  onBackProject?: () => void;
 }
 
-export function EvLayout({ demo }: EvLayoutProps) {
+export function EvLayout({
+  demo,
+  holding,
+  onClaim,
+  isClaiming,
+  claimSuccessText,
+  claimErrorText,
+  onBackProject,
+}: EvLayoutProps) {
   const [flowMode, setFlowMode] = useState<'both' | 'power' | 'funds'>('both');
 
   const { currentPower, dailyTotals, financials } = demo;
@@ -65,8 +85,8 @@ export function EvLayout({ demo }: EvLayoutProps) {
         }}
         revenueOrSavings={{
           label: 'High-Velocity EV Revenue',
-          value: `+$${dailyDisplacedSavings} / day`,
-          subtext: '10 Bays ($0.42/kWh + $2.50 session fee)',
+          value: `+€${dailyDisplacedSavings} / day`,
+          subtext: '10 Bays (€0.42/kWh + €2.50 session fee)',
         }}
         investorYield={{
           apyPercent: financials.projectedApy,
@@ -78,10 +98,14 @@ export function EvLayout({ demo }: EvLayoutProps) {
       {/* 3. REUSABLE STREAMING YIELD TICKER */}
       <StreamingYieldTicker
         assetName="Solar EV Fast-Charging Hub"
-        stakePercent="0.10%"
-        hourlyRate="+$0.042 / hr"
-        baseYieldUsdc={0.0664}
-        incrementPerSecond={0.0018}
+        siteId={demo.siteId}
+        holding={holding}
+        financials={financials}
+        onBackProject={onBackProject}
+        onClaim={onClaim}
+        isClaiming={isClaiming}
+        claimSuccessText={claimSuccessText}
+        claimErrorText={claimErrorText}
       />
 
       {/* 4. SCHEMATIC CANVAS + UNCOUPLED TELEMETRY SIDEPANEL */}
@@ -264,7 +288,7 @@ export function EvLayout({ demo }: EvLayoutProps) {
                 subtext="Canopy lighting & HVAC"
                 sparklineData={acLoadTrend}
                 footerLabel="Billed Tariff:"
-                footerValue="-$0.07 / hr"
+                footerValue="-€0.07 / hr"
               />
 
               {/* Card 1.3: ESSENTIAL LOADS */}
@@ -281,7 +305,7 @@ export function EvLayout({ demo }: EvLayoutProps) {
                 subtext="Dedicated EV charging bus"
                 sparklineData={essentialTrend}
                 footerLabel="Throughput:"
-                footerValue="+$3.41 / hr"
+                footerValue="+€3.41 / hr"
               />
 
               {/* ROW 2: EVCS STATION #1, QUATTRO HUB, EVCS STATION #2 */}
@@ -298,7 +322,7 @@ export function EvLayout({ demo }: EvLayoutProps) {
                 primaryValue="14.45 kW"
                 subtext="Fast charging in progress"
                 footerLabel="Session Rate:"
-                footerValue="$0.42 / kWh"
+                footerValue="€0.42 / kWh"
               />
 
               {/* Card 2.2: QUATTRO INVERTER HUB */}
@@ -430,7 +454,7 @@ export function EvLayout({ demo }: EvLayoutProps) {
                   10x Commercial Fast-Charging Bays (32A Three-Phase Plaza)
                 </h4>
               </div>
-              <span className="rounded-full bg-emerald-100 px-3 py-1 font-mono text-xs font-bold text-emerald-800 border border-emerald-300">
+              <span className="font-mono text-xs font-semibold text-emerald-700">
                 4 of 10 Bays Active Dispensing
               </span>
             </div>
@@ -520,11 +544,11 @@ export function EvLayout({ demo }: EvLayoutProps) {
           },
           {
             label: 'Billing Velocity',
-            value: '$0.42 / kWh',
-            subtext: '+$2.50 session fee',
+            value: '€0.42 / kWh',
+            subtext: '+€2.50 session fee',
           },
         ]}
-        grossRevenueTitle="$18,500.00 / Year Gross Revenue"
+        grossRevenueTitle="€18,500.00 / Year Gross Revenue"
         waterfallSteps={financials.cashFlowWaterfall}
       />
     </div>

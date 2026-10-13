@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { useAuth } from './features/auth/auth-context';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useConnectedWallet } from './features/wallet/use-connected-wallet';
 import { Button } from './components/ui/button';
 import { ErrorMessage } from './components/ui/feedback';
 const AdminWorkspace = lazy(() =>
@@ -10,7 +10,8 @@ const AdminWorkspace = lazy(() =>
 );
 export function AdminAccess() {
   const auth = useAuth();
-  const { connected } = useWallet();
+  const wallet = useConnectedWallet();
+  const connected = !!wallet;
   return (
     <section
       aria-label="Admin access"

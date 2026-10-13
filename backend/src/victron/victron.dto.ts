@@ -330,7 +330,7 @@ export class VictronDemoItemDto {
   projectedApy!: string;
 
   @ApiProperty({
-    description: 'Suggested funding target in mockUSDC',
+    description: 'Suggested funding target in EURTree',
     example: '10000',
   })
   suggestedTargetUsdc!: string;

@@ -26,7 +26,8 @@ pub use treetino::{
 };
 
 pub const INTERVALS: usize = 96;
-pub const USDC: u64 = 1_000_000;
+pub const EURTREE: u64 = 1_000_000;
+pub const USDC: u64 = EURTREE;
 pub const START: i64 = DAY * 20_000;
 pub fn pda(seeds: &[&[u8]]) -> Pubkey {
     Pubkey::find_program_address(seeds, &treetino::id()).0

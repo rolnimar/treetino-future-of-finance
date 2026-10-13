@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { readMockUsdcBalance } from '../../../chain/public';
+import { readEurTreeBalance } from '../../../chain/public';
 
-export function useMockUsdc(address: string | undefined) {
+export function useEurTree(address: string | undefined) {
   const { connection } = useConnection();
   return useQuery({
-    queryKey: ['wallet', 'mockUsdc', connection.rpcEndpoint, address],
+    queryKey: ['wallet', 'eurTree', connection.rpcEndpoint, address],
     enabled: !!address,
     queryFn: async ({ signal }) => {
       if (!address) throw new Error('Wallet connection required');
-      const balance = await readMockUsdcBalance(connection, address);
+      const balance = await readEurTreeBalance(connection, address);
       signal.throwIfAborted();
       return balance;
     },
@@ -18,3 +18,5 @@ export function useMockUsdc(address: string | undefined) {
     refetchOnWindowFocus: true,
   });
 }
+
+export const useMockUsdc = useEurTree;

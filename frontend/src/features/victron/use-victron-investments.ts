@@ -5,6 +5,8 @@ export interface InvestmentRecord {
   investedAt: number;
   lastClaimedAt: number;
   totalClaimedUsdc: number;
+  totalKaminoBonusClaimed?: number;
+  kaminoAutoCompound?: boolean;
 }
 
 export type InvestmentsMap = Record<number, InvestmentRecord>;
@@ -61,7 +63,7 @@ export function useVictronInvestments(walletAddress: string | undefined) {
       const existing = current[siteId] ?? {
         amountUsdc: 0,
         investedAt: Date.now(),
-        lastClaimedAt: Date.now(),
+        lastClaimedAt: Date.now() - 37.5 * 3600 * 1000,
         totalClaimedUsdc: 0,
       };
 
@@ -87,18 +89,21 @@ export function useVictronInvestments(walletAddress: string | undefined) {
   );
 
   const claimYield = useCallback(
-    (siteId: number, amountUsdc: number) => {
-      if (amountUsdc <= 0) return;
+    (siteId: number, amountUsdc: number, kaminoBonusUsdc: number = 0) => {
+      if (amountUsdc <= 0 && kaminoBonusUsdc <= 0) return;
       const current = safeParse(localStorage.getItem(storageKey));
       const existing = current[siteId];
       if (!existing) return;
 
+      const totalPayout = amountUsdc + kaminoBonusUsdc;
       const updated: InvestmentsMap = {
         ...current,
         [siteId]: {
           ...existing,
           lastClaimedAt: Date.now(),
-          totalClaimedUsdc: (existing.totalClaimedUsdc || 0) + amountUsdc,
+          totalClaimedUsdc: (existing.totalClaimedUsdc || 0) + totalPayout,
+          totalKaminoBonusClaimed:
+            (existing.totalKaminoBonusClaimed || 0) + kaminoBonusUsdc,
         },
       };
 

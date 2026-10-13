@@ -53,7 +53,7 @@ export const createCampaignFormSchema = createTreeFormSchema.extend({
   city: z.string().min(1, 'City is required'),
   country: z.string().min(1, 'Country is required'),
   projectedApy: z.string().min(1, 'Enter projected APY (e.g. 14.2%)'),
-  tariffRate: z.string().min(1, 'Enter tariff rate (e.g. $0.40/kWh)'),
+  tariffRate: z.string().min(1, 'Enter tariff rate (e.g. €0.40/kWh)'),
   offTakerName: z.string().min(1, 'Enter off-taker name'),
   offTakerDescription: z.string().optional(),
   supplierName: z.string().optional(),

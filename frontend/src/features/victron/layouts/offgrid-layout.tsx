@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import type { VictronDemoItem } from '../victron-types';
-import {
-  SunIcon,
-  BatteryIcon,
-  PowerPlugIcon,
-  GridIcon,
-} from '../victron-icons';
+import { BatteryIcon, GridIcon, BoltIcon } from '../victron-icons';
 import {
   InstallationHeader,
   FlowSummaryBanner,
@@ -16,31 +11,108 @@ import {
   ConduitLine,
 } from '../components';
 
-interface OffgridLayoutProps {
+import type { InvestmentRecord } from '../use-victron-investments';
+
+export interface OffgridLayoutProps {
   demo: VictronDemoItem;
+  holding?: InvestmentRecord;
+  onClaim?: (
+    siteId: number,
+    baseAmount: number,
+    kaminoBonus: number,
+  ) => Promise<void>;
+  isClaiming?: boolean;
+  claimSuccessText?: string | null;
+  claimErrorText?: string | null;
+  onBackProject?: () => void;
 }
 
-export function OffgridLayout({ demo }: OffgridLayoutProps) {
+export function OffgridLayout({
+  demo,
+  holding,
+  onClaim,
+  isClaiming,
+  claimSuccessText,
+  claimErrorText,
+  onBackProject,
+}: OffgridLayoutProps) {
   const [flowMode, setFlowMode] = useState<'both' | 'power' | 'funds'>('both');
 
   const { currentPower, dailyTotals, financials } = demo;
 
-  // Financial rates
-  const dieselReplacementRate = 0.35; // $0.35 / kWh displaced
-  const dailyDisplacedSavings = (
-    dailyTotals.solarYieldKwh * dieselReplacementRate
+  // Commercial Wind Park metrics for 4.0 MW (2x Vestas V80)
+  const isKryryWind =
+    demo.title.toLowerCase().includes('wind') || demo.key === 'offgrid';
+
+  const dailyFeedInMwh = (
+    (dailyTotals.solarYieldKwh * 14 + 1420) /
+    1000
   ).toFixed(2);
+  const dailyFeedInUsd = (parseFloat(dailyFeedInMwh) * 88 * 1.08).toFixed(2); // €88/MWh tariff
+
   const annualPoolDistribution = (
     financials.targetUsdc *
     (financials.projectedApy / 100)
   ).toLocaleString();
 
-  const loadTrend = demo.hourlyData.map((d) => d.consumptionKwh);
-  const solarTrend = demo.hourlyData.map((d) => d.solarKwh);
-  const batteryTrend = [98, 98.5, 99, 99.4, currentPower.batterySocPercent];
+  const loadTrend = demo.hourlyData.map((d) => d.consumptionKwh * 12 + 100);
+  const turbineTrend = demo.hourlyData.map((d) => d.solarKwh * 15 + 150);
+  const yawHealthTrend = [98, 98.5, 99, 99.4, 99.8];
 
   return (
     <div className="rounded-3xl border border-black/10 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+      {/* 0. LIVE COMMERCIAL CONCESSION BANNER */}
+      <div className="rounded-2xl border border-sky-500/30 bg-sky-50/80 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="flex h-3 w-3 rounded-full bg-sky-500 animate-pulse mt-1 shrink-0" />
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-sky-900">
+                OPERATIONAL STATUS: GRID SYNCHRONIZED · 20-YEAR ČEZ FEED-IN
+                CONCESSION
+              </span>
+              <span className="font-mono text-xs font-semibold text-sky-950">
+                · 22 kV High-Voltage Interconnect
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-zinc-700">
+              Two <strong>2.0 MW Vestas V80</strong> industrial wind turbines
+              located in Kryry (Ústí nad Labem region, Czech Republic).
+              Supplying utility-scale power under a guaranteed long-term feed-in
+              agreement with ČEZ Distribuce, backed by licensed Czech technician
+              maintenance.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start md:self-center shrink-0">
+          <a
+            href="/downloads/Wind_Park_Kryry_4MW_Vestas_V80_Feasibility_Study.pdf"
+            download="Wind_Park_Kryry_4MW_Vestas_V80_Feasibility_Study.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#183d89] hover:bg-[#132f6b] !text-white px-3.5 py-2 font-mono text-xs font-bold shadow-xs transition cursor-pointer"
+          >
+            <span className="!text-white">
+              Download Feasibility Study (PDF)
+            </span>
+            <svg
+              className="h-3.5 w-3.5 !text-sky-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+
       {/* 1. REUSABLE INSTALLATION HEADER */}
       <InstallationHeader
         demo={demo}
@@ -51,34 +123,38 @@ export function OffgridLayout({ demo }: OffgridLayoutProps) {
       {/* 2. REUSABLE FLOW SUMMARY BANNER */}
       <FlowSummaryBanner
         generation={{
-          label: 'Metered Clean Generation',
-          value: `${dailyTotals.solarYieldKwh.toFixed(2)} kWh Today`,
-          subtext: 'Clean solar generation displacing diesel reliance',
+          label: 'Metered Turbine Generation',
+          value: `${dailyFeedInMwh} MWh Today`,
+          subtext: 'Clean wind power generated by 2× Vestas V80-2.0 MW',
         }}
         consumption={{
-          label: 'Home Load Consumption',
-          value: `${currentPower.consumptionWatts.toFixed(0)} W`,
-          subtext: `Today: ${dailyTotals.consumptionKwh.toFixed(2)} kWh consumed`,
+          label: '22 kV Regional Grid Infeed',
+          value: `${((currentPower.consumptionWatts || 1800) * 1.6).toFixed(0)} kW Feed-In`,
+          subtext: 'Supplied directly into ČEZ Distribuce distribution lines',
         }}
         revenueOrSavings={{
-          label: 'Displaced Fuel Value',
-          value: `+$${dailyDisplacedSavings} / day saved`,
-          subtext: 'Billed at consumer tariff ($0.35/kWh)',
+          label: 'Guaranteed Feed-in Value',
+          value: `+€${dailyFeedInUsd} / day`,
+          subtext: 'Billed under long-term PPA concession tariff',
         }}
         investorYield={{
           apyPercent: financials.projectedApy,
           annualDistribution: annualPoolDistribution,
-          subtext: 'Distributed proportionally to tokenholders on Solana',
+          subtext: 'Distributed in EURTree (€) on Solana via PDA escrow',
         }}
       />
 
       {/* 3. REUSABLE STREAMING YIELD TICKER */}
       <StreamingYieldTicker
-        assetName="Microgrid"
-        stakePercent="0.40%"
-        hourlyRate="+$0.028 / hr"
-        baseYieldUsdc={0.0245}
-        incrementPerSecond={0.0009}
+        assetName={isKryryWind ? 'Wind Park Kryry 4.0 MW' : 'Clean Asset Pool'}
+        siteId={demo.siteId}
+        holding={holding}
+        financials={financials}
+        onBackProject={onBackProject}
+        onClaim={onClaim}
+        isClaiming={isClaiming}
+        claimSuccessText={claimSuccessText}
+        claimErrorText={claimErrorText}
       />
 
       {/* 4. SCHEMATIC CANVAS + UNCOUPLED TELEMETRY SIDEPANEL */}
@@ -90,20 +166,25 @@ export function OffgridLayout({ demo }: OffgridLayoutProps) {
             className="w-full h-auto min-w-[680px] select-none"
           >
             {/* CONDUIT PIPES */}
-            {/* Pipe 1: Generator (240, 110) -> Inverter Hub (320, 110) */}
-            <ConduitLine x1={240} y1={110} x2={320} y2={110} />
+            {/* Pipe 1: Vestas Turbine A (240, 110) -> MV Transformer Substation (320, 110) */}
+            <ConduitLine
+              x1={240}
+              y1={110}
+              x2={320}
+              y2={110}
+              flow={flowMode !== 'funds' ? 'sky' : null}
+              fundsFlow={
+                flowMode === 'funds' || flowMode === 'both' ? 'gold' : null
+              }
+            />
 
-            {/* Pipe 2: Inverter Hub (490, 110) -> AC Loads (560, 110) */}
+            {/* Pipe 2: MV Transformer Substation (490, 110) -> 22kV Grid Interconnect (560, 110) */}
             <ConduitLine
               x1={490}
               y1={110}
               x2={560}
               y2={110}
-              flow={
-                flowMode !== 'funds' && currentPower.consumptionWatts > 0
-                  ? 'sky'
-                  : null
-              }
+              flow={flowMode !== 'funds' ? 'sky' : null}
               fundsFlow={
                 flowMode === 'funds' || flowMode === 'both'
                   ? 'reverse-gold'
@@ -111,131 +192,128 @@ export function OffgridLayout({ demo }: OffgridLayoutProps) {
               }
             />
 
-            {/* Pipe 3: Inverter Hub bottom (405, 190) -> DC Junction (405, 310) */}
+            {/* Pipe 3: MV Substation bottom (405, 190) -> SCADA Bus (405, 310) */}
             <ConduitLine x1={405} y1={190} x2={405} y2={310} />
 
-            {/* Pipe 4: Battery Storage (240, 310) -> DC Junction (405, 310) */}
+            {/* Pipe 4: Yaw & Pitch Control (240, 310) -> SCADA Bus (405, 310) */}
             <ConduitLine
               x1={240}
               y1={310}
               x2={405}
               y2={310}
-              flow={flowMode !== 'funds' ? 'reverse-emerald' : null}
+              flow={flowMode !== 'funds' ? 'emerald' : null}
               fundsFlow={
                 flowMode === 'funds' || flowMode === 'both' ? 'gold' : null
               }
             />
 
-            {/* Pipe 5: DC Junction (405, 310) -> PV Charger (560, 310) */}
+            {/* Pipe 5: SCADA Bus (405, 310) -> Vestas Turbine B (560, 310) */}
             <ConduitLine
               x1={405}
               y1={310}
               x2={560}
               y2={310}
-              flow={
-                flowMode !== 'funds' && currentPower.solarYieldWatts > 0
-                  ? 'amber'
-                  : null
-              }
+              flow={flowMode !== 'funds' ? 'sky' : null}
               fundsFlow={
                 flowMode === 'funds' || flowMode === 'both' ? 'gold' : null
               }
             />
 
-            {/* Central DC Bus T-Junction Node */}
+            {/* Central SCADA Node */}
             <circle
               cx="405"
               cy="310"
               r="8"
-              fill="#059669"
+              fill="#0284c7"
               stroke="#ffffff"
               strokeWidth="3"
             />
 
             {/* HARDWARE NODES */}
-            {/* Card 1.1: BACKUP GENERATOR */}
+            {/* Card 1.1: VESTAS V80 UNIT A */}
             <SchematicCard
               x={30}
               y={30}
-              accent="forest"
-              icon={<GridIcon className="h-4 w-4 text-zinc-600" />}
-              title="Generator"
-              badge={demo.systemInfo.generatorState || 'Stopped'}
-              primaryValue="—"
-              subtext="Standby backup power"
-              footerLabel="Fuel Cost:"
-              footerValue="$0.00 / hr"
+              accent="sky"
+              icon={<BoltIcon className="h-4 w-4 text-sky-700" />}
+              title="Vestas V80 (Unit A)"
+              badge="Rated 2.0 MW"
+              primaryValue="1,840 kW"
+              subtext="80m Hub · Pitch Active"
+              sparklineData={turbineTrend.slice(-10)}
+              footerLabel="Rotor Speed:"
+              footerValue="16.7 RPM"
             />
 
-            {/* Card 1.2: INVERTER HUB (Multi RS Smart) */}
+            {/* Card 1.2: 690V / 22kV TRANSFORMER SUBSTATION */}
             <foreignObject x={320} y={30} width={170} height={160}>
               <div className="h-full w-full rounded-2xl border-2 border-black/10 bg-white shadow-md flex flex-col justify-between overflow-hidden text-center select-none">
-                <div className="bg-t-blue py-2 text-white">
+                <div className="bg-[#183d89] py-2 text-white">
                   <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 font-mono text-xs font-black">
-                    RS
+                    MV
                   </div>
                   <div className="mt-1 font-mono text-[10px] font-bold tracking-tight text-white/90">
-                    Multi RS Smart 48V
+                    690V → 22 kV Step-Up
                   </div>
                 </div>
                 <div className="p-2 flex flex-col items-center justify-center">
-                  <span className="rounded-full bg-t-blue/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-t-blue">
-                    Mode: {demo.systemInfo.systemState}
+                  <span className="font-mono text-[10px] font-bold text-[#183d89]">
+                    ČEZ Grid Synchronized
                   </span>
-                  <div className="mt-1 font-mono text-xs font-extrabold text-t-blue">
+                  <div className="mt-1 font-mono text-xs font-extrabold text-[#183d89]">
                     {financials.projectedApy}% APY
                   </div>
                 </div>
                 <div className="bg-zinc-50 py-1 font-mono text-[9px] text-zinc-500 border-t border-black/10">
-                  Off-Grid Controller
+                  Substation Kryry
                 </div>
               </div>
             </foreignObject>
 
-            {/* Card 1.3: AC LOADS */}
+            {/* Card 1.3: ČEZ 22 kV REGIONAL GRID */}
             <SchematicCard
               x={560}
               y={30}
-              accent="sky"
-              icon={<PowerPlugIcon className="h-4 w-4 text-sky-700" />}
-              title="AC Loads"
-              badge="230V Microgrid"
-              primaryValue={`${currentPower.consumptionWatts.toFixed(0)} W`}
-              subtext={`Today: ${dailyTotals.consumptionKwh.toFixed(2)} kWh`}
+              accent="forest"
+              icon={<GridIcon className="h-4 w-4 text-emerald-700" />}
+              title="ČEZ 22 kV Grid"
+              badge="High Voltage Feed"
+              primaryValue="3.68 MW Infeed"
+              subtext="Continuous distribution feed"
               sparklineData={loadTrend.slice(-10)}
-              footerLabel="Tariff:"
-              footerValue="$0.35 / kWh"
+              footerLabel="Contract Tariff:"
+              footerValue="€88.00 / MWh"
             />
 
-            {/* Card 2.1: BATTERY STORAGE */}
+            {/* Card 2.1: SCADA YAW & HYDRAULIC CONTROL */}
             <SchematicCard
               x={30}
               y={230}
               accent="emerald"
               icon={<BatteryIcon className="h-4 w-4 text-emerald-700" />}
-              title="Battery Bank"
-              badge={currentPower.batteryState}
-              primaryValue={`${currentPower.batterySocPercent.toFixed(1)} %`}
-              subtext={`${currentPower.batteryVoltage.toFixed(2)} V · 0.6 A`}
-              sparklineData={batteryTrend}
-              progressPercent={currentPower.batterySocPercent}
-              footerLabel="Reserve Bank:"
-              footerValue="15.0 kWh Lithium"
+              title="SCADA & Yaw Health"
+              badge="100% Operational"
+              primaryValue="99.8 %"
+              subtext="Hydraulic pitch active · OptiSpeed"
+              sparklineData={yawHealthTrend}
+              progressPercent={99.8}
+              footerLabel="Supervision:"
+              footerValue="Czech Certified"
             />
 
-            {/* Card 2.3: PV CHARGER (MPPT) */}
+            {/* Card 2.3: VESTAS V80 UNIT B */}
             <SchematicCard
               x={560}
               y={230}
-              accent="amber"
-              icon={<SunIcon className="h-4 w-4 text-amber-600" />}
-              title="Solar Charger"
-              badge="MPPT Active"
-              primaryValue={`${currentPower.solarYieldWatts.toFixed(0)} W`}
-              subtext={`Today: ${dailyTotals.solarYieldKwh.toFixed(2)} kWh`}
-              sparklineData={solarTrend.slice(-10)}
-              footerLabel="Yield Stream:"
-              footerValue={`+$${dailyDisplacedSavings} / day`}
+              accent="sky"
+              icon={<BoltIcon className="h-4 w-4 text-sky-700" />}
+              title="Vestas V80 (Unit B)"
+              badge="Rated 2.0 MW"
+              primaryValue="1,840 kW"
+              subtext="80m Hub · Pitch Active"
+              sparklineData={turbineTrend.slice(-10)}
+              footerLabel="Daily Cashflow:"
+              footerValue={`+$${dailyFeedInUsd} / day`}
             />
           </svg>
         </div>
@@ -244,21 +322,21 @@ export function OffgridLayout({ demo }: OffgridLayoutProps) {
         <div className="xl:col-span-3">
           <TelemetrySidepanel
             demo={demo}
-            specialtyTitle="Diesel Replacement"
-            specialtyBadge="Clean Equity"
+            specialtyTitle="Turbine Concession"
+            specialtyBadge="ČEZ 20-Yr PPA"
             specialtyContent={
               <div className="space-y-1.5 text-[10px] font-mono text-zinc-600">
                 <div className="flex justify-between items-center">
-                  <span>Daily Fuel Savings:</span>
+                  <span>Daily Feed-in Cashflow:</span>
                   <strong className="text-emerald-700 text-xs">
-                    +${dailyDisplacedSavings} / day
+                    +${dailyFeedInUsd} / day
                   </strong>
                 </div>
                 <div className="text-zinc-500">
-                  100% clean solar microgrid operation
+                  Two Vestas V80-2.0 MW industrial turbines
                 </div>
                 <div className="border-t border-black/10 pt-1 text-zinc-400">
-                  Displacing $1.40/L generator fuel cost
+                  Kryry, Czech Republic · 20-Year Concession
                 </div>
               </div>
             }
@@ -268,22 +346,32 @@ export function OffgridLayout({ demo }: OffgridLayoutProps) {
 
       {/* 5. REUSABLE COMMERCIAL DOSSIER & CASH FLOW WATERFALL */}
       <CashFlowDossier
-        offTakerTitle="Residential Off-Grid Cooperative"
-        offTakerBadge="Consumer Repayment"
-        offTakerDescription="Decentralized off-grid residential homes in rural Queensland, Australia. Homeowners make daily metered repayments for clean power generated by tokenized solar panels and batteries, avoiding expensive diesel generator operation."
+        offTakerTitle="ČEZ Distribuce a.s. (22 kV High-Voltage Grid)"
+        offTakerBadge="20-Year PPA Concession"
+        offTakerDescription="Two 2.0 MW Vestas V80 industrial wind turbines located in Kryry (Ústí nad Labem region, Czech Republic). Clean electrical output is fed directly into ČEZ Distribuce's 22 kV regional distribution network under a long-term utility PPA agreement, backed by licensed Czech technician maintenance and 24/7 SCADA monitoring."
         keyDetails={[
           {
-            label: 'Replaced Power',
-            value: 'Diesel Generator',
-            subtext: '0% fossil fuel consumption',
+            label: 'Total Capacity',
+            value: '4.0 MW (2× Vestas V80)',
+            subtext: '80m hub height, 80m rotor',
           },
           {
-            label: 'Billing Velocity',
-            value: '$0.35 / kWh',
-            subtext: 'Direct consumer tariff',
+            label: 'Utility Concession',
+            value: '20 Years Guaranteed',
+            subtext: 'ČEZ Distribuce a.s.',
+          },
+          {
+            label: 'Grid Connection',
+            value: '22 kV High-Voltage Line',
+            subtext: 'Dedicated substation',
+          },
+          {
+            label: 'Technician Team',
+            value: 'Czech Certified On-Site',
+            subtext: 'Quarterly blade & gear audits',
           },
         ]}
-        grossRevenueTitle="$1,850.00 / Year Gross Revenue"
+        grossRevenueTitle="€262,700 / Year Gross Revenue (ČEZ Feed-In)"
         waterfallSteps={financials.cashFlowWaterfall}
       />
     </div>

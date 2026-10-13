@@ -188,20 +188,20 @@ function campaignToDemoItem(
         {
           title: 'Gross Energy Revenue',
           percentage: '100%',
-          amount: `$${annualRev.toLocaleString()} / yr`,
+          amount: `€${annualRev.toLocaleString()} / yr`,
           description: `Metered tariff collected from off-taker ${c.offTakerName}`,
         },
         {
           title: 'O&M & Telemetry Reserve',
           percentage: '6%',
-          amount: `-$${Math.round(annualRev * 0.06).toLocaleString()} / yr`,
+          amount: `-€${Math.round(annualRev * 0.06).toLocaleString()} / yr`,
           description:
             'Cerbo GX LTE connectivity, hardware warranty, and routine inspection',
         },
         {
           title: 'Net Investor Distribution',
           percentage: '94%',
-          amount: `$${Math.round(annualRev * 0.94).toLocaleString()} / yr`,
+          amount: `€${Math.round(annualRev * 0.94).toLocaleString()} / yr`,
           description:
             'Direct proportional yield streaming to tokenholders on Solana',
         },
@@ -255,6 +255,22 @@ export function useEnrichedCampaigns() {
       demos.push(campaignToDemoItem(c, customIdx++));
     }
   }
+
+  // Canonical priority sort aligning with pitch:
+  // 1. Batteries (35% APY - core yield product)
+  // 2. Treetino V1 Trees (signature biomimetic)
+  // 3. EV Charging Plaza (stablecoin settlement)
+  // 4. Industrial Wind Turbines (4.0 MW utility)
+  const priorityOrder: Record<string, number> = {
+    ess: 1,
+    'treetino-v1': 2,
+    ev: 3,
+    offgrid: 4,
+    wind: 4,
+  };
+  demos.sort(
+    (a, b) => (priorityOrder[a.key] ?? 99) - (priorityOrder[b.key] ?? 99),
+  );
 
   return {
     demos,

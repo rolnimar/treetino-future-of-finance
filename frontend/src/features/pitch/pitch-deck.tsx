@@ -27,11 +27,7 @@ interface PitchDeckProps {
   onOpenDeposit?: () => void;
 }
 
-export function PitchDeck({
-  onExit,
-  onExploreCampaigns,
-  onOpenDeposit,
-}: PitchDeckProps) {
+export function PitchDeck({ onExit }: PitchDeckProps) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isPresenterNotesOpen, setIsPresenterNotesOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -224,14 +220,12 @@ export function PitchDeck({
             muted
             playsInline
             poster="/img/hero-images/poster-v1_1.1.1.webp"
-            className="w-full h-full object-cover object-center sm:object-right"
+            className="w-full h-full object-cover object-[75%_center]"
           >
             <source src="/video/hero-v1-cine-noaudio.webm" type="video/webm" />
           </video>
-          {/* Balanced white overlay: video is clearly visible while typography remains 100% legible */}
-          <div className="absolute inset-0 bg-white/35" />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/50 via-40% to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-white/90 via-white/60 to-transparent" />
+          {/* Clean directional scrim: keeps text on the left pure white and razor sharp, leaves tree video 100% visible with zero bottom fog */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 via-35% to-transparent" />
         </div>
       )}
 
@@ -499,7 +493,7 @@ export function PitchDeck({
             </div>
 
             {/* Bottom 3-Part Contrast: Minimal, Sleek, No Heavy Bubbles */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t-2 border-zinc-100">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t-2 border-zinc-200/80 max-w-4xl">
               <div className="space-y-2">
                 <span className="font-mono text-xs font-bold text-zinc-400 uppercase tracking-widest block">
                   Generation Capacity
@@ -539,25 +533,26 @@ export function PitchDeck({
           </div>
         )}
 
-        {/* SLIDE 4: 8.6 MW BATTERY OPPORTUNITY */}
+        {/* SLIDE 4: UTILITY BATTERY STORAGE */}
         {currentSlide.id === 'financial-engine' && (
           <div className="w-full flex flex-col justify-between py-4 min-h-[58vh]">
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="font-mono text-sm font-bold text-blue-600 tracking-widest uppercase">
-                  04 / Utility Scale Asset
+                  04 / Financial Engine
                 </div>
                 <div className="flex items-center gap-2 font-mono text-xs font-bold text-blue-700">
                   <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
-                  <span>Signed ČEZ 22 kV Interconnection Secured</span>
+                  <span>
+                    Pipeline Anchor: 8.6 MW ČEZ Grid Interconnection Secured
+                  </span>
                 </div>
               </div>
               <h2 className="text-8xl sm:text-9xl lg:text-[10rem] font-black tracking-tighter text-zinc-950 leading-none">
-                8.6 MW BESS.
+                Battery Storage.
               </h2>
               <p className="text-2xl sm:text-4xl font-bold text-zinc-600 tracking-tight max-w-4xl pt-2">
-                Přeštice utility storage. ČEPS grid balancing and spot power
-                arbitrage.
+                Grid volatility creates Europe’s most lucrative cash-flow asset.
               </p>
             </div>
 
@@ -568,79 +563,50 @@ export function PitchDeck({
                   Net Annual EBITDA
                 </span>
                 <div className="text-4xl sm:text-5xl font-black text-zinc-950 font-mono">
-                  €1.48M
+                  €1.0M–€1.5M
                 </div>
                 <p className="text-base font-bold text-zinc-600">
-                  ČEPS grid balancing and spot power arbitrage across peak
-                  spreads.
+                  Dual revenue: 24/7 grid balancing capacity fees + negative
+                  price spot arbitrage.
                 </p>
               </div>
 
               <div className="space-y-2">
                 <span className="font-mono text-xs font-bold text-emerald-600 uppercase tracking-widest block">
-                  Rapid Payback
+                  Capital Payback
                 </span>
                 <div className="text-4xl sm:text-5xl font-black text-emerald-600 font-mono">
-                  2.95 Yrs
+                  &lt; 3 Years
                 </div>
                 <p className="text-base font-bold text-zinc-600">
-                  21.8%–31.5% 10-year project IRR (Equity IRR &gt;35%).
+                  25%–35% unlevered project IRR outperforming traditional
+                  infrastructure.
                 </p>
               </div>
 
               <div className="space-y-2">
                 <span className="font-mono text-xs font-bold text-blue-600 uppercase tracking-widest block">
-                  Grid Capacity
+                  Dual Revenue Engine
                 </span>
                 <div className="text-4xl sm:text-5xl font-black text-blue-600 font-mono">
-                  8.6 MW
+                  24/7 Yield
                 </div>
                 <p className="text-base font-bold text-zinc-600">
-                  Signed ČEZ 22 kV interconnection contracts secured on-site.
+                  Paid to charge during negative solar midday; discharging at
+                  evening peak spreads.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* SLIDE 5: LIVE VICTRON SCADA INTEGRATION */}
-        {currentSlide.id === 'victron-integration' && (
-          <div className="w-full flex flex-col justify-between py-2 min-h-[58vh]">
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="font-mono text-sm font-bold text-blue-600 tracking-widest uppercase">
-                  05 / Edge Architecture
-                </div>
-                <div className="flex items-center gap-2 font-mono text-xs font-bold text-emerald-700">
-                  <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-                  <span>
-                    96 Signed SCADA Readings / Day · Modbus TCP &lt; 10 ms RTT
-                  </span>
-                </div>
-              </div>
-              <h2 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-zinc-950 leading-none">
-                Live Victron SCADA.
-              </h2>
-              <p className="text-xl sm:text-2xl font-bold text-zinc-600 tracking-tight max-w-4xl">
-                Physical edge telemetry streaming straight from Venus OS into
-                Solana state.
-              </p>
-            </div>
-
-            {/* Seamless Light Industrial Topology Canvas - No Outer Bubble */}
-            <div className="w-full flex justify-center pt-4 border-t-2 border-zinc-100">
-              <PitchVictronTopology />
-            </div>
-          </div>
-        )}
-
-        {/* SLIDE 6: MULTI-LAYER DEFI FINANCIAL ENGINE */}
+        {/* SLIDE 5: MULTI-LAYER DEFI FINANCIAL ENGINE */}
         {currentSlide.id === 'defi-financial-engine' && (
           <div className="w-full flex flex-col justify-between py-4 min-h-[58vh]">
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="font-mono text-sm font-bold text-blue-600 tracking-widest uppercase">
-                  06 / Multi-Layer Financial Engine
+                  05 / Multi-Layer Financial Engine
                 </div>
                 <div className="flex items-center gap-2 font-mono text-xs font-bold text-blue-700">
                   <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
@@ -700,42 +666,74 @@ export function PitchDeck({
           </div>
         )}
 
-        {/* SLIDE 7: SIMPLIFIED FINALE & CTA TO FOLLOW ON X */}
-        {currentSlide.id === 'vision-round' && (
-          <div className="w-full flex flex-col justify-between py-4 min-h-[58vh]">
-            <div className="space-y-4">
+        {/* SLIDE 6: LIVE VICTRON SCADA INTEGRATION */}
+        {currentSlide.id === 'victron-integration' && (
+          <div className="w-full flex flex-col justify-between py-2 min-h-[58vh]">
+            <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="font-mono text-sm font-bold text-blue-600 tracking-widest uppercase">
-                  07 / The New Energy Era
+                  06 / Edge Architecture
                 </div>
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-700">
+                <div className="flex items-center gap-2 font-mono text-xs font-bold text-emerald-700">
                   <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-                  <span>Live on Solana Devnet</span>
+                  <span>
+                    96 Signed SCADA Readings / Day · Modbus TCP &lt; 10 ms RTT
+                  </span>
                 </div>
               </div>
-              <h2 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-zinc-950 leading-tight">
-                &ldquo;We only ever had to pay for energy. It&rsquo;s time to
-                earn from the global energy transformation.&rdquo;
+              <h2 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-zinc-950 leading-none">
+                Live Victron SCADA.
               </h2>
-              <p className="text-2xl sm:text-3xl font-bold text-zinc-500 tracking-tight pt-2">
-                Unlocking the $3 Trillion Energy Market · Liquid &amp; Direct on
-                Solana.
+              <p className="text-xl sm:text-2xl font-bold text-zinc-600 tracking-tight max-w-4xl">
+                Physical edge telemetry streaming straight from Venus OS into
+                Solana state.
               </p>
             </div>
 
-            {/* Unboxed Minimal CTA Row with Scannable QR Code for Presentation Audience */}
-            <div className="pt-8 border-t-2 border-zinc-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-              <div className="space-y-2">
-                <span className="font-mono text-xs font-bold text-blue-600 uppercase tracking-widest block">
-                  Join The Movement
-                </span>
-                <div className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
-                  Follow our journey on 𝕏
+            {/* Seamless Light Industrial Topology Canvas - No Outer Bubble */}
+            <div className="w-full flex justify-center pt-4 border-t-2 border-zinc-100">
+              <PitchVictronTopology />
+            </div>
+          </div>
+        )}
+
+        {/* SLIDE 7: SIMPLIFIED FINALE & CTA TO FOLLOW ON X */}
+        {currentSlide.id === 'vision-round' && (
+          <div className="w-full flex flex-col justify-between py-6 min-h-[62vh]">
+            {/* Top Indicator */}
+            <div className="flex items-center justify-between">
+              <div className="font-mono text-sm font-bold text-blue-600 tracking-widest uppercase">
+                07 / The New Energy Era
+              </div>
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-700">
+                <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+                <span>Live on Solana Devnet</span>
+              </div>
+            </div>
+
+            {/* Hero Punchline Quote with Generous Breathing Room */}
+            <div className="py-8 max-w-5xl">
+              <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-zinc-950 leading-[1.15]">
+                &ldquo;We only ever had to pay for energy. It&rsquo;s time to
+                earn from the global energy transformation.&rdquo;
+              </h2>
+            </div>
+
+            {/* Streamlined Minimalist CTA to Follow on X */}
+            <div className="pt-8 border-t-2 border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="space-y-1.5">
+                <div className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight flex items-center gap-2.5">
+                  <span>Follow our journey on</span>
+                  <svg
+                    className="h-6 w-6 fill-current text-zinc-950"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
                 </div>
-                <p className="text-base font-bold text-zinc-500 max-w-xl">
-                  Scan the QR code with your phone for live deployment updates,
-                  BESS milestones &amp; protocol releases.
-                </p>
+                <div className="font-mono text-xl font-bold text-blue-600">
+                  @treetino_corp
+                </div>
               </div>
 
               {/* Scannable Vector QR Code linking to https://x.com/treetino_corp */}
@@ -744,36 +742,25 @@ export function PitchDeck({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-5 p-3.5 border-2 border-zinc-200 hover:border-zinc-950 transition-colors bg-white shadow-sm shrink-0 group cursor-pointer"
-                title="Scan with phone or click to open @treetino_corp on 𝕏"
+                className="flex items-center gap-4 group cursor-pointer"
+                title="Scan to follow @treetino_corp on X"
               >
-                <div className="bg-white p-1 shrink-0">
+                <div className="bg-white p-2 border border-zinc-200 group-hover:border-zinc-950 transition-colors shadow-sm">
                   {qrCodeDataUrl ? (
                     <img
                       src={qrCodeDataUrl}
-                      alt="QR Code for @treetino_corp on 𝕏"
-                      className="w-28 h-28 sm:w-32 sm:h-32"
+                      alt="QR Code for @treetino_corp on X"
+                      className="w-24 h-24 sm:w-28 sm:h-28"
                     />
                   ) : (
-                    <TreetinoXQRCode className="w-28 h-28 sm:w-32 sm:h-32" />
+                    <TreetinoXQRCode className="w-24 h-24 sm:w-28 sm:h-28" />
                   )}
                 </div>
-                <div className="space-y-1 text-left pr-3">
-                  <div className="flex items-center gap-2">
-                    <svg
-                      className="h-4 w-4 fill-current text-zinc-950"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-400">
-                      Scan QR
-                    </span>
+                <div className="hidden sm:block text-left space-y-1">
+                  <div className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    Scan to Follow
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-zinc-950 group-hover:text-blue-600 transition-colors">
-                    @treetino_corp
-                  </div>
-                  <div className="text-xs font-mono font-bold text-blue-600 flex items-center gap-1">
+                  <div className="text-sm font-mono font-bold text-blue-600 group-hover:underline flex items-center gap-1">
                     <span>x.com/treetino_corp</span>
                     <span>↗</span>
                   </div>
@@ -781,77 +768,18 @@ export function PitchDeck({
               </a>
             </div>
 
-            {/* Quick Actions to Explore & Test Funds */}
-            <div className="flex flex-wrap items-center gap-4">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onExploreCampaigns();
-                }}
-                className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-6 py-3.5 text-sm font-bold text-white shadow-md transition-all active:scale-[0.98] cursor-pointer"
-              >
-                <span>Explore Live Campaigns</span>
-                <span>→</span>
-              </button>
-              {onOpenDeposit && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenDeposit();
-                  }}
-                  className="flex items-center gap-2 rounded-xl border-2 border-zinc-950 bg-white hover:bg-zinc-50 px-6 py-3.5 text-sm font-bold text-zinc-950 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
-                >
-                  <span>Deposit Test Capital</span>
-                </button>
-              )}
-            </div>
-
             {/* Clean Hackathon Team Attribution */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-zinc-200 text-sm">
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-2 shrink-0">
-                  <div
-                    className="h-9 w-9 rounded-full bg-blue-600 border-2 border-white flex items-center justify-center font-mono text-xs font-black text-white shadow-sm z-10"
-                    title="Jakub Lustyk (CTO, Treetino)"
-                  >
-                    JL
-                  </div>
-                  <div
-                    className="h-9 w-9 rounded-full bg-zinc-900 border-2 border-white flex items-center justify-center font-mono text-xs font-black text-white shadow-sm"
-                    title="Marian-Daniel Rolník (Cleevio)"
-                  >
-                    MR
-                  </div>
-                </div>
-                <div className="text-zinc-700">
-                  <span className="font-black text-zinc-950">Jakub Lustyk</span>{' '}
-                  <span className="font-mono text-xs font-bold text-blue-600">
-                    (CTO, Treetino)
-                  </span>
-                  <span className="text-zinc-300 mx-2">·</span>
-                  <span className="font-black text-zinc-950">
-                    Marian-Daniel Rolník
-                  </span>{' '}
-                  <span className="font-mono text-xs font-bold text-zinc-500">
-                    (Cleevio)
-                  </span>{' '}
-                  <a
-                    href="https://github.com/rolnimar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="font-mono text-xs font-bold text-blue-600 hover:underline ml-1"
-                  >
-                    github.com/rolnimar
-                  </a>
-                </div>
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-zinc-100 text-xs font-mono text-zinc-500">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-zinc-900">Jakub Lustyk</span>
+                <span className="text-blue-600">(CTO, Treetino)</span>
+                <span className="text-zinc-300">·</span>
+                <span className="font-bold text-zinc-900">
+                  Marian-Daniel Rolník
+                </span>
+                <span className="text-zinc-500">(Cleevio)</span>
               </div>
-
-              <div className="font-mono text-xs font-bold text-zinc-400">
-                Solana Global Hackathon 2026
-              </div>
+              <div className="text-zinc-400">Solana Global Hackathon 2026</div>
             </div>
           </div>
         )}

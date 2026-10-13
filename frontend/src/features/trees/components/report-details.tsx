@@ -12,7 +12,7 @@ export function ReportDetails({ report }: { report: IndexedReport }) {
       <ReportCharts report={report} />
       {report.invoiceIssued ? (
         <p>
-          {formatTokenAmount(report.due)} mockUSDC billed ·{' '}
+          {formatTokenAmount(report.due)} EURTree billed ·{' '}
           {formatTokenAmount(report.paid)} paid ·{' '}
           {formatTokenAmount(
             (BigInt(report.due) - BigInt(report.paid)).toString(),
@@ -33,7 +33,7 @@ export function ReportDetails({ report }: { report: IndexedReport }) {
           <p>
             {pricing.amount === null
               ? 'This spot-price amount cannot be issued as an unsigned on-chain invoice.'
-              : `${formatTokenAmount(pricing.amount)} mockUSDC at ${pricing.usdCzk} CZK/USD`}
+              : `${formatTokenAmount(pricing.amount)} EURTree at ${pricing.eurCzk} CZK/EUR`}
           </p>
           <p className="text-xs text-zinc-500">
             UTC report day {pricing.date} · CNB fixing{' '}

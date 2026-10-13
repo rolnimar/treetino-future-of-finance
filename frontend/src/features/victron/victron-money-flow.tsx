@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { VictronDemoItem } from './victron-types';
 import { useVictronInvestments } from './use-victron-investments';
+import { useLiveYieldStream } from './yield-stream';
 import { useConnectedWallet } from '../wallet/use-connected-wallet';
 import { usePublicTransactions } from '../marketplace/hooks/use-public-transactions';
 import { parseTokenAmount } from '../../chain/amounts';
@@ -23,18 +24,9 @@ export function VictronMoneyFlow({
   const publicTx = usePublicTransactions(wallet);
   const [investAmount, setInvestAmount] = useState<number>(500);
   const [justInvested, setJustInvested] = useState<boolean>(false);
-  const [elapsedTicks, setElapsedTicks] = useState<number>(0);
 
   const { investments, invest } = useVictronInvestments(walletAddress);
   const currentHolding = investments[demo.siteId];
-
-  // Ticking effect for live streaming yield
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setElapsedTicks((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Proportional calculations
   const target = demo.financials.targetUsdc || 10000;
@@ -44,17 +36,9 @@ export function VictronMoneyFlow({
   const monthlyDividend = ((investAmount * apyFraction) / 12).toFixed(2);
   const dailyDividend = ((investAmount * apyFraction) / 365).toFixed(2);
 
-  // Live accrued yield calculation
-  const calculateAccrued = () => {
-    if (!currentHolding || currentHolding.amountUsdc <= 0) return 0;
-    const holdingApy = demo.financials.projectedApy / 100;
-    const holdingAnnual = currentHolding.amountUsdc * holdingApy;
-    const secondsInYear = 365 * 24 * 3600;
-    const stream = (holdingAnnual / secondsInYear) * (elapsedTicks + 1);
-    return Math.max(0.0001, stream);
-  };
-
-  const accruedUsdc = calculateAccrued();
+  // Synchronized live accrued yield
+  const liveResult = useLiveYieldStream(currentHolding, demo.financials);
+  const accruedUsdc = liveResult.totalAccrued;
 
   const handleInvest = () => {
     if (investAmount <= 0) return;
@@ -108,7 +92,7 @@ export function VictronMoneyFlow({
               Energy Revenue
             </div>
             <div className="mt-2 font-mono text-lg font-black text-t-blue">
-              ${demo.financials.estAnnualRevenueUsdc.toLocaleString()} / yr
+              €{demo.financials.estAnnualRevenueUsdc.toLocaleString()} / yr
             </div>
             <p className="mt-1.5 text-[11px] text-zinc-600 leading-snug">
               {demo.financials.tariffRate}
@@ -162,8 +146,8 @@ export function VictronMoneyFlow({
                 <div>
                   <div className="font-bold text-zinc-950 text-sm flex items-center gap-2">
                     <span>{item.title}</span>
-                    <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 font-mono text-[10px] text-zinc-600 font-bold">
-                      {item.percentage}
+                    <span className="font-mono text-xs text-zinc-400 font-normal">
+                      ({item.percentage})
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-zinc-500">
@@ -206,7 +190,7 @@ export function VictronMoneyFlow({
               {walletAddress ? (
                 <span className="text-t-blue font-bold">
                   {walletAddress.slice(0, 4)}…{walletAddress.slice(-4)} (
-                  {walletBalance ?? '0'} mockUSDC)
+                  {walletBalance ?? '0'} EURTree)
                 </span>
               ) : (
                 <span className="text-amber-700 font-semibold">
@@ -221,7 +205,7 @@ export function VictronMoneyFlow({
                 onClick={onOpenDeposit}
                 className="rounded-xl border border-t-blue/30 bg-t-blue/5 px-3 py-2 font-mono text-xs font-bold text-t-blue hover:bg-t-blue/10 transition shadow-2xs cursor-pointer flex items-center gap-1.5"
               >
-                <span>+ Deposit / Mint USDC</span>
+                <span>+ Deposit / Mint EURTree</span>
               </button>
             ) : wallet ? (
               <button
@@ -235,7 +219,7 @@ export function VictronMoneyFlow({
                 }
                 className="rounded-xl border border-t-blue/30 bg-t-blue/5 px-3 py-2 font-mono text-xs font-bold text-t-blue hover:bg-t-blue/10 transition disabled:opacity-50 shadow-2xs cursor-pointer"
               >
-                {publicTx.isPending ? 'Minting…' : '+ Faucet 1,000 USDC'}
+                {publicTx.isPending ? 'Minting…' : '+ Faucet 1,000 EURTree'}
               </button>
             ) : null}
           </div>
@@ -243,7 +227,7 @@ export function VictronMoneyFlow({
 
         {publicTx.isSuccess && (
           <div className="mt-4 rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-semibold text-emerald-800">
-            Minted 1,000 mockUSDC to your devnet wallet!
+            Minted 1,000 EURTree to your devnet wallet!
           </div>
         )}
         {publicTx.error && (
@@ -261,7 +245,7 @@ export function VictronMoneyFlow({
                   Demo Asset Holding
                 </div>
                 <div className="mt-1 text-2xl font-black text-zinc-950">
-                  ${currentHolding.amountUsdc.toLocaleString()} mockUSDC (
+                  €{currentHolding.amountUsdc.toLocaleString()} EURTree (
                   {((currentHolding.amountUsdc / target) * 100).toFixed(2)}%
                   Pool Share)
                 </div>
@@ -277,7 +261,7 @@ export function VictronMoneyFlow({
                     Simulated Dividend
                   </span>
                   <span className="font-mono text-2xl font-black text-t-blue">
-                    +${accruedUsdc.toFixed(4)} mockUSDC
+                    +€{accruedUsdc.toFixed(4)} EURTree
                   </span>
                 </div>
                 <a
@@ -297,7 +281,7 @@ export function VictronMoneyFlow({
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700">
-                Investment Amount (mockUSDC)
+                Investment Amount (EURTree)
               </label>
               <div className="relative mt-2">
                 <input
@@ -313,7 +297,7 @@ export function VictronMoneyFlow({
                   className="w-full rounded-xl border border-black/15 bg-white px-4 py-3 font-mono text-xl font-extrabold text-zinc-950 focus:border-t-blue focus:ring-1 focus:ring-t-blue focus:outline-hidden shadow-2xs"
                 />
                 <span className="absolute right-4 top-3.5 font-mono text-xs font-bold text-zinc-400">
-                  mockUSDC
+                  EURTree
                 </span>
               </div>
             </div>
@@ -331,7 +315,7 @@ export function VictronMoneyFlow({
                       : 'border-black/10 bg-white text-zinc-700 hover:bg-black/5'
                   }`}
                 >
-                  ${amt}
+                  €{amt}
                 </button>
               ))}
             </div>
@@ -342,14 +326,13 @@ export function VictronMoneyFlow({
               disabled={investAmount <= 0}
               className="w-full rounded-xl bg-t-blue hover:bg-t-blue/90 py-3.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-50 cursor-pointer"
             >
-              Fund ${investAmount.toLocaleString()} mockUSDC in this Asset →
+              Fund €{investAmount.toLocaleString()} EURTree in this Asset →
             </button>
 
             {justInvested && (
               <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-700">
                 <CheckIcon className="h-4 w-4" />
-                Successfully allocated ${investAmount.toLocaleString()}{' '}
-                mockUSDC!
+                Successfully allocated €{investAmount.toLocaleString()} EURTree!
               </div>
             )}
           </div>
@@ -357,7 +340,7 @@ export function VictronMoneyFlow({
           {/* Right: Proportional Distribution Table */}
           <div className="rounded-2xl border border-black/10 bg-zinc-50/70 p-6 text-xs shadow-2xs">
             <span className="font-mono text-[10px] text-t-blue font-bold uppercase tracking-wider">
-              Exact Distribution for ${investAmount.toLocaleString()} mockUSDC
+              Exact Distribution for €{investAmount.toLocaleString()} EURTree
             </span>
 
             <div className="mt-4 space-y-3">
@@ -375,7 +358,7 @@ export function VictronMoneyFlow({
                   Daily Energy Dividend:
                 </span>
                 <span className="font-mono font-bold text-t-blue text-sm">
-                  +${dailyDividend} / day
+                  +€{dailyDividend} / day
                 </span>
               </div>
 
@@ -384,7 +367,7 @@ export function VictronMoneyFlow({
                   Monthly Run-Rate:
                 </span>
                 <span className="font-mono font-bold text-t-blue text-sm">
-                  +${monthlyDividend} / mo
+                  +€{monthlyDividend} / mo
                 </span>
               </div>
 
@@ -393,7 +376,7 @@ export function VictronMoneyFlow({
                   Annual Distributed Yield:
                 </span>
                 <span className="font-mono text-2xl font-black text-t-blue">
-                  +${annualDividend} / yr
+                  +€{annualDividend} / yr
                 </span>
               </div>
             </div>
@@ -403,8 +386,8 @@ export function VictronMoneyFlow({
                 Yield Distribution Rule:
               </strong>{' '}
               For every kilowatt-hour metered by this Victron installation,
-              revenue is split proportionally according to token share. ($
-              {investAmount} × {demo.financials.projectedApy}%) = $
+              revenue is split proportionally according to token share. (€
+              {investAmount} × {demo.financials.projectedApy}%) = €
               {annualDividend} annual return.
             </div>
           </div>

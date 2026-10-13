@@ -39,9 +39,15 @@ export function TreeRewards({
             {rewards.isError
               ? 'Rewards unavailable'
               : state
-                ? `${formatTokenAmount(state.claimable)} mockUSDC`
+                ? `${formatTokenAmount(state.claimable)} EURTree`
                 : 'Loading rewards…'}
           </p>
+          {state && !rewards.isError && state.claimable !== '0' && (
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-100/70 border border-emerald-300 px-2.5 py-0.5 text-[11px] font-mono font-medium text-emerald-800">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Kamino Pool (+8.85% APY) Auto-Compounding</span>
+            </div>
+          )}
           <ErrorMessage error={rewards.error} />
           {state && !rewards.isError && (
             <p className="mb-3 text-sm text-zinc-600">

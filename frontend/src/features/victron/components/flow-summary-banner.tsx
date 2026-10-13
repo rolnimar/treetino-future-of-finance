@@ -76,7 +76,7 @@ export function FlowSummaryBanner({
             <TrendUpIcon className="h-4 w-4 text-t-accent" />
             <span>{investorYield.apyPercent}% APY</span>
             <span className="text-xs font-normal text-zinc-500">
-              (${investorYield.annualDistribution} / yr)
+              (€{investorYield.annualDistribution} / yr)
             </span>
           </div>
           <p className="mt-0.5 text-[11px] text-zinc-600">

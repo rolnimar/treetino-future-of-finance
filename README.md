@@ -164,9 +164,9 @@ Switching accounts or disconnecting clears the admin session.
 
 The public marketplace loads trees from `GET /api/trees`, with phase filters,
 pagination, funding bars and 10-second refreshes. Active trees remain visible;
-new shares are sold during the funding phase, at 1 mockUSDC per share. Purchases
-cannot exceed your mockUSDC balance or the tree’s remaining funding. The **Max**
-button uses the smaller of those amounts. Wallet balances come from the mockUSDC
+new shares are sold during the funding phase, at 1 EURTree per share. Purchases
+cannot exceed your EURTree balance or the tree’s remaining funding. The **Max**
+button uses the smaller of those amounts. Wallet balances come from the EURTree
 payment ATA; a missing ATA displays zero. The faucet creates it as needed.
 
 Faucet and share-purchase transactions are built on the frontend and signed by
@@ -250,9 +250,9 @@ After signing in, use the admin tabs in this order:
 1. **Protocol setup**: initialize chain admins as the current program upgrade
    authority. Include your own wallet if it should create trees. Later, use
    **Update chain admins** to replace the list (1–10 distinct nonzero wallets).
-2. **Protocol setup**: initialize the mockUSDC payment token and metadata once.
+2. **Protocol setup**: initialize the EURTree payment token and metadata once.
 3. **Create tree**: enter a creator-scoped integer tree ID, funding target in
-   mockUSDC, supplier and client. The backend prepares and saves a mock reporter
+   EURTree, supplier and client. The backend prepares and saves a mock reporter
    wallet for that creator/tree ID and prefills the read-only reporter field.
    The initialization transaction also sends it 0.05 devnet SOL.
    Your wallet must be in the chain admin list.
@@ -262,7 +262,7 @@ After signing in, use the admin tabs in this order:
 5. **Trees**: activate purchased trees with a UTC first billing day, including a past day for historical reporting.
    The creator can load active tree reports and issue a final invoice, including
    a zero invoice. Invoice amounts cannot be changed after issuance.
-6. **Demo faucet**: mint demo mockUSDC to your wallet's payment ATA.
+6. **Demo faucet**: mint demo EURTree to your wallet's payment ATA.
 
 Purchase, activation and invoice actions require the original tree creator,
 even if chain admin membership later changes. Report submission remains the
@@ -440,7 +440,7 @@ also cannot access client routes. `GET /api/client/me` verifies the client sessi
 invoices (404 for unassigned trees). Assignments come from the indexed on-chain
 `client` wallet, so no separate client account table or migration is required.
 Client sessions stay in memory and clear on sign-out, wallet change, disconnect,
-or expiry. Clients see their mockUSDC balance and sign invoice payments on the
+or expiry. Clients see their EURTree balance and sign invoice payments on the
 frontend. Public trees, reports, the faucet and share purchases remain available.
 Permissions overlap: the same wallet can hold both admin and client sessions
 while also buying shares or using the public faucet. Client permissions apply
@@ -465,17 +465,17 @@ No energy-value or reading-count limits are added.
 interval CZK/kWh = OTE interval EUR/MWh × report-day CNB EUR/CZK ÷ 1,000
 interval CZK = on-chain interval Wh ÷ 1,000 × interval CZK/kWh
 CZK invoice = sum of all interval CZK amounts
-mockUSDC invoice = CZK invoice ÷ report-day CNB USD/CZK
+EURTree invoice = CZK invoice ÷ report-day CNB EUR/CZK (1:1 with EUR)
 ```
 
 The CNB fixing for the UTC report date is used throughout that invoice, including
 intervals on the next Czech delivery date. CNB supplies the applicable previous
 working-day rate on weekends/holidays. Calculations use integer decimal arithmetic
-and round the mockUSDC total once to six decimals after summing all signed prices.
+and round the EURTree total once to six decimals after summing all signed prices.
 Displayed interval totals use six decimals and the daily CZK total uses two;
 conversion uses the full sum before display rounding. Negative-price intervals
 reduce the total, with no clamping. A net credit or an amount exceeding u64 has no
-unsigned mockUSDC draft because the current program cannot represent it.
+unsigned EURTree draft because the current program cannot represent it.
 
 Market curves and exchange rates are cached by delivery date. Each priced report
 stores its readings, interval UTC starts, EUR/MWh, CZK/kWh, line totals, daily total
@@ -491,10 +491,10 @@ JSON pricing data and requires no additional SQL migration.
 
 The backend automatically creates a **priced draft**, not an issued chain invoice.
 In the admin tree's **Load reports & invoices** panel, the creator reviews the
-prefilled mockUSDC amount and signs **Issue invoice**. Issuance is immutable under
+prefilled EURTree amount and signs **Issue invoice**. Issuance is immutable under
 the existing deployed program, so no program upgrade is needed. The public
 **View production & invoices** panel shows reports and outstanding invoices.
-The tree's client wallet can pay the remaining amount using its mockUSDC balance
+The tree's client wallet can pay the remaining amount using its EURTree balance
 and the public faucet; other wallets can view it. Payment uses the connected
 client wallet and updates after indexer confirmation.
 

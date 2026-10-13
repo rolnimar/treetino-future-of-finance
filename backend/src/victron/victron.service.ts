@@ -17,55 +17,55 @@ interface CachedData {
 const SITE_METADATA = {
   209689: {
     key: 'offgrid' as const,
-    title: 'Off-Grid Solar Microgrid',
-    category: 'Grassroots DePIN · Permissionless Adoption',
-    categoryBadge: 'Off-Grid Solar',
+    title: 'Wind Park Kryry 4.0 MW (Vestas V80)',
+    category: 'Utility Wind · High-Voltage Grid Intertie',
+    categoryBadge: 'Wind Turbines · 4.0 MW',
     narrative:
-      'Community microgrid enabling permissionless clean power. Retail investors fund rooftop solar and battery hardware for off-grid homes. As the homeowner consumes clean energy, their metered repayments stream directly to tokenholders.',
+      'Two utility-scale 2.0 MW Vestas V80 wind turbines located in the Kryry wind corridor. Feeds clean industrial baseload power directly into the high-voltage transmission grid, generating stable metered feed-in cashflows.',
     investorHighlight:
-      'Direct consumer payback model replacing expensive off-grid diesel generators with clean solar equity.',
-    projectedApy: '8.5%',
-    suggestedTargetUsdc: '10000',
+      'Proven utility-grade wind infrastructure with 20-year grid concession, certified turbine availability >98%, and predictable European green energy cash flows.',
+    projectedApy: '14.2%',
+    suggestedTargetUsdc: '180000',
     location: {
-      city: 'Queensland',
-      country: 'Australia',
-      latitude: -25.7503,
-      longitude: 151.265,
-      timezone: 'Australia/Brisbane',
+      city: 'Kryry',
+      country: 'Czech Republic',
+      latitude: 50.1742,
+      longitude: 13.4286,
+      timezone: 'Europe/Prague',
     },
     financials: {
-      targetUsdc: 10000,
-      fundedUsdc: 7850,
-      fundedPercent: 78.5,
+      targetUsdc: 180000,
+      fundedUsdc: 142000,
+      fundedPercent: 78.9,
       sharePriceUsdc: 1.0,
-      totalShares: 10000,
-      projectedApy: 8.5,
-      estDailyRevenueUsdc: 2.33,
-      estMonthlyRevenueUsdc: 70.83,
-      estAnnualRevenueUsdc: 850.0,
+      totalShares: 180000,
+      projectedApy: 14.2,
+      estDailyRevenueUsdc: 70.03,
+      estMonthlyRevenueUsdc: 2130.0,
+      estAnnualRevenueUsdc: 25560.0,
       tariffRate:
-        '$0.40 / kWh metered consumer consumption (vs $0.65/kWh diesel baseline)',
+        '€95.00 / MWh guaranteed grid feed-in tariff (Vestas V80 2× 2.0 MW)',
       revenueModelDescription:
-        'Homeowner pays a fixed microgrid tariff for each kilowatt-hour consumed from the tokenized battery and solar array.',
+        'Direct power feed-in contract: High-voltage regional grid off-taker purchases all metered wind kilowatt-hours.',
       cashFlowWaterfall: [
         {
-          title: 'Gross Energy Revenue',
+          title: 'Gross Wind Energy Revenue',
           percentage: '100%',
-          amount: '$850.00 / yr',
+          amount: '€340,000 / yr',
           description:
-            'Metered energy payments collected from remote homeowner',
+            'Metered electricity fed into high-voltage grid across 2× Vestas V80 turbines',
         },
         {
-          title: 'O&M & Telemetry Reserve',
-          percentage: '5%',
-          amount: '-$42.50 / yr',
+          title: 'O&M & Turbine Insurance Reserve',
+          percentage: '7.5%',
+          amount: '-€25,500 / yr',
           description:
-            'Cerbo GX LTE connectivity, insurance, and routine hardware servicing',
+            'Full-scope Vestas service contract, blade inspection, and grid intertie insurance',
         },
         {
           title: 'Net Investor Distribution',
-          percentage: '95%',
-          amount: '$807.50 / yr',
+          percentage: '92.5%',
+          amount: '€314,500 / yr',
           description:
             'Direct proportional yield streaming to tokenized share holders on Solana',
         },
@@ -75,13 +75,13 @@ const SITE_METADATA = {
   219742: {
     key: 'ess' as const,
     title: 'BESS Přeštice 8.6 MW (WATTINO hBESS)',
-    category: 'Grid Flexibility · ČEPS SVR + Spot Arbitrage',
-    categoryBadge: 'BESS 8.6 MW · Ancillary + Spot',
+    category: 'Grid Flexibility · ČEPS Standby + Spot Arbitrage',
+    categoryBadge: 'BESS 8.6 MW · 35% APY',
     narrative:
-      'High-capacity 8.6 MW / 10.0–17.2 MWh battery energy storage system (BESS) directly connected to the 110/22 kV Přeštice substation. Monetizes automated grid frequency containment (ČEPS SVR) and algorithmic day-ahead/intraday spot power arbitrage.',
+      'High-capacity 8.6 MW / 10.0–17.2 MWh battery energy storage system (BESS) directly connected to the 110/22 kV Přeštice substation. Monetizes negative midday solar prices (20% arbitrage) and guaranteed 24/7 grid standby availability fees (15%) from ČEPS, achieving up to 35% projected APY.',
     investorHighlight:
-      'High-yield grid infrastructure with 2 signed utility connection contracts, 4.2y payback (2.95y w/ subsidy), 21.8%–31.5% IRR, and 10-year EU replacement warranty.',
-    projectedApy: '21.8%',
+      'Dual-yield European grid battery: 20% spot arbitrage from negative prices + 15% ČEPS standby fee = 35% APY. 2 signed ČEZ connection agreements, 2.95y payback, and 10-year EU replacement warranty.',
+    projectedApy: '35.0%',
     suggestedTargetUsdc: '108000',
     location: {
       city: 'Dolni Lukavice (Prestice)',
@@ -96,21 +96,21 @@ const SITE_METADATA = {
       fundedPercent: 78.0,
       sharePriceUsdc: 1.0,
       totalShares: 108000,
-      projectedApy: 21.8,
-      estDailyRevenueUsdc: 295.4,
-      estMonthlyRevenueUsdc: 8980.0,
-      estAnnualRevenueUsdc: 108000.0,
+      projectedApy: 35.0,
+      estDailyRevenueUsdc: 103.56,
+      estMonthlyRevenueUsdc: 3150.0,
+      estAnnualRevenueUsdc: 37800.0,
       tariffRate:
-        '2× Signed Connection Agreements (#4122602318 & #4122623464) · ČEPS Ancillary + OTE Arbitrage',
+        '2× Signed Connection Agreements (#4122602318 & #4122623464) · 20% Spot Arbitrage + 15% ČEPS Standby',
       revenueModelDescription:
-        'Dual-income model: 60–70% ČEPS frequency regulation capacity & activation + 30–40% OTE day-ahead & 15-min intraday power arbitrage.',
+        'Dual-income model: 20% from buying negative-priced solar energy and selling at peak spreads + 15% from guaranteed ČEPS 24/7 frequency standby fees.',
       cashFlowWaterfall: [
         {
           title: 'Gross Annual Revenue (Ancillary + Spot)',
           percentage: '100%',
-          amount: '€1.24M / yr ($1.35M / 30.94M CZK)',
+          amount: '€1.24M / yr (30.94M CZK)',
           description:
-            'ČEPS capacity & activation (€860k / 21.5M CZK) + OTE day-ahead & intraday arbitrage (€380k / 9.44M CZK)',
+            'ČEPS capacity standby (€860k / 21.5M CZK) + OTE day-ahead & intraday arbitrage (€380k / 9.44M CZK)',
         },
         {
           title: 'Aggregator & Trader Revenue Share',
@@ -129,7 +129,7 @@ const SITE_METADATA = {
         {
           title: 'Clean Annual Operating Profit (EBITDA)',
           percentage: '82.7%',
-          amount: '€1.02M / yr ($1.11M / 25.6M CZK)',
+          amount: '€1.02M / yr (25.6M CZK)',
           description:
             'Net annual cash flow distributed to project equity and tokenized investors (Var. A Realistic)',
         },
@@ -165,28 +165,28 @@ const SITE_METADATA = {
       estMonthlyRevenueUsdc: 1541.67,
       estAnnualRevenueUsdc: 18500.0,
       tariffRate:
-        '$0.42 / kWh delivered + $2.50 session connection fee per charge',
+        '€0.42 / kWh delivered + €2.50 session connection fee per charge',
       revenueModelDescription:
         'Continuous point-of-sale micro-transactions generated across 10 commercial charging bays with automated energy billing.',
       cashFlowWaterfall: [
         {
           title: 'Gross Charging Revenue',
           percentage: '100%',
-          amount: '$18,500.00 / yr',
+          amount: '€18,500.00 / yr',
           description:
             'Commercial charging fees collected across 10 high-power EV charging bays',
         },
         {
           title: 'Site Lease & Payment Processing',
           percentage: '8%',
-          amount: '-$1,480.00 / yr',
+          amount: '-€1,480.00 / yr',
           description:
             'Commercial parking space lease, hardware warranty, and payment gateway costs',
         },
         {
           title: 'Net Investor Distribution',
           percentage: '92%',
-          amount: '$17,020.00 / yr',
+          amount: '€17,020.00 / yr',
           description:
             'Direct automated yield stream distributed to plaza tokenholders on Solana',
         },
@@ -221,28 +221,28 @@ const SITE_METADATA = {
       estDailyRevenueUsdc: 82.41,
       estMonthlyRevenueUsdc: 2506.67,
       estAnnualRevenueUsdc: 30080.0,
-      tariffRate: '$0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
+      tariffRate: '€0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
       revenueModelDescription:
         'Dual revenue stream: direct metered corporate PPA payments from industrial client MKovo s.r.o. plus peak grid feed-in export.',
       cashFlowWaterfall: [
         {
           title: 'Gross Metered Energy Revenue',
           percentage: '100%',
-          amount: '$30,080.00 / yr',
+          amount: '€30,080.00 / yr',
           description:
             'Metered electricity payments collected from off-taker MKovo s.r.o. and grid feed-in',
         },
         {
           title: 'O&M, Telemetry & Warranty Reserve',
           percentage: '8%',
-          amount: '-$2,406.40 / yr',
+          amount: '-€2,406.40 / yr',
           description:
             'Victron Cerbo GX cloud connectivity, actuator inspection, and replacement reserve',
         },
         {
           title: 'Net Investor Distribution',
           percentage: '92%',
-          amount: '$27,673.60 / yr',
+          amount: '€27,673.60 / yr',
           description:
             'Direct programmatic yield distributions streamed to Treetino V1 tokenholders on Solana',
         },
@@ -734,7 +734,7 @@ export class VictronService {
       turbineRpm,
       activeAiMode,
       clientName: 'MKovo s.r.o. (Precision Manufacturing)',
-      clientTariff: '$0.32 / kWh metered corporate PPA',
+      clientTariff: '€0.32 / kWh metered corporate PPA',
     };
 
     const energyStats = this.getFallbackEnergyStats(siteId);
