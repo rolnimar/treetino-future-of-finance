@@ -274,6 +274,7 @@ export function App() {
             {/* 1. Featured Crowdfunding Campaign Spotlight Hero (Desktop only) */}
             <div className="hidden md:block">
               <TreetinoHeroCinematic
+                demos={demos}
                 onSelectAsset={(id) => {
                   window.location.hash = `asset/${id}`;
                   setSelectedSiteId(id);

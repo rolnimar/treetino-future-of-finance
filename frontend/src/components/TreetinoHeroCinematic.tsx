@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { ArrowRightIcon } from '../features/victron/victron-icons';
+import type { VictronDemoItem } from '../features/victron/victron-types';
 
 interface TreetinoHeroCinematicProps {
+  demos: VictronDemoItem[];
   onSelectAsset?: (siteId: number) => void;
   onExploreCampaigns?: () => void;
   onBackProject?: (siteId: number) => void;
@@ -17,9 +19,6 @@ interface HeroSlide {
   media: string;
   poster?: string;
   siteId: number;
-  raised: string;
-  target: string;
-  percent: number;
   apy: string;
   backers: number;
   daysLeft: number;
@@ -38,9 +37,6 @@ const HERO_SLIDES: HeroSlide[] = [
     media: '/campaigns/ess.jpg',
     poster: '/campaigns/ess.jpg',
     siteId: 219742,
-    raised: 'USDC 84,200',
-    target: 'USDC 108,000',
-    percent: 78,
     apy: '35.0%',
     backers: 46,
     daysLeft: 21,
@@ -57,9 +53,6 @@ const HERO_SLIDES: HeroSlide[] = [
     media: '/video/hero-v1-cine-noaudio.webm',
     poster: '/img/hero-images/poster-v1_1.1.1.webp',
     siteId: 100001,
-    raised: 'USDC 192,700',
-    target: 'USDC 235,000',
-    percent: 82,
     apy: '12.8%',
     backers: 48,
     daysLeft: 14,
@@ -76,9 +69,6 @@ const HERO_SLIDES: HeroSlide[] = [
     media: '/campaigns/ev.jpg',
     poster: '/campaigns/ev.jpg',
     siteId: 374891,
-    raised: 'USDC 91,500',
-    target: 'USDC 100,000',
-    percent: 92,
     apy: '18.5%',
     backers: 82,
     daysLeft: 9,
@@ -95,9 +85,6 @@ const HERO_SLIDES: HeroSlide[] = [
     media: '/campaigns/wind.jpg',
     poster: '/campaigns/wind.jpg',
     siteId: 209689,
-    raised: 'USDC 142,000',
-    target: 'USDC 180,000',
-    percent: 79,
     apy: '14.2%',
     backers: 64,
     daysLeft: 18,
@@ -106,6 +93,7 @@ const HERO_SLIDES: HeroSlide[] = [
 ];
 
 export function TreetinoHeroCinematic({
+  demos,
   onSelectAsset,
   onExploreCampaigns,
   onBackProject,
@@ -113,6 +101,12 @@ export function TreetinoHeroCinematic({
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const slide = HERO_SLIDES[currentSlideIndex];
+  const financials = demos.find(
+    (demo) => demo.siteId === slide.siteId,
+  )?.financials;
+  const fundedPercent = financials?.fundedPercent;
+  const formatUsdc = (amount: number) =>
+    `USDC ${amount.toLocaleString('en-US', { maximumFractionDigits: 6 })}`;
 
   useEffect(() => {
     if (slide.type === 'video' && videoRef.current) {
@@ -190,22 +184,32 @@ export function TreetinoHeroCinematic({
                   <div className="flex items-baseline justify-between font-mono">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl sm:text-4xl font-semibold text-white tracking-tight">
-                        {slide.raised}
+                        {financials ? formatUsdc(financials.fundedUsdc) : '—'}
                       </span>
                       <span className="text-xs text-zinc-400 font-normal">
-                        of {slide.target}
+                        of{' '}
+                        {financials ? formatUsdc(financials.targetUsdc) : '—'}
                       </span>
                     </div>
                     <span className="text-xs font-mono font-medium text-sky-400">
-                      {slide.percent}% funded
+                      {fundedPercent === undefined
+                        ? 'Loading funding…'
+                        : `${fundedPercent.toLocaleString('en-US', { maximumFractionDigits: 2 })}% funded`}
                     </span>
                   </div>
 
                   {/* Luminous progress bar - using the ONE signature gradient */}
-                  <div className="mt-3.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                  <div
+                    role="progressbar"
+                    aria-label={`${slide.title} funding`}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={fundedPercent}
+                    className="mt-3.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10"
+                  >
                     <div
                       className="h-full bg-gradient-to-r from-[#183d89] to-[#2563eb] transition-all duration-700 rounded-full shadow-[0_0_12px_rgba(37,99,235,0.5)]"
-                      style={{ width: `${slide.percent}%` }}
+                      style={{ width: `${fundedPercent ?? 0}%` }}
                     />
                   </div>
                 </div>
