@@ -30,21 +30,21 @@ export const PITCH_SLIDES: PitchSlide[] = [
     timeRange: '0:00 - 0:25',
     category: 'hook',
     title: 'The Energy Monopoly',
-    subtitle: '$3 Trillion Injected, 0% Public Ownership',
+    subtitle: 'USDC 3 Trillion Injected, 0% Public Ownership',
     script:
       'Three trillion dollars.\n\n(Pause. Make direct eye contact.)\n\nThat’s how much capital was poured into global energy last year alone. That is larger than the entire market cap of crypto.\n\nYet, while any teenager with a phone can buy ten dollars of Bitcoin, ordinary people are completely shut out from the energy boom. We don’t get to profit from the grid. We only get the bill.\n\nWhat if we flipped that script? At Treetino, we’re turning everyday consumers from passive bill-payers into direct, profitable energy owners.',
     presenterNotes: [
       'Command the room: Deliver "Three trillion dollars" and hold eye contact for 2 full seconds.',
-      'Contrast: $3T invested in energy vs entire crypto market cap ($2.6T).',
-      'Visceral pain point: Teenagers can buy $10 BTC on a phone, but ordinary people only get electricity bills.',
+      'Contrast: USDC 3T invested in energy vs entire crypto market cap (USDC 2.6T).',
+      'Visceral pain point: Teenagers can buy USDC 10 BTC on a phone, but ordinary people only get electricity bills.',
       'The Shift: Introduce Treetino as the inversion of passive bill-payers into profitable energy owners.',
     ],
     keyTakeaway:
-      'The $3T energy transition is closed to the public. Treetino democratizes physical energy ownership.',
+      'The USDC 3T energy transition is closed to the public. Treetino democratizes physical energy ownership.',
     revealSteps: [
       {
         step: 0,
-        label: '$3,000B',
+        label: 'USDC 3,000B',
         description:
           'Global energy investment in 2025 alone. Exceeds total crypto market cap.',
         highlightText:
@@ -56,7 +56,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
         description:
           'Ordinary people shut out from grid revenue. We only receive bills.',
         highlightText:
-          'Any teenager can buy $10 Bitcoin. Everyday people get 0% grid access.',
+          'Any teenager can buy USDC 10 Bitcoin. Everyday people get 0% grid access.',
       },
       {
         step: 2,
@@ -80,7 +80,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     presenterNotes: [
       'Hold up phone: "Ethereum cannot do this. Layer-twos cannot do this."',
       'Cite physical grid constraint: 400ms Solana slot times match millisecond grid frequency regulation.',
-      'Highlight micro-dividends: Gas fees at $0.0002 allow continuous streaming of small yields without fee drag.',
+      'Highlight micro-dividends: Gas fees at USDC 0.0002 allow continuous streaming of small yields without fee drag.',
       'Security proof: Non-custodial PDA escrow and mint authority burned forever on-chain (Program EEbZ5DVTQ...).',
     ],
     keyTakeaway:
@@ -112,18 +112,18 @@ export const PITCH_SLIDES: PitchSlide[] = [
     category: 'financials',
     title: 'Utility Battery Storage',
     subtitle:
-      'Europe’s Volatility Engine: <3Y Payback, 25%–35% IRR, €1M–€1.5M EBITDA',
+      'Europe’s Volatility Engine: <3Y Payback, 25%–35% IRR, USDC 1M–USDC 1.5M EBITDA',
     script:
-      'However a design energy producing tree is not the most interesting financial product in the market. But we can use the experience learned from it in some of the most lucrative business opportunities available in Europe right now.\n\n(Lean in, speak with fast authority)\n\nUtility battery storage is the single most lucrative cash-flow engine in European infrastructure.\n\nWhy? Renewable volatility has broken the grid. Midday solar drives power prices into negative territory, followed by extreme evening price spikes.\n\nBatteries capture dual revenue streams: grid operators like ČEPS pay 24/7 capacity fees just for standby frequency balancing, and we get paid to charge when power prices are negative, dumping power at peak spreads.\n\nThe numbers are unmatched:\nAn 8 to 10 megawatt battery generates over one to one-point-five million euros in clean net EBITDA every year.\nThe capital payback? Two-point-nine-five years.\nProject IRR is over thirty percent.\n\nOur flagship site—BESS Přeštice—has already secured its 8.6 megawatt interconnection with ČEZ Distribuce. Treetino tokenizes these institutional cash flows so anyone can co-own this yield on Solana.',
+      'However a design energy producing tree is not the most interesting financial product in the market. But we can use the experience learned from it in some of the most lucrative business opportunities available in Europe right now.\n\n(Lean in, speak with fast authority)\n\nUtility battery storage is the single most lucrative cash-flow engine in European infrastructure.\n\nWhy? Renewable volatility has broken the grid. Midday solar drives power prices into negative territory, followed by extreme evening price spikes.\n\nBatteries capture dual revenue streams: grid operators like ČEPS pay 24/7 capacity fees just for standby frequency balancing, and we get paid to charge when power prices are negative, dumping power at peak spreads.\n\nThe numbers are unmatched:\nAn 8 to 10 megawatt battery generates over one to one-point-five million USDC in clean net EBITDA every year.\nThe capital payback? Two-point-nine-five years.\nProject IRR is over thirty percent.\n\nOur flagship site—BESS Přeštice—has already secured its 8.6 megawatt interconnection with ČEZ Distribuce. Treetino tokenizes these institutional cash flows so anyone can co-own this yield on Solana.',
     presenterNotes: [
       'Deliver exact opener: "However a design energy producing tree is not the most interesting financial product in the market. But we can use the experience learned from it in some of the most lucrative business opportunities available in Europe right now."',
       'Explain the macro opportunity: Renewable volatility creates negative power prices midday and massive evening spreads.',
       'Highlight dual revenue streams: 24/7 grid balancing standby fees (ČEPS) + negative spot arbitrage.',
-      'Drop the hard numbers fast: €1.0M–€1.5M net annual EBITDA, <3 year payback, 25%–35% project IRR.',
+      'Drop the hard numbers fast: USDC 1.0M–USDC 1.5M net annual EBITDA, <3 year payback, 25%–35% project IRR.',
       'Anchor to pipeline: Signed 8.6 MW ČEZ interconnection in Přeštice.',
     ],
     keyTakeaway:
-      'Utility battery storage delivers institutional-grade €1.0M–€1.5M EBITDA with 2.95y payback and 25%–35% IRR.',
+      'Utility battery storage delivers institutional-grade USDC 1.0M–USDC 1.5M EBITDA with 2.95y payback and 25%–35% IRR.',
   },
   {
     id: 'defi-financial-engine',
@@ -170,7 +170,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     number: 7,
     timeRange: '2:35 - 3:00',
     category: 'vision',
-    title: 'Unlocking the $3 Trillion Grid',
+    title: 'Unlocking the USDC 3 Trillion Grid',
     subtitle:
       'Built for Solana Hackathon by Jakub Lustyk (CTO, Treetino) & Marian-Daniel Rolník (Cleevio)',
     script:

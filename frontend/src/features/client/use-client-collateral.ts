@@ -205,7 +205,7 @@ export function useClientCollateral(clientWalletAddress?: string) {
         isSimulated: params.isSimulated ?? false,
         isOnChainVerified: !params.isSimulated,
         msolAta,
-        tariffKwhUsd: 0.24, // €0.24 / kWh metered energy rate
+        tariffKwhUsd: 0.24, // USDC 0.24 / kWh metered energy rate
         kwhConsumed: 185.5, // Initial metered energy from telemetry
         paidUsd: 0,
       };

@@ -4,7 +4,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useEnrichedCampaigns } from '../victron/use-enriched-campaigns';
 import { useVictronInvestments } from '../victron/use-victron-investments';
 import { useConnectedWallet } from '../wallet/use-connected-wallet';
-import { useEurTree } from '../marketplace/hooks/use-mock-usdc';
+import { useUsdc } from '../marketplace/hooks/use-mock-usdc';
 import { formatTokenAmount } from '../../chain/amounts';
 import { requestWalletApproval } from '../../chain/wallet-action';
 import {
@@ -17,7 +17,7 @@ import {
   BatteryIcon,
   ArrowRightIcon,
   ShieldCheckIcon,
-  CurrencyEuroIcon,
+  CurrencyDollarIcon,
   ExternalLinkIcon,
   BoltIcon,
   PowerPlugIcon,
@@ -44,7 +44,7 @@ export function InvestorPortfolio({
   const { connection } = useConnection();
   const { setVisible: openWalletModal } = useWalletModal();
   const wallet = useConnectedWallet();
-  const balance = useEurTree(wallet?.address);
+  const balance = useUsdc(wallet?.address);
   const { investments, claimYield } = useVictronInvestments(wallet?.address);
   const [now, setNow] = useState(() => Date.now());
   const [isKaminoModalOpen, setIsKaminoModalOpen] = useState(false);
@@ -171,7 +171,7 @@ export function InvestorPortfolio({
           asset_title: demo?.title || `Clean Energy Asset #${siteId}`,
           base_dividend: Number(baseAmount.toFixed(4)),
           kamino_bonus: Number(kaminoBonus.toFixed(4)),
-          total_claimed_eurtree: Number(totalAmount.toFixed(4)),
+          total_claimed_usdc: Number(totalAmount.toFixed(4)),
         },
       });
 
@@ -181,8 +181,8 @@ export function InvestorPortfolio({
         ...prev,
         [siteId]:
           kaminoBonus > 0
-            ? `Claimed +€${totalAmount.toFixed(4)} EURTree (incl. Kamino yield)`
-            : `Claimed +€${totalAmount.toFixed(4)} EURTree`,
+            ? `Claimed +${totalAmount.toFixed(4)} USDC (incl. Kamino yield)`
+            : `Claimed +${totalAmount.toFixed(4)} USDC`,
       }));
 
       setTimeout(() => {
@@ -238,7 +238,7 @@ export function InvestorPortfolio({
         actionName: 'claim_all_kilowatt_dividends',
         memoPayload: {
           site_ids: siteIds,
-          total_claimed_eurtree: Number(totalAccruedUsdc.toFixed(4)),
+          total_claimed_usdc: Number(totalAccruedUsdc.toFixed(4)),
           base_dividends: Number(totalBaseDividendsUsdc.toFixed(4)),
           kamino_bonus: Number(totalKaminoBonusUsdc.toFixed(4)),
         },
@@ -262,8 +262,8 @@ export function InvestorPortfolio({
           ...prev,
           [demo.siteId]:
             yieldResult.kaminoBonus > 0
-              ? `Claimed +€${yieldResult.totalAccrued.toFixed(4)} EURTree (incl. Kamino yield)`
-              : `Claimed +€${yieldResult.totalAccrued.toFixed(4)} EURTree`,
+              ? `Claimed +${yieldResult.totalAccrued.toFixed(4)} USDC (incl. Kamino yield)`
+              : `Claimed +${yieldResult.totalAccrued.toFixed(4)} USDC`,
         }));
       }
 
@@ -310,12 +310,12 @@ export function InvestorPortfolio({
             Portfolio value
           </span>
           <div className="font-mono text-4xl sm:text-5xl font-black text-zinc-950 tracking-tight">
-            €{displayBalance.toLocaleString()}
+            USDC {displayBalance.toLocaleString()}
           </div>
           <div className="flex items-center gap-2 pt-0.5">
             <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
               <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-              <span>+€{displayToday.toFixed(2)} today</span>
+              <span>+USDC {displayToday.toFixed(2)} today</span>
             </span>
             <span className="text-xs font-mono text-emerald-700/80">
               ({averageApy ? averageApy : '35.0'}% APY)
@@ -404,7 +404,7 @@ export function InvestorPortfolio({
               {isClaimingAll ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
-                <CurrencyEuroIcon className="h-5 w-5" />
+                <CurrencyDollarIcon className="h-5 w-5" />
               )}
             </div>
             <span className="text-[11px] font-semibold text-zinc-900">
@@ -429,7 +429,7 @@ export function InvestorPortfolio({
         <div className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-zinc-200/80 bg-zinc-50/80 text-left shadow-2xs">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 border border-blue-200 text-[#183d89]">
-              <CurrencyEuroIcon className="h-5 w-5" />
+              <CurrencyDollarIcon className="h-5 w-5" />
             </div>
             <div>
               <div className="text-xs font-semibold text-zinc-950">
@@ -442,7 +442,7 @@ export function InvestorPortfolio({
           </div>
           <div className="flex items-center gap-2.5">
             <span className="font-mono text-sm font-bold text-zinc-950">
-              €
+              USDC
               {balance.data?.balance
                 ? formatTokenAmount(balance.data.balance)
                 : '10,000'}
@@ -478,12 +478,12 @@ export function InvestorPortfolio({
               Continuous Kilowatt-Hour Streaming
             </div>
             <div className="font-mono text-[10px] text-emerald-700 font-semibold">
-              +€
+              +USDC
               {(totalAnnualYieldUsdc > 0
                 ? totalAnnualYieldUsdc / (365 * 24 * 3600)
                 : 0.0001
               ).toFixed(6)}{' '}
-              EURTree / sec
+              USDC / sec
             </div>
           </div>
           <div className="h-9 w-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -527,7 +527,7 @@ export function InvestorPortfolio({
               </div>
               <div className="text-right shrink-0 pl-3">
                 <div className="font-mono text-sm font-semibold text-zinc-950">
-                  €
+                  USDC
                   {(investments[219742]?.amountUsdc
                     ? investments[219742].amountUsdc
                     : 12400
@@ -560,7 +560,7 @@ export function InvestorPortfolio({
               </div>
               <div className="text-right shrink-0 pl-3">
                 <div className="font-mono text-sm font-semibold text-zinc-950">
-                  €6,150
+                  USDC 6,150
                 </div>
                 <div className="font-mono text-[11px] font-bold text-emerald-600 mt-0.5">
                   +18.4 % APY
@@ -589,7 +589,7 @@ export function InvestorPortfolio({
               </div>
               <div className="text-right shrink-0 pl-3">
                 <div className="font-mono text-sm font-semibold text-zinc-950">
-                  €3,900
+                  USDC 3,900
                 </div>
                 <div className="font-mono text-[11px] font-bold text-emerald-600 mt-0.5">
                   +22.0 % APY
@@ -618,7 +618,7 @@ export function InvestorPortfolio({
               </div>
               <div className="text-right shrink-0 pl-3">
                 <div className="font-mono text-sm font-semibold text-zinc-950">
-                  €2,410
+                  USDC 2,410
                 </div>
                 <div className="font-mono text-[11px] font-bold text-emerald-600 mt-0.5">
                   +14.2 % APY
@@ -677,8 +677,8 @@ export function InvestorPortfolio({
             <span className="text-zinc-500">Balance: </span>
             <strong className="text-zinc-950 font-semibold">
               {balance.data
-                ? `€${formatTokenAmount(balance.data.balance)} EURTree`
-                : '€0.00 EURTree'}
+                ? `${formatTokenAmount(balance.data.balance)} USDC`
+                : '0.00 USDC'}
             </strong>
           </div>
 
@@ -689,7 +689,7 @@ export function InvestorPortfolio({
               onClick={onOpenDeposit}
               className="flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-white hover:bg-zinc-50 px-4 py-2 text-xs font-mono font-medium text-zinc-800 shadow-xs transition active:scale-[0.98] cursor-pointer"
             >
-              <CurrencyEuroIcon className="h-4 w-4 text-[#183d89]" />
+              <CurrencyDollarIcon className="h-4 w-4 text-[#183d89]" />
               <span>+ Deposit Funds</span>
             </button>
           )}
@@ -708,7 +708,7 @@ export function InvestorPortfolio({
               <span>
                 {isClaimingAll
                   ? 'Signing in Phantom…'
-                  : `Claim All (€${totalAccruedUsdc.toFixed(4)} EURTree)`}
+                  : `Claim All (${totalAccruedUsdc.toFixed(4)} USDC)`}
               </span>
             </button>
           )}
@@ -723,7 +723,7 @@ export function InvestorPortfolio({
             Total Capital Backed
           </span>
           <span className="block font-mono text-2xl sm:text-4xl font-semibold text-zinc-950 tracking-tight">
-            €{totalInvestedUsdc.toLocaleString()}
+            USDC {totalInvestedUsdc.toLocaleString()}
           </span>
           <span className="block text-xs text-zinc-500 font-normal pt-1">
             Across {backedDemos.length} clean energy installation
@@ -759,7 +759,7 @@ export function InvestorPortfolio({
           </span>
           <span className="block text-xs text-zinc-500 font-normal pt-1">
             {totalInvestedUsdc > 0
-              ? `+€${totalAnnualYieldUsdc.toFixed(2)} / yr contracted`
+              ? `+USDC ${totalAnnualYieldUsdc.toFixed(2)} / yr contracted`
               : 'Contracted PPA yields (12.8% – 35.0%)'}
           </span>
         </div>
@@ -781,12 +781,12 @@ export function InvestorPortfolio({
             </button>
           </div>
           <span className="block font-mono text-2xl sm:text-4xl font-semibold text-[#183d89] tracking-tight">
-            +€{totalAccruedUsdc.toFixed(4)}
+            +USDC {totalAccruedUsdc.toFixed(4)}
           </span>
           <span className="block text-xs text-zinc-500 font-normal pt-1">
             {totalKaminoBonusUsdc > 0
-              ? `€${totalBaseDividendsUsdc.toFixed(4)} base + €${totalKaminoBonusUsdc.toFixed(4)} Kamino pool yield`
-              : 'Streaming per second · 1:1 EUR peg'}
+              ? `USDC ${totalBaseDividendsUsdc.toFixed(4)} base + USDC ${totalKaminoBonusUsdc.toFixed(4)} Kamino pool yield`
+              : 'Streaming per second · 1:1 USD peg'}
           </span>
         </div>
       </div>
@@ -876,7 +876,7 @@ export function InvestorPortfolio({
                           Your Allocation
                         </span>
                         <span className="mt-0.5 block font-mono text-lg font-semibold text-zinc-950">
-                          €{holding.amountUsdc.toLocaleString()} EURTree
+                          {holding.amountUsdc.toLocaleString()} USDC
                         </span>
                         <span className="text-[11px] text-zinc-500 font-mono">
                           {poolSharePercent}% of Pool Stake
@@ -890,7 +890,7 @@ export function InvestorPortfolio({
                           {demo.financials.projectedApy}% APY
                         </span>
                         <span className="text-[11px] text-zinc-600 font-mono">
-                          +€{holdingAnnual.toFixed(2)} / yr
+                          +USDC {holdingAnnual.toFixed(2)} / yr
                         </span>
                       </div>
                     </div>
@@ -946,10 +946,10 @@ export function InvestorPortfolio({
                           </button>
                         </div>
                         <span className="font-mono text-xl font-semibold text-zinc-950 mt-0.5 block">
-                          +€{totalAccruedHolding.toFixed(4)} EURTree
+                          +{totalAccruedHolding.toFixed(4)} USDC
                         </span>
                         <span className="font-mono text-[10px] text-zinc-500 block">
-                          €{accruedBase.toFixed(4)} hardware + €
+                          USDC {accruedBase.toFixed(4)} hardware + USDC
                           {kaminoBonus.toFixed(4)} Kamino bonus
                         </span>
                       </div>
@@ -1039,8 +1039,8 @@ export function InvestorPortfolio({
               No Active Allocations Yet
             </h2>
             <p className="text-xs sm:text-sm text-zinc-500 font-normal leading-relaxed">
-              Back high-yield physical energy pools starting at just €50. Stream
-              real-time kilowatt-hour cashflows secured by Solana smart
+              Back high-yield physical energy pools starting at just USDC 50.
+              Stream real-time kilowatt-hour cashflows secured by Solana smart
               contracts.
             </p>
             {onOpenDeposit && (
@@ -1050,8 +1050,8 @@ export function InvestorPortfolio({
                   onClick={onOpenDeposit}
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#183d89] to-[#2563eb] hover:from-[#1d4bb5] hover:to-[#3b82f6] px-6 py-3 text-xs font-semibold text-white shadow-sm transition active:scale-[0.98] cursor-pointer"
                 >
-                  <CurrencyEuroIcon className="h-4 w-4" />
-                  <span>Deposit Capital (€1,000 EURTree)</span>
+                  <CurrencyDollarIcon className="h-4 w-4" />
+                  <span>Deposit Capital (1,000 USDC)</span>
                 </button>
               </div>
             )}
@@ -1172,8 +1172,9 @@ export function InvestorPortfolio({
               15.2% <span className="text-xs text-zinc-500">APY</span>
             </div>
             <div className="font-mono text-sm font-semibold text-[#183d89]">
-              +€{(1000 * Math.pow(1 + 0.152, horizonYears) - 1000).toFixed(0)}{' '}
-              return / €1,000
+              +USDC{' '}
+              {(1000 * Math.pow(1 + 0.152, horizonYears) - 1000).toFixed(0)}{' '}
+              return / USDC 1,000
             </div>
             <p className="text-[11px] text-zinc-600 font-normal leading-snug">
               Contracted industrial off-taker PPA backed by physical hardware
@@ -1190,8 +1191,9 @@ export function InvestorPortfolio({
               4.2% <span className="text-xs text-zinc-500">APY</span>
             </div>
             <div className="font-mono text-sm font-semibold text-zinc-700">
-              +€{(1000 * Math.pow(1 + 0.042, horizonYears) - 1000).toFixed(0)}{' '}
-              return / €1,000
+              +USDC{' '}
+              {(1000 * Math.pow(1 + 0.042, horizonYears) - 1000).toFixed(0)}{' '}
+              return / USDC 1,000
             </div>
             <p className="text-[11px] text-zinc-500 font-normal leading-snug">
               Standard sovereign benchmark. Locked maturity, fixed yield.
@@ -1207,8 +1209,9 @@ export function InvestorPortfolio({
               1.6% <span className="text-xs text-zinc-500">APY</span>
             </div>
             <div className="font-mono text-sm font-semibold text-zinc-700">
-              +€{(1000 * Math.pow(1 + 0.016, horizonYears) - 1000).toFixed(0)}{' '}
-              return / €1,000
+              +USDC{' '}
+              {(1000 * Math.pow(1 + 0.016, horizonYears) - 1000).toFixed(0)}{' '}
+              return / USDC 1,000
             </div>
             <p className="text-[11px] text-zinc-500 font-normal leading-snug">
               Equities yield without principal guarantees. Subject to market
@@ -1225,8 +1228,9 @@ export function InvestorPortfolio({
               0.5% <span className="text-xs text-zinc-500">APY</span>
             </div>
             <div className="font-mono text-sm font-semibold text-zinc-700">
-              +€{(1000 * Math.pow(1 + 0.005, horizonYears) - 1000).toFixed(0)}{' '}
-              return / €1,000
+              +USDC{' '}
+              {(1000 * Math.pow(1 + 0.005, horizonYears) - 1000).toFixed(0)}{' '}
+              return / USDC 1,000
             </div>
             <p className="text-[11px] text-zinc-500 font-normal leading-snug">
               Negative real return after inflation. Full custodian risk.
@@ -1238,8 +1242,8 @@ export function InvestorPortfolio({
       <KaminoPoolModal
         isOpen={isKaminoModalOpen}
         onClose={() => setIsKaminoModalOpen(false)}
-        unclaimedDividendsEur={totalBaseDividendsUsdc}
-        kaminoBonusEur={totalKaminoBonusUsdc}
+        unclaimedDividendsUsdc={totalBaseDividendsUsdc}
+        kaminoBonusUsdc={totalKaminoBonusUsdc}
         walletAddress={wallet?.address}
         wallet={wallet}
         onClaimSuccess={(baseAmount, bonusAmount) => {

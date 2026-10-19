@@ -274,7 +274,7 @@ async function runDemo() {
 
   // STEP 5: INVESTOR ALICE BACKS HARDWARE ON MOBILE
   console.log(
-    '--- STEP 5: Investor Alice Backs Asset with €500 EURTree on Mobile ---',
+    '--- STEP 5: Investor Alice Backs Asset with 500 USDC on Mobile ---',
   );
   // Open Backing Modal
   await page.evaluate(() => {

@@ -44,28 +44,28 @@ const SITE_METADATA = {
       estMonthlyRevenueUsdc: 2130.0,
       estAnnualRevenueUsdc: 25560.0,
       tariffRate:
-        '€95.00 / MWh guaranteed grid feed-in tariff (Vestas V80 2× 2.0 MW)',
+        'USDC 95.00 / MWh guaranteed grid feed-in tariff (Vestas V80 2× 2.0 MW)',
       revenueModelDescription:
         'Direct power feed-in contract: High-voltage regional grid off-taker purchases all metered wind kilowatt-hours.',
       cashFlowWaterfall: [
         {
           title: 'Gross Wind Energy Revenue',
           percentage: '100%',
-          amount: '€340,000 / yr',
+          amount: 'USDC 340,000 / yr',
           description:
             'Metered electricity fed into high-voltage grid across 2× Vestas V80 turbines',
         },
         {
           title: 'O&M & Turbine Insurance Reserve',
           percentage: '7.5%',
-          amount: '-€25,500 / yr',
+          amount: '-USDC 25,500 / yr',
           description:
             'Full-scope Vestas service contract, blade inspection, and grid intertie insurance',
         },
         {
           title: 'Net Investor Distribution',
           percentage: '92.5%',
-          amount: '€314,500 / yr',
+          amount: 'USDC 314,500 / yr',
           description:
             'Direct proportional yield streaming to tokenized share holders on Solana',
         },
@@ -108,28 +108,28 @@ const SITE_METADATA = {
         {
           title: 'Gross Annual Revenue (Ancillary + Spot)',
           percentage: '100%',
-          amount: '€1.24M / yr (30.94M CZK)',
+          amount: 'USDC 1.24M / yr',
           description:
-            'ČEPS capacity standby (€860k / 21.5M CZK) + OTE day-ahead & intraday arbitrage (€380k / 9.44M CZK)',
+            'ČEPS capacity standby + OTE day-ahead & intraday arbitrage',
         },
         {
           title: 'Aggregator & Trader Revenue Share',
           percentage: '12%',
-          amount: '-€148k / yr (-3.71M CZK)',
+          amount: '-USDC 148k / yr',
           description:
             '12% success-fee for automated market bidding, forecasting, and ČEPS dispatching',
         },
         {
           title: 'Direct Operating Expenses (OPEX)',
           percentage: '5.3%',
-          amount: '-€65k / yr (-1.63M CZK)',
+          amount: '-USDC 65k / yr',
           description:
             'Preventive service, land lease, insurance, 500L compressor-less thermal buffer management (~1.5% CAPEX)',
         },
         {
           title: 'Clean Annual Operating Profit (EBITDA)',
           percentage: '82.7%',
-          amount: '€1.02M / yr (25.6M CZK)',
+          amount: 'USDC 1.02M / yr',
           description:
             'Net annual cash flow distributed to project equity and tokenized investors (Var. A Realistic)',
         },
@@ -165,28 +165,28 @@ const SITE_METADATA = {
       estMonthlyRevenueUsdc: 1541.67,
       estAnnualRevenueUsdc: 18500.0,
       tariffRate:
-        '€0.42 / kWh delivered + €2.50 session connection fee per charge',
+        'USDC 0.42 / kWh delivered + USDC 2.50 session connection fee per charge',
       revenueModelDescription:
         'Continuous point-of-sale micro-transactions generated across 10 commercial charging bays with automated energy billing.',
       cashFlowWaterfall: [
         {
           title: 'Gross Charging Revenue',
           percentage: '100%',
-          amount: '€18,500.00 / yr',
+          amount: 'USDC 18,500.00 / yr',
           description:
             'Commercial charging fees collected across 10 high-power EV charging bays',
         },
         {
           title: 'Site Lease & Payment Processing',
           percentage: '8%',
-          amount: '-€1,480.00 / yr',
+          amount: '-USDC 1,480.00 / yr',
           description:
             'Commercial parking space lease, hardware warranty, and payment gateway costs',
         },
         {
           title: 'Net Investor Distribution',
           percentage: '92%',
-          amount: '€17,020.00 / yr',
+          amount: 'USDC 17,020.00 / yr',
           description:
             'Direct automated yield stream distributed to plaza tokenholders on Solana',
         },
@@ -221,28 +221,28 @@ const SITE_METADATA = {
       estDailyRevenueUsdc: 82.41,
       estMonthlyRevenueUsdc: 2506.67,
       estAnnualRevenueUsdc: 30080.0,
-      tariffRate: '€0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
+      tariffRate: 'USDC 0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
       revenueModelDescription:
         'Dual revenue stream: direct metered corporate PPA payments from industrial client MKovo s.r.o. plus peak grid feed-in export.',
       cashFlowWaterfall: [
         {
           title: 'Gross Metered Energy Revenue',
           percentage: '100%',
-          amount: '€30,080.00 / yr',
+          amount: 'USDC 30,080.00 / yr',
           description:
             'Metered electricity payments collected from off-taker MKovo s.r.o. and grid feed-in',
         },
         {
           title: 'O&M, Telemetry & Warranty Reserve',
           percentage: '8%',
-          amount: '-€2,406.40 / yr',
+          amount: '-USDC 2,406.40 / yr',
           description:
             'Victron Cerbo GX cloud connectivity, actuator inspection, and replacement reserve',
         },
         {
           title: 'Net Investor Distribution',
           percentage: '92%',
-          amount: '€27,673.60 / yr',
+          amount: 'USDC 27,673.60 / yr',
           description:
             'Direct programmatic yield distributions streamed to Treetino V1 tokenholders on Solana',
         },
@@ -734,7 +734,7 @@ export class VictronService {
       turbineRpm,
       activeAiMode,
       clientName: 'MKovo s.r.o. (Precision Manufacturing)',
-      clientTariff: '€0.32 / kWh metered corporate PPA',
+      clientTariff: 'USDC 0.32 / kWh metered corporate PPA',
     };
 
     const energyStats = this.getFallbackEnergyStats(siteId);

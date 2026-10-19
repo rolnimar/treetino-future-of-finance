@@ -282,7 +282,7 @@ function BuyerCollateralModalContent({
           <div className="space-y-2 py-2 text-xs font-mono text-zinc-600">
             <div className="flex items-center justify-between text-zinc-900 font-semibold">
               <span>1. Zero-CAPEX Agreement</span>
-              <span className="text-[#183d89]">Approved (€0 Capex)</span>
+              <span className="text-[#183d89]">Approved (USDC 0 Capex)</span>
             </div>
             <div className="flex items-center justify-between text-[#183d89] font-semibold">
               <span>2. Marinade Liquid Stake CPI</span>
@@ -354,13 +354,13 @@ function BuyerCollateralModalContent({
               <div className="flex justify-between">
                 <span>Hardware Cost:</span>
                 <span className="font-bold text-zinc-950">
-                  €0.00 (100% Free Capex)
+                  USDC 0.00 (100% Free Capex)
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Off-taker Obligation:</span>
                 <span className="font-bold text-[#183d89]">
-                  Pay only for energy (€0.24/kWh)
+                  Pay only for energy (USDC 0.24/kWh)
                 </span>
               </div>
               {confirmedTxSig && (
@@ -433,7 +433,7 @@ function BuyerCollateralModalContent({
       }
       tag="ZERO-CAPEX HARDWARE ESCROW · MARINADE STAKING"
       title="Post Staked Collateral"
-      description="Host commercial clean energy at €0 upfront CAPEX. Your SOL is staked into Marinade mSOL at 7.82% APY to secure the agreement."
+      description="Host commercial clean energy at USDC 0 upfront CAPEX. Your SOL is staked into Marinade mSOL at 7.82% APY to secure the agreement."
       mainPoint={
         <div className="space-y-3 text-center py-2">
           {/* Centered Marinade Status Pill */}
@@ -518,12 +518,14 @@ function BuyerCollateralModalContent({
           <div className="pt-2 border-t border-zinc-200/60 text-[11px] text-zinc-500 space-y-1.5 text-left">
             <div className="flex justify-between">
               <span>Hardware CAPEX:</span>
-              <span className="font-bold text-zinc-950">€0.00 (100% Free)</span>
+              <span className="font-bold text-zinc-950">
+                USDC 0.00 (100% Free)
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Power Consumption:</span>
               <span className="font-bold text-[#183d89]">
-                Metered €0.24 / kWh
+                Metered USDC 0.24 / kWh
               </span>
             </div>
             <div className="flex justify-between">

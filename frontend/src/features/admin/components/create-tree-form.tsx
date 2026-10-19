@@ -43,7 +43,7 @@ const PRESETS: ArchetypePreset[] = [
     city: 'Poprad',
     country: 'Slovakia',
     projectedApy: '12.8%',
-    tariffRate: '€0.32 / kWh corporate PPA (MKovo s.r.o.)',
+    tariffRate: 'USDC 0.32 / kWh corporate PPA (MKovo s.r.o.)',
     offTakerName: 'MKovo s.r.o.',
     target: '250000',
     narrative:
@@ -61,7 +61,7 @@ const PRESETS: ArchetypePreset[] = [
     city: 'Amsterdam',
     country: 'Netherlands',
     projectedApy: '14.2%',
-    tariffRate: 'Dynamic spot spread: €0.18 / kWh peak vs off-peak',
+    tariffRate: 'Dynamic spot spread: USDC 0.18 / kWh peak vs off-peak',
     offTakerName: 'EnergyHub Amsterdam B.V.',
     target: '200000',
     narrative:
@@ -79,7 +79,7 @@ const PRESETS: ArchetypePreset[] = [
     city: 'Paris',
     country: 'France',
     projectedApy: '18.5%',
-    tariffRate: '€0.45 / kWh high-power DC fast-charging tariff',
+    tariffRate: 'USDC 0.45 / kWh high-power DC fast-charging tariff',
     offTakerName: 'ChargeVolt Paris SAS',
     target: '350000',
     narrative:
@@ -97,7 +97,7 @@ const PRESETS: ArchetypePreset[] = [
     city: 'Queensland',
     country: 'Australia',
     projectedApy: '8.5%',
-    tariffRate: '€0.40 / kWh metered consumer consumption',
+    tariffRate: 'USDC 0.40 / kWh metered consumer consumption',
     offTakerName: 'Outback Queensland Property',
     target: '20000',
     narrative:
@@ -140,7 +140,7 @@ export function CreateTreeForm() {
       city: 'Queensland',
       country: 'Australia',
       projectedApy: '8.5%',
-      tariffRate: '€0.40 / kWh metered consumer consumption',
+      tariffRate: 'USDC 0.40 / kWh metered consumer consumption',
       offTakerName: 'Queensland Rural Resident',
       narrative:
         'Community microgrid enabling permissionless clean power. Backers fund rooftop solar and lithium battery storage replacing expensive off-grid diesel generation.',
@@ -363,7 +363,7 @@ export function CreateTreeForm() {
                 error={errors.projectedApy?.message}
               />
               <Field
-                label="Tariff Rate (e.g. €0.40/kWh)"
+                label="Tariff Rate (e.g. USDC 0.40/kWh)"
                 {...register('tariffRate')}
                 error={errors.tariffRate?.message}
               />
@@ -373,7 +373,7 @@ export function CreateTreeForm() {
                 error={errors.offTakerName?.message}
               />
               <Field
-                label="Funding Target (EURTree)"
+                label="Funding Target (USDC)"
                 {...register('target')}
                 error={errors.target?.message}
               />

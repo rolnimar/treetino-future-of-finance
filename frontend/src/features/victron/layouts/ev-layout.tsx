@@ -85,8 +85,8 @@ export function EvLayout({
         }}
         revenueOrSavings={{
           label: 'High-Velocity EV Revenue',
-          value: `+€${dailyDisplacedSavings} / day`,
-          subtext: '10 Bays (€0.42/kWh + €2.50 session fee)',
+          value: `+USDC ${dailyDisplacedSavings} / day`,
+          subtext: '10 Bays (USDC 0.42/kWh + USDC 2.50 session fee)',
         }}
         investorYield={{
           apyPercent: financials.projectedApy,
@@ -288,7 +288,7 @@ export function EvLayout({
                 subtext="Canopy lighting & HVAC"
                 sparklineData={acLoadTrend}
                 footerLabel="Billed Tariff:"
-                footerValue="-€0.07 / hr"
+                footerValue="-USDC 0.07 / hr"
               />
 
               {/* Card 1.3: ESSENTIAL LOADS */}
@@ -305,7 +305,7 @@ export function EvLayout({
                 subtext="Dedicated EV charging bus"
                 sparklineData={essentialTrend}
                 footerLabel="Throughput:"
-                footerValue="+€3.41 / hr"
+                footerValue="+USDC 3.41 / hr"
               />
 
               {/* ROW 2: EVCS STATION #1, QUATTRO HUB, EVCS STATION #2 */}
@@ -322,7 +322,7 @@ export function EvLayout({
                 primaryValue="14.45 kW"
                 subtext="Fast charging in progress"
                 footerLabel="Session Rate:"
-                footerValue="€0.42 / kWh"
+                footerValue="USDC 0.42 / kWh"
               />
 
               {/* Card 2.2: QUATTRO INVERTER HUB */}
@@ -544,11 +544,11 @@ export function EvLayout({
           },
           {
             label: 'Billing Velocity',
-            value: '€0.42 / kWh',
-            subtext: '+€2.50 session fee',
+            value: 'USDC 0.42 / kWh',
+            subtext: '+USDC 2.50 session fee',
           },
         ]}
-        grossRevenueTitle="€18,500.00 / Year Gross Revenue"
+        grossRevenueTitle="USDC 18,500.00 / Year Gross Revenue"
         waterfallSteps={financials.cashFlowWaterfall}
       />
     </div>

@@ -261,14 +261,15 @@ export function VictronDemos({
                 <div className="flex items-center justify-between font-mono text-xs">
                   <div>
                     <span className="font-bold text-zinc-950">
-                      €{featuredDemo.financials.fundedUsdc.toLocaleString()}
+                      USDC {featuredDemo.financials.fundedUsdc.toLocaleString()}
                     </span>
                     <span className="text-zinc-500 ml-1">
                       ({featuredDemo.financials.fundedPercent}%)
                     </span>
                   </div>
                   <span className="text-zinc-500">
-                    Goal: €{featuredDemo.financials.targetUsdc.toLocaleString()}
+                    Goal: USDC{' '}
+                    {featuredDemo.financials.targetUsdc.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -281,7 +282,7 @@ export function VictronDemos({
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckIcon className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                  <span className="truncate">1:1 EURTree Daily</span>
+                  <span className="truncate">1:1 USDC Daily</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckIcon className="h-3.5 w-3.5 text-[#183d89] shrink-0" />
@@ -306,7 +307,7 @@ export function VictronDemos({
                   }}
                   className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#183d89] to-[#2563eb] hover:from-[#1d4bb5] hover:to-[#3b82f6] py-2.5 px-3 text-xs font-semibold text-white shadow-xs transition active:scale-95 cursor-pointer"
                 >
-                  <span>Back Pool (€500)</span>
+                  <span>Back Pool (USDC 500)</span>
                   <ArrowRightIcon className="h-3.5 w-3.5" />
                 </button>
                 <button
@@ -387,7 +388,7 @@ export function VictronDemos({
                         </div>
                         <p className="font-mono text-[10px] text-zinc-500 truncate mt-0.5">
                           {isEv
-                            ? '10 bays · 350 kW DC Fast · 1:1 EURTree'
+                            ? '10 bays · 350 kW DC Fast · 1:1 USDC'
                             : isBess
                               ? '8.6 MW · 17.2 MWh · Spot Arb & Standby'
                               : isTree
@@ -400,7 +401,7 @@ export function VictronDemos({
                     {/* Right: Valuation + APY */}
                     <div className="text-right shrink-0 pl-2">
                       <div className="font-mono text-sm font-semibold text-zinc-950">
-                        €{d.financials.fundedUsdc.toLocaleString()}
+                        USDC {d.financials.fundedUsdc.toLocaleString()}
                       </div>
                       <div className="font-mono text-[11px] font-bold text-emerald-600 mt-0.5">
                         +{d.financials.projectedApy}% APY
@@ -474,9 +475,9 @@ export function VictronDemos({
             </div>
             <p className="mt-3 text-base sm:text-lg text-zinc-600 font-light leading-relaxed">
               Back physical battery storage, kinetic solar & wind trees, and
-              utility wind turbines starting from €50. Power is balanced 24/7 on
-              the grid, streaming daily dividends in 1:1 stable currency with
-              zero crypto jargon.
+              utility wind turbines starting from USDC 50. Power is balanced
+              24/7 on the grid, streaming daily dividends in 1:1 stable currency
+              with zero crypto jargon.
             </p>
           </div>
 
@@ -756,7 +757,7 @@ export function VictronDemos({
             </div>
           </div>
           <div className="font-mono text-[11px] text-zinc-500 shrink-0">
-            Direct PPA Escrow · 100% EURTree Pegged
+            Direct PPA Escrow · 100% USDC Pegged
           </div>
         </div>
       </div>
@@ -900,10 +901,11 @@ export function VictronDemos({
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-y border-zinc-100 py-6">
                     <div>
                       <span className="block font-mono text-2xl font-light text-zinc-950 sm:text-3xl">
-                        €{featuredDemo.financials.fundedUsdc.toLocaleString()}
+                        USDC{' '}
+                        {featuredDemo.financials.fundedUsdc.toLocaleString()}
                       </span>
                       <span className="block font-mono text-[11px] text-zinc-400 mt-1 uppercase">
-                        of €
+                        of USDC
                         {featuredDemo.financials.targetUsdc.toLocaleString()}
                       </span>
                     </div>
@@ -921,7 +923,7 @@ export function VictronDemos({
 
                     <div>
                       <span className="block font-mono text-2xl font-light text-zinc-950 sm:text-3xl">
-                        €
+                        USDC
                         {(
                           featuredDemo.financials.estAnnualRevenueUsdc / 1000
                         ).toFixed(1)}
@@ -1037,11 +1039,11 @@ export function VictronDemos({
                         You backed this hardware
                       </span>
                       <span className="font-mono font-bold text-[#183d89]">
-                        €
+                        USDC
                         {investments[
                           featuredDemo.siteId
                         ].amountUsdc.toLocaleString()}{' '}
-                        EURTree
+                        USDC
                       </span>
                     </div>
                   ) : null}
@@ -1184,14 +1186,15 @@ export function VictronDemos({
                         <div className="flex items-center justify-between text-[11px] font-mono text-zinc-600">
                           <div>
                             <span className="font-bold text-zinc-950">
-                              €{item.financials.fundedUsdc.toLocaleString()}
+                              USDC {item.financials.fundedUsdc.toLocaleString()}
                             </span>
                             <span className="text-zinc-400 ml-1">
                               ({item.financials.fundedPercent}%)
                             </span>
                           </div>
                           <span>
-                            Goal: €{item.financials.targetUsdc.toLocaleString()}
+                            Goal: USDC{' '}
+                            {item.financials.targetUsdc.toLocaleString()}
                           </span>
                         </div>
                       </div>
@@ -1204,7 +1207,7 @@ export function VictronDemos({
                             Your Backing
                           </span>
                           <span className="font-mono font-bold text-emerald-700">
-                            €{holding.toLocaleString()} EURTree
+                            {holding.toLocaleString()} USDC
                           </span>
                         </div>
                       )}
@@ -1334,7 +1337,9 @@ export function VictronDemos({
                         />
                       </div>
                       <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                        <span>€{d.financials.fundedUsdc.toLocaleString()}</span>
+                        <span>
+                          USDC {d.financials.fundedUsdc.toLocaleString()}
+                        </span>
                         <span className="font-medium text-zinc-600">
                           {d.financials.fundedPercent}% funded
                         </span>
@@ -1386,7 +1391,7 @@ export function VictronDemos({
                 Total Goal
               </span>
               <span className="mt-2 block font-mono text-2xl sm:text-3xl font-light text-zinc-950">
-                €{totalTargetUsdc.toLocaleString()}
+                USDC {totalTargetUsdc.toLocaleString()}
               </span>
             </div>
             <div>
@@ -1394,7 +1399,7 @@ export function VictronDemos({
                 Capital Backed
               </span>
               <span className="mt-2 block font-mono text-2xl sm:text-3xl font-light text-[#183d89]">
-                €{totalFundedUsdc.toLocaleString()}
+                USDC {totalFundedUsdc.toLocaleString()}
               </span>
             </div>
             <div>

@@ -39,7 +39,7 @@ export function ProtocolSetup() {
       </Card>
       <Card title="Payment token">
         <p className="mb-3 text-sm">
-          EURTree · 6 decimals · Euro-backed RWA Stablecoin (1:1 EUR)
+          USDC · 6 decimals · Solana devnet test token
         </p>
         <AddressLink address={state.paymentMint} />
         <p className="my-4 text-sm">

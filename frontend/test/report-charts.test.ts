@@ -74,14 +74,17 @@ test('report charts retain exact on-chain intervals, zero production and negativ
     value: 4294967295,
   });
   expect(data.production[96]!.startTs).toBe('1790812800');
-  expect(data.prices.map((point) => point.value)).toEqual([-1.25, 0, 2.5]);
+  expect(data.prices[0]!.value).toBeCloseTo(-0.0568181818);
+  expect(data.prices[1]!.value).toBe(0);
+  expect(data.prices[2]!.value).toBeCloseTo(0.1136363636);
   const html = renderToStaticMarkup(
     createElement(ReportCharts, { report: input }),
   );
   expect(html).toContain('15-minute production · 2026-09-30');
   expect(html).toContain('15-minute spot price · 2026-09-30');
   expect(html).toContain('97 intervals');
-  expect(html).toContain('-1.25');
+  expect(html).toContain('USDC/kWh');
+  expect(html).toContain('-0.057');
 });
 test('empty production and unavailable market data never produce invented graph series', () => {
   const input = { ...report(), wh: [], totalWh: '0', pricing: null };

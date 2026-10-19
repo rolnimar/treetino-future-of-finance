@@ -70,7 +70,7 @@ export interface DiurnalWindow {
   time: string;
   title: string;
   category: 'charge' | 'discharge' | 'balancing';
-  priceEurMwh: string;
+  priceUsdcMwh: string;
   description: string;
 }
 
@@ -135,10 +135,10 @@ export interface ProjectDossier {
     technologyProvider: string;
     partnerCompany: string;
     investorPerTz: string;
-    currency?: 'EUR' | 'USD' | 'CZK';
+    currency?: 'USDC' | 'CZK';
     currencySymbol?: string;
     currencyScale?: number; // scale multiplier vs internal storage unit if applicable
-    currencyUnitLabel?: string; // e.g. "€" or "$" or "CZK"
+    currencyUnitLabel?: string; // e.g. "USDC " or "$" or "CZK"
     capexTitle?: string;
     offTakerAgreementTitle?: string;
   };

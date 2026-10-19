@@ -1,7 +1,7 @@
 pub const DAY: i64 = 86_400;
 pub const SCALE: u128 = 1_000_000_000_000_000_000;
-pub const PAYMENT_TOKEN_NAME: &str = "EURTree";
-pub const PAYMENT_TOKEN_SYMBOL: &str = "EURTree";
+pub const PAYMENT_TOKEN_NAME: &str = "USDC";
+pub const PAYMENT_TOKEN_SYMBOL: &str = "USDC";
 pub const MAX_ADMINS: usize = 10;
 
 pub mod seeds {

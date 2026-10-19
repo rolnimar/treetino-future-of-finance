@@ -52,7 +52,7 @@ export function PublicTreeCard({
         <div className="mt-4 rounded-xl border border-black/5 bg-zinc-50 p-4">
           <p className="mb-3 text-xs text-zinc-600">
             <strong className="text-zinc-900 font-semibold font-mono">
-              {formatTokenAmount(tree.remaining)} EURTree
+              {formatTokenAmount(tree.remaining)} USDC
             </strong>{' '}
             remaining to fully fund this tree pool.
           </p>

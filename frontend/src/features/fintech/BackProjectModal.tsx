@@ -9,7 +9,11 @@ import { parseTokenAmount } from '../../chain/amounts';
 import { requestWalletApproval } from '../../chain/wallet-action';
 import type { VictronDemoItem } from '../victron/victron-types';
 import { getCampaignCoverImage } from '../victron/campaign-helpers';
-import { CheckIcon, ExternalLinkIcon } from '../victron/victron-icons';
+import {
+  CheckIcon,
+  CurrencyDollarIcon,
+  ExternalLinkIcon,
+} from '../victron/victron-icons';
 import { UniversalPopup } from './UniversalPopup';
 
 interface BackProjectModalProps {
@@ -114,7 +118,7 @@ export function BackProjectModal({
         memoPayload: {
           site_id: demo.siteId,
           asset_title: demo.title,
-          amount_eurtree: amountNum,
+          amount_usdc: amountNum,
           projected_apy: demo.financials.projectedApy,
           hardware_escrow: 'solana_devnet_v1',
         },
@@ -198,7 +202,7 @@ export function BackProjectModal({
         }
         tag="ALLOCATION CONFIRMED"
         title={`You Backed ${demo.title}!`}
-        description={`€${amountNum.toLocaleString()} EURTree allocated into hardware escrow. You now own ${poolStakePercent}% of this installation.`}
+        description={`${amountNum.toLocaleString()} USDC allocated into hardware escrow. You now own ${poolStakePercent}% of this installation.`}
         mainPoint={
           <div className="space-y-1.5 text-center py-2">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-700 border border-emerald-200">
@@ -206,9 +210,9 @@ export function BackProjectModal({
               <span>LIVE YIELD STREAM ACTIVE</span>
             </div>
             <div className="font-mono text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight pt-1">
-              +€{streamingCents}{' '}
+              +{streamingCents}{' '}
               <span className="text-xs text-zinc-500 font-normal font-sans">
-                EURTree
+                USDC
               </span>
             </div>
             <p className="text-[11px] text-zinc-600 font-normal">
@@ -273,8 +277,8 @@ export function BackProjectModal({
           {/* Amount Input Row */}
           <div className="flex items-center justify-between pb-2 border-b border-zinc-200/80">
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-light text-zinc-400 select-none">
-                €
+              <span className="text-sm font-medium text-zinc-400 select-none">
+                <CurrencyDollarIcon className="h-4 w-4" />
               </span>
               <input
                 id="back-amount-input"
@@ -289,9 +293,9 @@ export function BackProjectModal({
             </div>
             <div className="flex items-center gap-1.5 rounded-xl bg-blue-50 border border-blue-200 px-2.5 py-1 shadow-2xs font-mono text-xs font-bold text-[#183d89]">
               <div className="h-4 w-4 rounded-full bg-[#10b981] flex items-center justify-center text-white text-[10px] font-bold">
-                €
+                <CurrencyDollarIcon className="h-4 w-4" />
               </div>
-              <span>EURTree</span>
+              <span>USDC</span>
             </div>
           </div>
 
@@ -308,7 +312,7 @@ export function BackProjectModal({
                     : 'bg-white border border-zinc-200/80 text-zinc-700 hover:bg-zinc-100'
                 }`}
               >
-                €{val}
+                USDC {val}
               </button>
             ))}
             {wallet && balanceNum > 0 && (
@@ -327,7 +331,7 @@ export function BackProjectModal({
             <div className="flex justify-between items-center">
               <span>Projected Yield:</span>
               <span className="font-mono font-bold text-emerald-600">
-                +€{annualDividend}/yr (+€{dailyDividend}/d)
+                +USDC {annualDividend}/yr (+USDC {dailyDividend}/d)
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -353,7 +357,7 @@ export function BackProjectModal({
                 onClick={handleQuickMint}
                 className="font-bold text-amber-800 underline cursor-pointer"
               >
-                Mint €1k
+                Mint USDC 1k
               </button>
             </div>
           )}
@@ -374,7 +378,7 @@ export function BackProjectModal({
         ) : !wallet ? (
           'Connect Wallet to Invest'
         ) : (
-          `Confirm on Solana (€${amountNum.toLocaleString()})`
+          `Confirm on Solana (USDC ${amountNum.toLocaleString()})`
         ),
         onClick: !wallet ? () => openWalletModal(true) : handleConfirmBacking,
         disabled: amountNum <= 0,

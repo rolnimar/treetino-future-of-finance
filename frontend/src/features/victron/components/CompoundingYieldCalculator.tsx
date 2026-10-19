@@ -20,15 +20,15 @@ export function CompoundingYieldCalculator({
 }: CompoundingYieldCalculatorProps) {
   const [strategyMode, setStrategyMode] = useState<StrategyMode>('contracted');
   const [years, setYears] = useState<number>(10);
-  const [monthlyDepositEur, setMonthlyDepositEur] = useState<number>(100);
+  const [monthlyDepositUsdc, setMonthlyDepositUsdc] = useState<number>(100);
   const [hoverYear, setHoverYear] = useState<number | null>(null);
 
-  // Format currency helper - strictly EUR only
-  const formatVal = (amountEur: number, compact: boolean = false) => {
-    if (compact && amountEur >= 1000) {
-      return `€${(amountEur / 1000).toFixed(amountEur >= 10000 ? 0 : 1)}k`;
+  // Format currency helper - USDC amounts
+  const formatVal = (amountUsdc: number, compact: boolean = false) => {
+    if (compact && amountUsdc >= 1000) {
+      return `USDC ${(amountUsdc / 1000).toFixed(amountUsdc >= 10000 ? 0 : 1)}k`;
     }
-    return `€${Math.round(amountEur).toLocaleString('en-US')}`;
+    return `USDC ${Math.round(amountUsdc).toLocaleString('en-US')}`;
   };
 
   // Derive APY multiplier from selected strategy mode
@@ -60,29 +60,33 @@ export function CompoundingYieldCalculator({
     );
   };
 
-  const totalPrincipalEur = monthlyDepositEur * months;
-  const expectedFvEur = calcFv(monthlyDepositEur, effectiveExpectedApy, months);
-  const optimisticFvEur = calcFv(
-    monthlyDepositEur,
+  const totalPrincipalUsdc = monthlyDepositUsdc * months;
+  const expectedFvUsdc = calcFv(
+    monthlyDepositUsdc,
+    effectiveExpectedApy,
+    months,
+  );
+  const optimisticFvUsdc = calcFv(
+    monthlyDepositUsdc,
     effectiveOptimisticApy,
     months,
   );
-  const conservativeFvEur = calcFv(
-    monthlyDepositEur,
+  const conservativeFvUsdc = calcFv(
+    monthlyDepositUsdc,
     effectiveConservativeApy,
     months,
   );
-  const netProfitEur = expectedFvEur - totalPrincipalEur;
+  const netProfitUsdc = expectedFvUsdc - totalPrincipalUsdc;
   const gainPercentage =
-    totalPrincipalEur > 0 ? (netProfitEur / totalPrincipalEur) * 100 : 0;
+    totalPrincipalUsdc > 0 ? (netProfitUsdc / totalPrincipalUsdc) * 100 : 0;
 
   // Generate plot points for years 0 to `years`
   const plotPoints = Array.from({ length: years + 1 }, (_, yr) => {
     const m = yr * 12;
-    const principal = monthlyDepositEur * m;
-    const fvOpt = calcFv(monthlyDepositEur, effectiveOptimisticApy, m);
-    const fvExp = calcFv(monthlyDepositEur, effectiveExpectedApy, m);
-    const fvCons = calcFv(monthlyDepositEur, effectiveConservativeApy, m);
+    const principal = monthlyDepositUsdc * m;
+    const fvOpt = calcFv(monthlyDepositUsdc, effectiveOptimisticApy, m);
+    const fvExp = calcFv(monthlyDepositUsdc, effectiveExpectedApy, m);
+    const fvCons = calcFv(monthlyDepositUsdc, effectiveConservativeApy, m);
     return {
       year: yr,
       principal,
@@ -218,7 +222,7 @@ export function CompoundingYieldCalculator({
           }`}
         >
           <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>EURTree (1:1 EUR)</span>
+          <span>USDC (1:1 USD)</span>
         </div>
       </div>
 
@@ -239,7 +243,7 @@ export function CompoundingYieldCalculator({
                   dark ? 'text-blue-400' : 'text-[#183d89]'
                 }`}
               >
-                €{monthlyDepositEur} / month
+                USDC {monthlyDepositUsdc} / month
               </span>
             </div>
 
@@ -249,9 +253,9 @@ export function CompoundingYieldCalculator({
                 <button
                   key={preset}
                   type="button"
-                  onClick={() => setMonthlyDepositEur(preset)}
+                  onClick={() => setMonthlyDepositUsdc(preset)}
                   className={`py-1.5 rounded-xl font-mono text-xs font-semibold transition cursor-pointer ${
-                    monthlyDepositEur === preset
+                    monthlyDepositUsdc === preset
                       ? dark
                         ? 'bg-blue-600 text-white'
                         : 'bg-[#183d89] text-white shadow-xs'
@@ -260,7 +264,7 @@ export function CompoundingYieldCalculator({
                         : 'border border-zinc-200/80 bg-zinc-50 hover:bg-zinc-100 text-zinc-700'
                   }`}
                 >
-                  €{preset}
+                  USDC {preset}
                 </button>
               ))}
             </div>
@@ -271,8 +275,8 @@ export function CompoundingYieldCalculator({
               min={25}
               max={1000}
               step={25}
-              value={monthlyDepositEur}
-              onChange={(e) => setMonthlyDepositEur(Number(e.target.value))}
+              value={monthlyDepositUsdc}
+              onChange={(e) => setMonthlyDepositUsdc(Number(e.target.value))}
               className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${
                 dark
                   ? 'bg-zinc-800 accent-blue-500'
@@ -428,18 +432,18 @@ export function CompoundingYieldCalculator({
                   dark ? 'text-white' : 'text-zinc-950'
                 }`}
               >
-                {formatVal(expectedFvEur)}
+                {formatVal(expectedFvUsdc)}
               </span>
               <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full text-emerald-700 bg-emerald-50 border border-emerald-200">
-                +{formatVal(netProfitEur)} (+{gainPercentage.toFixed(0)}% gain)
+                +{formatVal(netProfitUsdc)} (+{gainPercentage.toFixed(0)}% gain)
               </span>
             </div>
 
             <p
               className={`text-xs font-mono mt-1 ${dark ? 'text-zinc-400' : 'text-zinc-500'}`}
             >
-              from {formatVal(totalPrincipalEur)} principal deposited (€
-              {monthlyDepositEur}/mo over {years}{' '}
+              from {formatVal(totalPrincipalUsdc)} principal deposited (USDC
+              {monthlyDepositUsdc}/mo over {years}{' '}
               {years === 1 ? 'year' : 'years'})
             </p>
           </div>
@@ -625,7 +629,7 @@ export function CompoundingYieldCalculator({
                 <span>Conservative</span>
               </div>
               <div className="font-semibold text-zinc-950 mt-1">
-                {formatVal(conservativeFvEur)}
+                {formatVal(conservativeFvUsdc)}
               </div>
               <span className="text-[10px] text-zinc-500">
                 {effectiveConservativeApy.toFixed(1)}% APY
@@ -646,7 +650,7 @@ export function CompoundingYieldCalculator({
                 <span>Contracted PPA</span>
               </div>
               <div className="font-semibold text-zinc-950 mt-1">
-                {formatVal(calcFv(monthlyDepositEur, initialApy, months))}
+                {formatVal(calcFv(monthlyDepositUsdc, initialApy, months))}
               </div>
               <span className="text-[10px] text-[#183d89] font-medium">
                 {initialApy.toFixed(1)}% APY Base
@@ -667,7 +671,7 @@ export function CompoundingYieldCalculator({
                 <span>AI Arbitrage</span>
               </div>
               <div className="font-semibold text-zinc-950 mt-1">
-                {formatVal(optimisticFvEur)}
+                {formatVal(optimisticFvUsdc)}
               </div>
               <span className="text-[10px] text-emerald-700 font-medium">
                 {effectiveOptimisticApy.toFixed(1)}% APY
@@ -682,7 +686,9 @@ export function CompoundingYieldCalculator({
               onClick={onBackProject}
               className="w-full flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#183d89] to-[#2563eb] hover:from-[#1d4bb5] hover:to-[#3b82f6] px-6 py-3.5 text-xs font-semibold text-white shadow-xs transition active:scale-[0.98] cursor-pointer"
             >
-              <span>Back Project with this Plan (€{monthlyDepositEur}/mo)</span>
+              <span>
+                Back Project with this Plan (USDC {monthlyDepositUsdc}/mo)
+              </span>
               <ArrowRightIcon className="h-3.5 w-3.5" />
             </button>
           )}

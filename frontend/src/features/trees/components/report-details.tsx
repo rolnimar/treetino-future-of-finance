@@ -4,6 +4,10 @@ import { ReportCharts } from './report-charts';
 
 export function ReportDetails({ report }: { report: IndexedReport }) {
   const pricing = report.pricing;
+  const inUsdc = (czk: string | undefined) =>
+    pricing && czk !== undefined
+      ? (Number(czk) / Number(pricing.usdCzk)).toFixed(6)
+      : '—';
   return (
     <div className="space-y-2 text-sm">
       <p className="font-semibold">
@@ -12,7 +16,7 @@ export function ReportDetails({ report }: { report: IndexedReport }) {
       <ReportCharts report={report} />
       {report.invoiceIssued ? (
         <p>
-          {formatTokenAmount(report.due)} EURTree billed ·{' '}
+          {formatTokenAmount(report.due)} USDC billed ·{' '}
           {formatTokenAmount(report.paid)} paid ·{' '}
           {formatTokenAmount(
             (BigInt(report.due) - BigInt(report.paid)).toString(),
@@ -27,13 +31,13 @@ export function ReportDetails({ report }: { report: IndexedReport }) {
           <p>
             {pricing.method === 'quarter-hour'
               ? '15-minute spot billing:'
-              : `Historical daily-average billing: ${pricing.czkPerKwh} CZK/kWh ·`}{' '}
-            {pricing.totalCzk} CZK total
+              : `Historical daily-average billing: ${inUsdc(pricing.czkPerKwh)} USDC/kWh ·`}{' '}
+            {inUsdc(pricing.totalCzk)} USDC total
           </p>
           <p>
             {pricing.amount === null
               ? 'This spot-price amount cannot be issued as an unsigned on-chain invoice.'
-              : `${formatTokenAmount(pricing.amount)} EURTree at ${pricing.eurCzk} CZK/EUR`}
+              : `${formatTokenAmount(pricing.amount)} USDC to settle`}
           </p>
           <p className="text-xs text-zinc-500">
             UTC report day {pricing.date} · CNB fixing{' '}
@@ -51,8 +55,8 @@ export function ReportDetails({ report }: { report: IndexedReport }) {
                     <tr>
                       <th>UTC start</th>
                       <th>Wh</th>
-                      <th>CZK/kWh</th>
-                      <th>CZK</th>
+                      <th>USDC/kWh</th>
+                      <th>USDC</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -65,8 +69,8 @@ export function ReportDetails({ report }: { report: IndexedReport }) {
                             .replace('T', ' ')}
                         </td>
                         <td>{interval.wh}</td>
-                        <td>{interval.czkPerKwh}</td>
-                        <td>{interval.totalCzk}</td>
+                        <td>{inUsdc(interval.czkPerKwh)}</td>
+                        <td>{inUsdc(interval.totalCzk)}</td>
                       </tr>
                     ))}
                   </tbody>

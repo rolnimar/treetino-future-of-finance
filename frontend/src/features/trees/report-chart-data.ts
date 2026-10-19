@@ -14,7 +14,7 @@ export function reportChartData(report: IndexedReport) {
       report.pricing?.method === 'quarter-hour'
         ? (report.pricing.intervals?.map(({ startTs, czkPerKwh }) => ({
             startTs,
-            value: Number(czkPerKwh),
+            value: Number(czkPerKwh) / Number(report.pricing!.usdCzk),
           })) ?? [])
         : [],
   };

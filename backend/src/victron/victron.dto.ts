@@ -195,7 +195,7 @@ export class VictronWaterfallStepDto {
   @ApiProperty({ example: '100%' })
   percentage!: string;
 
-  @ApiProperty({ example: '$7,100 / yr' })
+  @ApiProperty({ example: 'USDC 7,100 / yr' })
   amount!: string;
 
   @ApiProperty({
@@ -233,7 +233,8 @@ export class VictronFinancialsDto {
   estAnnualRevenueUsdc!: number;
 
   @ApiProperty({
-    example: '$0.35/kWh peak arbitrage spread + grid balancing capacity fees',
+    example:
+      'USDC 0.35/kWh peak arbitrage spread + grid balancing capacity fees',
   })
   tariffRate!: string;
 
@@ -282,7 +283,7 @@ export class VictronTreeDiagnosticsDto {
   clientName!: string;
 
   @ApiProperty({
-    example: '$0.32 / kWh metered corporate PPA',
+    example: 'USDC 0.32 / kWh metered corporate PPA',
     description: 'Metered energy tariff rate for the client',
   })
   clientTariff!: string;
@@ -330,7 +331,7 @@ export class VictronDemoItemDto {
   projectedApy!: string;
 
   @ApiProperty({
-    description: 'Suggested funding target in EURTree',
+    description: 'Suggested funding target in USDC',
     example: '10000',
   })
   suggestedTargetUsdc!: string;

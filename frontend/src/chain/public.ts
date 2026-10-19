@@ -22,10 +22,7 @@ import {
 } from '../features/marketplace/schemas';
 
 /** Reads only the payment mint and the connected wallet's token account. */
-export async function readEurTreeBalance(
-  connection: Connection,
-  address: string,
-) {
+export async function readUsdcBalance(connection: Connection, address: string) {
   await assertDevnet(connection);
   const owner = new PublicKey(address);
   const mintAddress = paymentMintAddress();
@@ -42,7 +39,7 @@ export async function readEurTreeBalance(
     !mint.mintAuthority?.equals(mintAddress) ||
     mint.freezeAuthority
   )
-    throw new Error('The payment mint is not the expected EURTree');
+    throw new Error('The payment mint is not the expected USDC');
   if (!tokenAccount) return { initialized: true, balance: '0' };
   const token = unpackAccount(ata, tokenAccount, TOKEN_PROGRAM_ID);
   if (
@@ -51,11 +48,11 @@ export async function readEurTreeBalance(
     !token.isInitialized ||
     token.isFrozen
   )
-    throw new Error('Invalid EURTree wallet account');
+    throw new Error('Invalid USDC wallet account');
   return { initialized: true, balance: token.amount.toString() };
 }
 
-export const readMockUsdcBalance = readEurTreeBalance;
+export const readMockUsdcBalance = readUsdcBalance;
 
 export async function buildPublicTransaction(
   connection: Connection,
@@ -64,7 +61,7 @@ export async function buildPublicTransaction(
 ) {
   const input = publicActionSchema.parse(value);
   const owner = new PublicKey(address);
-  const state = await readEurTreeBalance(connection, address);
+  const state = await readUsdcBalance(connection, address);
   if (!state.initialized)
     throw new Error('The demo payment token has not been initialized yet');
   const transaction = new Transaction();
@@ -107,7 +104,7 @@ export async function buildPublicTransaction(
     )
       throw new Error('Amount exceeds the unpaid invoice');
     if (BigInt(input.amount) > BigInt(state.balance))
-      throw new Error('Insufficient EURTree balance');
+      throw new Error('Insufficient USDC balance');
     transaction.add(payInvoiceInstruction(owner, tree, report, input.amount));
     return transaction;
   }
@@ -124,7 +121,7 @@ export async function buildPublicTransaction(
   if (BigInt(input.amount) > target - raised)
     throw new Error('Amount exceeds remaining tree funding');
   if (BigInt(input.amount) > BigInt(state.balance))
-    throw new Error('Insufficient EURTree balance');
+    throw new Error('Insufficient USDC balance');
   transaction.add(buySharesInstruction(owner, tree, input.amount));
   return transaction;
 }

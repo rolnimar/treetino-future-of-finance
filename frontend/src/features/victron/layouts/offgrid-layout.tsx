@@ -48,7 +48,7 @@ export function OffgridLayout({
     (dailyTotals.solarYieldKwh * 14 + 1420) /
     1000
   ).toFixed(2);
-  const dailyFeedInUsd = (parseFloat(dailyFeedInMwh) * 88 * 1.08).toFixed(2); // €88/MWh tariff
+  const dailyFeedInUsd = (parseFloat(dailyFeedInMwh) * 88 * 1.08).toFixed(2); // USDC 88/MWh tariff
 
   const annualPoolDistribution = (
     financials.targetUsdc *
@@ -134,13 +134,13 @@ export function OffgridLayout({
         }}
         revenueOrSavings={{
           label: 'Guaranteed Feed-in Value',
-          value: `+€${dailyFeedInUsd} / day`,
+          value: `+USDC ${dailyFeedInUsd} / day`,
           subtext: 'Billed under long-term PPA concession tariff',
         }}
         investorYield={{
           apyPercent: financials.projectedApy,
           annualDistribution: annualPoolDistribution,
-          subtext: 'Distributed in EURTree (€) on Solana via PDA escrow',
+          subtext: 'Distributed in USDC on Solana via PDA escrow',
         }}
       />
 
@@ -282,7 +282,7 @@ export function OffgridLayout({
               subtext="Continuous distribution feed"
               sparklineData={loadTrend.slice(-10)}
               footerLabel="Contract Tariff:"
-              footerValue="€88.00 / MWh"
+              footerValue="USDC 88.00 / MWh"
             />
 
             {/* Card 2.1: SCADA YAW & HYDRAULIC CONTROL */}
@@ -313,7 +313,7 @@ export function OffgridLayout({
               subtext="80m Hub · Pitch Active"
               sparklineData={turbineTrend.slice(-10)}
               footerLabel="Daily Cashflow:"
-              footerValue={`+$${dailyFeedInUsd} / day`}
+              footerValue={`+USDC ${dailyFeedInUsd} / day`}
             />
           </svg>
         </div>
@@ -371,7 +371,7 @@ export function OffgridLayout({
             subtext: 'Quarterly blade & gear audits',
           },
         ]}
-        grossRevenueTitle="€262,700 / Year Gross Revenue (ČEZ Feed-In)"
+        grossRevenueTitle="USDC 262,700 / Year Gross Revenue (ČEZ Feed-In)"
         waterfallSteps={financials.cashFlowWaterfall}
       />
     </div>

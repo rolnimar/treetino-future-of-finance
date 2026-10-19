@@ -16,8 +16,8 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
     technologyProvider: 'ElectroCharge France SAS × Victron Energy Certified',
     partnerCompany: 'Paris-Nord Logistics Park Operators',
     investorPerTz: 'Treetino Clean Mobility DAO',
-    currency: 'USD',
-    currencySymbol: '$',
+    currency: 'USDC',
+    currencySymbol: 'USDC ',
     currencyScale: 1.0,
     currencyUnitLabel: 'k',
     capexTitle:
@@ -57,7 +57,7 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
     },
     {
       label: 'Average Session Tariff',
-      value: '€0.42 / kWh + €2.50',
+      value: 'USDC 0.42 / kWh + USDC 2.50',
       subtext: 'Delivered energy price plus connection fee per session',
       highlight: true,
     },
@@ -73,7 +73,7 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
     },
     {
       label: 'Grid Demand Mitigation',
-      value: '€24,000 / yr Saved',
+      value: 'USDC 24,000 / yr Saved',
       subtext: 'Battery buffer caps grid spikes, eliminating utility penalties',
     },
     {
@@ -461,9 +461,9 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
       title:
         'Revenue Pillar 1: High-Velocity Commercial Fleet & Public Fast Charging',
       sharePercent: '80–85% of Revenue',
-      annualRevenueRangeCzk: '€89,200 – €108,500 / year',
+      annualRevenueRangeCzk: 'USDC 89,200 – USDC 108,500 / year',
       summary:
-        'Processes daily charging sessions from logistics delivery vans and public commuters paying €0.42/kWh plus €2.50 per connection. Multi-bay automated dispatch maximizes turnover and vehicle throughput.',
+        'Processes daily charging sessions from logistics delivery vans and public commuters paying USDC 0.42/kWh plus USDC 2.50 per connection. Multi-bay automated dispatch maximizes turnover and vehicle throughput.',
       bulletPoints: [
         'Guaranteed fleet charging master agreement with logistics operators in Paris-Nord 2.',
         'Seamless contactless card and autonomous machine-to-machine (OCPP 2.0.1) billing.',
@@ -474,9 +474,9 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
       title:
         'Revenue Pillar 2: Battery Buffer Peak Shaving & Solar Canopy Optimization',
       sharePercent: '15–20% of Revenue',
-      annualRevenueRangeCzk: '€18,800 – €23,500 / year',
+      annualRevenueRangeCzk: 'USDC 18,800 – USDC 23,500 / year',
       summary:
-        'The 200 kWh battery buffer absorbs peak charging spikes so the station never exceeds its 250 kVA Enedis grid reservation, avoiding €24,000/yr in utility penalty surcharges while monetizing solar canopy yields.',
+        'The 200 kWh battery buffer absorbs peak charging spikes so the station never exceeds its 250 kVA Enedis grid reservation, avoiding USDC 24,000/yr in utility penalty surcharges while monetizing solar canopy yields.',
       bulletPoints: [
         'Demand-charge mitigation: Avoids expensive MV capacity expansion and transformer upgrades.',
         '150 kW bifacial solar canopy generates on-site zero-cost power directly into vehicles.',
@@ -489,7 +489,7 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
       time: '05:00 – 08:00',
       title: 'Morning Fleet Pre-Departure Charging',
       category: 'discharge',
-      priceEurMwh: '€0.42 / kWh + €2.50 Fee',
+      priceUsdcMwh: 'USDC 0.42 / kWh + USDC 2.50 Fee',
       description:
         'Commercial delivery vans and courier fleets top off batteries prior to first regional delivery rounds.',
     },
@@ -497,7 +497,7 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
       time: '08:00 – 12:00',
       title: 'Commuter Fast Charging & Solar Canopy Ramp',
       category: 'charge',
-      priceEurMwh: '€0.42 / kWh + Solar Yield',
+      priceUsdcMwh: 'USDC 0.42 / kWh + Solar Yield',
       description:
         'Business travelers and commuter EVs charge while 150 kW rooftop canopy powers chargers directly.',
     },
@@ -505,7 +505,7 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
       time: '12:00 – 16:00',
       title: 'Peak Solar Generation & Battery Top-Up',
       category: 'charge',
-      priceEurMwh: 'Zero-Cost On-Site Solar',
+      priceUsdcMwh: 'Zero-Cost On-Site Solar',
       description:
         'Midday solar peak charges the 200 kWh buffer battery to full capacity in preparation for evening logistics rush.',
     },
@@ -513,7 +513,7 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
       time: '16:00 – 21:00',
       title: 'Evening Courier Return Rush & Peak Discharging',
       category: 'discharge',
-      priceEurMwh: '€0.42 / kWh + Peak Shaving',
+      priceUsdcMwh: 'USDC 0.42 / kWh + Peak Shaving',
       description:
         'High-density vehicle turnover. Battery buffer discharges in tandem with grid tap to prevent demand spikes.',
     },
@@ -705,7 +705,7 @@ export const EV_HUB_DOSSIER: ProjectDossier = {
         title: 'Victron Energy ESS Inverter & Energy Management',
         bullets: [
           'MultiPlus-II inverter cluster coordinates solar canopy MPPT, battery buffer, and grid import.',
-          'Algorithmic peak shaving throttles grid draw to 250 kVA max, saving €2,000+ per month.',
+          'Algorithmic peak shaving throttles grid draw to 250 kVA max, saving USDC 2,000+ per month.',
           'Cerbo GX industrial gateway logs every milliampere with millisecond precision.',
         ],
       },

@@ -17,8 +17,8 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
     technologyProvider: 'Treetino CleanTech s.r.o.',
     partnerCompany: 'MKovo s.r.o. (Precision CNC Machining)',
     investorPerTz: 'Treetino DePIN Protocol',
-    currency: 'USD',
-    currencySymbol: '$',
+    currency: 'USDC',
+    currencySymbol: 'USDC ',
     currencyScale: 1.0,
     currencyUnitLabel: 'k',
     capexTitle: 'Treetino V1 Turnkey Engineering & Installation Budget',
@@ -51,7 +51,7 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
     },
     {
       label: 'Contracted PPA Tariff',
-      value: '€0.32 / kWh',
+      value: 'USDC 0.32 / kWh',
       subtext: '15-Year Take-or-Pay agreement with MKovo',
       highlight: true,
     },
@@ -457,11 +457,12 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
   },
   revenuePillars: [
     {
-      title: 'Revenue Pillar 1: Contracted On-Site Corporate PPA (€0.32/kWh)',
+      title:
+        'Revenue Pillar 1: Contracted On-Site Corporate PPA (USDC 0.32/kWh)',
       sharePercent: '75–80% of Revenue',
-      annualRevenueRangeCzk: '€24,200 – €27,800 / year',
+      annualRevenueRangeCzk: 'USDC 24,200 – USDC 27,800 / year',
       summary:
-        'MKovo s.r.o. consumes generated electricity behind the meter to run high-precision 5-axis CNC machining centers. The rate is contracted at €0.32/kWh indexed to European industrial tariffs, delivering stable, predictable off-taker revenue.',
+        'MKovo s.r.o. consumes generated electricity behind the meter to run high-precision 5-axis CNC machining centers. The rate is contracted at USDC 0.32/kWh indexed to European industrial tariffs, delivering stable, predictable off-taker revenue.',
       bulletPoints: [
         '15-year legally binding take-or-pay agreement with corporate client MKovo s.r.o.',
         'Electricity consumed immediately on-site with zero transmission or distribution grid losses.',
@@ -472,7 +473,7 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
       title:
         'Revenue Pillar 2: Industrial Peak Shaving & Green Attribute Yield',
       sharePercent: '20–25% of Revenue',
-      annualRevenueRangeCzk: '€5,880 – €7,600 / year',
+      annualRevenueRangeCzk: 'USDC 5,880 – USDC 7,600 / year',
       summary:
         'Dynamic dispatching using Victron Quattro inverters shaves severe 15-minute factory power demand peaks, capturing shared cost savings and renewable Guarantees of Origin (GoO) credits.',
       bulletPoints: [
@@ -487,7 +488,7 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
       time: '00:00 – 06:00',
       title: 'Ducted Wind Night Baseload Generation',
       category: 'balancing',
-      priceEurMwh: '€0.32 / kWh Contracted',
+      priceUsdcMwh: 'USDC 0.32 / kWh Contracted',
       description:
         '12 low-noise vertical axis wind turbines capture nocturnal thermal breezes, maintaining power for facility lighting and server racks.',
     },
@@ -495,7 +496,7 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
       time: '06:00 – 11:00',
       title: 'Morning Sun-Tracking & Factory Ramp-Up',
       category: 'charge',
-      priceEurMwh: '€0.32 / kWh Contracted',
+      priceUsdcMwh: 'USDC 0.32 / kWh Contracted',
       description:
         'Dynamic solar leaves tilt eastwards, tracking the rising sun to power the CNC machine shift startup.',
     },
@@ -503,7 +504,7 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
       time: '11:00 – 16:00',
       title: 'Peak Solar Harvest & Full Dual Generation',
       category: 'discharge',
-      priceEurMwh: '€0.32 / kWh + Peak Savings',
+      priceUsdcMwh: 'USDC 0.32 / kWh + Peak Savings',
       description:
         'Maximum 45 kW generation peak. Leaves optimize solar incidence angle while turbines harness convection winds.',
     },
@@ -511,7 +512,7 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
       time: '16:00 – 24:00',
       title: 'Evening Sunset Tracking & Shift Overlap',
       category: 'balancing',
-      priceEurMwh: '€0.32 / kWh Contracted',
+      priceUsdcMwh: 'USDC 0.32 / kWh Contracted',
       description:
         'Leaves track the setting sun to west azimuth, transitioning smoothly to nocturnal wind kinetic harvesting.',
     },
@@ -582,7 +583,7 @@ export const TREETINO_V1_DOSSIER: ProjectDossier = {
       code: 'Corporate PPA',
       title: '15-Year Industrial Off-Take Agreement',
       description:
-        'Signed binding take-or-pay energy contract with MKovo s.r.o. at indexed €0.32/kWh.',
+        'Signed binding take-or-pay energy contract with MKovo s.r.o. at indexed USDC 0.32/kWh.',
       status: 'completed',
     },
     {

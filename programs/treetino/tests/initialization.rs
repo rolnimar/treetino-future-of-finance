@@ -33,8 +33,8 @@ fn payment_token_is_initialized_once_with_immutable_metadata_and_program_authori
     assert_eq!(metadata_account.owner, metadata::ID);
     let data = metadata::mpl_token_metadata::accounts::Metadata::from_bytes(&metadata_account.data)
         .unwrap();
-    assert_eq!(data.name.trim_end_matches('\0'), "EURTree");
-    assert_eq!(data.symbol.trim_end_matches('\0'), "EURTree");
+    assert_eq!(data.name.trim_end_matches('\0'), "USDC");
+    assert_eq!(data.symbol.trim_end_matches('\0'), "USDC");
     assert!(data.uri.trim_end_matches('\0').is_empty());
     assert_eq!(data.mint, e.mint);
     assert_eq!(data.update_authority, e.mint);

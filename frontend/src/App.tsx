@@ -6,7 +6,7 @@ import { AdminAccess } from './AdminAccess';
 import { VictronAssetPage } from './features/victron/victron-asset-page';
 import { useEnrichedCampaigns } from './features/victron/use-enriched-campaigns';
 import { useConnectedWallet } from './features/wallet/use-connected-wallet';
-import { useEurTree } from './features/marketplace/hooks/use-mock-usdc';
+import { useUsdc } from './features/marketplace/hooks/use-mock-usdc';
 import { usePublicTransactions } from './features/marketplace/hooks/use-public-transactions';
 import { formatTokenAmount } from './chain/amounts';
 import { InvestorPortfolio } from './features/investor/investor-portfolio';
@@ -58,7 +58,7 @@ export function App() {
   });
 
   const wallet = useConnectedWallet();
-  const balance = useEurTree(wallet?.address);
+  const balance = useUsdc(wallet?.address);
   const publicTransactions = usePublicTransactions(wallet);
   const formattedBalance = balance.data
     ? formatTokenAmount(balance.data.balance)

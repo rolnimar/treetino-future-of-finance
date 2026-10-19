@@ -201,11 +201,11 @@ export function TreetinoHeader({
                     ? 'border-white/20 bg-white/10 text-white hover:bg-white/20'
                     : 'border-zinc-200 bg-zinc-50 text-zinc-900 hover:bg-zinc-100 hover:border-zinc-300'
                 }`}
-                title="Deposit test EURTree funds"
+                title="Deposit test USDC funds"
               >
-                <span className="font-semibold">€{walletBalance}</span>
+                <span className="font-semibold">{walletBalance}</span>
                 <span className="text-[10px] text-zinc-400 hidden sm:inline">
-                  EURTree
+                  USDC
                 </span>
                 <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#183d89] text-white text-[10px] font-bold">
                   +

@@ -123,7 +123,7 @@ export function DualRevenueEngine({
                 <div className="text-xs text-zinc-700">
                   Tariff:{' '}
                   <strong className="text-zinc-950">
-                    {window.priceEurMwh}
+                    {window.priceUsdcMwh}
                   </strong>
                 </div>
 
@@ -138,8 +138,9 @@ export function DualRevenueEngine({
         {/* Operational Mechanics Note */}
         <p className="text-xs font-mono text-zinc-500 border-t border-black/5 pt-3 leading-relaxed">
           Operational Spread & Off-Take Execution: Realized net spread after DC
-          efficiency reaches €95 – €98 / MWh across 1.2 daily cycles, generating
-          institutional cash flows distributed continuously on Solana.
+          efficiency reaches USDC 95 – USDC 98 / MWh across 1.2 daily cycles,
+          generating institutional cash flows distributed continuously on
+          Solana.
         </p>
       </div>
     </div>

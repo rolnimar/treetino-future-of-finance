@@ -261,7 +261,7 @@ test('OTE quarter-hour curves use UTC timestamps and reject wrong days, missing 
   );
 });
 
-test('CZK billing and six-decimal EURTree use exact integer math including zero, negative prices and overflow', () => {
+test('CZK billing and six-decimal USDC use exact integer math including zero, negative prices and overflow', () => {
   expect(priceInvoice(day, [10000], [quote])).toMatchObject({
     totalCzk: '38.28',
     amount: '1756496',

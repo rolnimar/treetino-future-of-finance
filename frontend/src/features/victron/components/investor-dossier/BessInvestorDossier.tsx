@@ -31,9 +31,8 @@ export function ProjectInvestorDossier({
   const [activeSubTab, setActiveSubTab] =
     useState<DossierSectionTab>(initialTab);
 
-  const currency = dossier.meta.currency ?? 'EUR';
-  const currencySymbol =
-    dossier.meta.currencySymbol ?? (currency === 'USD' ? '$' : '€');
+  const currency = dossier.meta.currency ?? 'USDC';
+  const currencySymbol = 'USDC ';
 
   return (
     <div className="space-y-8 animate-fade-in">

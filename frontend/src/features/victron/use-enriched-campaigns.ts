@@ -188,20 +188,20 @@ function campaignToDemoItem(
         {
           title: 'Gross Energy Revenue',
           percentage: '100%',
-          amount: `€${annualRev.toLocaleString()} / yr`,
+          amount: `USDC ${annualRev.toLocaleString()} / yr`,
           description: `Metered tariff collected from off-taker ${c.offTakerName}`,
         },
         {
           title: 'O&M & Telemetry Reserve',
           percentage: '6%',
-          amount: `-€${Math.round(annualRev * 0.06).toLocaleString()} / yr`,
+          amount: `-USDC ${Math.round(annualRev * 0.06).toLocaleString()} / yr`,
           description:
             'Cerbo GX LTE connectivity, hardware warranty, and routine inspection',
         },
         {
           title: 'Net Investor Distribution',
           percentage: '94%',
-          amount: `€${Math.round(annualRev * 0.94).toLocaleString()} / yr`,
+          amount: `USDC ${Math.round(annualRev * 0.94).toLocaleString()} / yr`,
           description:
             'Direct proportional yield streaming to tokenholders on Solana',
         },

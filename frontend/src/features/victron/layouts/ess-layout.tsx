@@ -49,7 +49,7 @@ export function EssLayout({
   const { currentPower, financials } = demo;
 
   // Real BESS Přeštice 8.6 MW operational rates from co-founder documentation
-  const spotArbitrageSpreadEur = '€95 – €98 / MWh';
+  const spotArbitrageSpreadUsdc = 'USDC 95 – USDC 98 / MWh';
   const isGridExporting = (currentPower.gridWatts ?? 0) <= 0;
 
   const gridTrend = [
@@ -133,9 +133,9 @@ export function EssLayout({
       <FlowSummaryBanner
         generation={{
           label: 'Net Arbitrage Spread',
-          value: spotArbitrageSpreadEur,
+          value: spotArbitrageSpreadUsdc,
           subtext:
-            'Negative midday prices (down to -€60) → evening peak (€180–€320+/MWh)',
+            'Negative midday prices (down to -USDC 60) → evening peak (USDC 180–USDC 320+/MWh)',
         }}
         consumption={{
           label: 'Active Storage Output',
@@ -145,12 +145,12 @@ export function EssLayout({
         }}
         revenueOrSavings={{
           label: 'Gross Daily Revenue Run-Rate',
-          value: '+€3,390 / day',
+          value: '+USDC 3,390 / day',
           subtext: 'Combined ČEPS capacity & activation + OTE intraday spread',
         }}
         investorYield={{
           apyPercent: financials.projectedApy,
-          annualDistribution: '€1.02M / yr (25.6M CZK)',
+          annualDistribution: 'USDC 1.02M / yr',
           subtext: 'Clean net EBITDA after 12% aggregator success fee & OPEX',
         }}
       />
@@ -287,7 +287,7 @@ export function EssLayout({
               subtext="Přeštice Substation (Parcel 450/2)"
               sparklineData={gridTrend}
               footerLabel="Arbitrage Spread:"
-              footerValue={spotArbitrageSpreadEur}
+              footerValue={spotArbitrageSpreadUsdc}
             />
 
             {/* Card 1.2: WATTINO AI EMS (SVR + Spot Bidding) */}
@@ -479,7 +479,7 @@ export function EssLayout({
           },
           {
             label: 'Net Spread Margin',
-            value: spotArbitrageSpreadEur,
+            value: spotArbitrageSpreadUsdc,
             subtext: 'After 92% DC efficiency',
           },
           {
@@ -493,7 +493,7 @@ export function EssLayout({
             subtext: 'Equity IRR > 35%',
           },
         ]}
-        grossRevenueTitle="€1.24M / yr (30.94M CZK) Gross Annual Run-Rate (Var. A Realistic)"
+        grossRevenueTitle="USDC 1.24M / yr Gross Annual Run-Rate (Var. A Realistic)"
         waterfallSteps={financials.cashFlowWaterfall}
       />
     </div>

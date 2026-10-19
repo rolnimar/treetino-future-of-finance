@@ -17,8 +17,8 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
     partnerCompany: 'EcoPower Solution (Štěpán Bártl)',
     investorPerTz: 'Remindee s.r.o.',
     currency: 'CZK',
-    currencySymbol: '€',
-    currencyScale: 25.0, // 25 CZK per EUR
+    currencySymbol: 'USDC ',
+    currencyScale: 25.0, // Demo model scale: 25 source CZK units per USDC
     currencyUnitLabel: 'M',
     capexTitle: 'BESS Přeštice 8.6 MW Turnkey Budget',
     offTakerAgreementTitle: 'ČEPS Grid Balancing & OTE Power Arbitrage',
@@ -49,8 +49,8 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
     },
     {
       label: 'Net Annual EBITDA',
-      value: '€1.02M – €1.48M',
-      subtext: '25.6M – 37.0M CZK net of OPEX & aggregator',
+      value: 'USDC 1.02M – USDC 1.48M',
+      subtext: 'Net of OPEX & aggregator',
       highlight: true,
     },
     {
@@ -139,7 +139,7 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
           id: 'dynamic',
           label: 'Dynamic Volatility',
           description:
-            'Higher intraday spread with negative midday prices and evening peak spikes over €250/MWh with accelerated coal phaseout.',
+            'Higher intraday spread with negative midday prices and evening peak spikes over USDC 250/MWh with accelerated coal phaseout.',
           grossRevenueCzk: 37_950_000,
           svrRevenueCzk: 25_800_000,
           spotRevenueCzk: 12_150_000,
@@ -458,25 +458,25 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
     {
       title: 'Revenue Pillar 1: Grid Balancing (ČEPS Ancillary Services / SVR)',
       sharePercent: '60–70% of Revenue',
-      annualRevenueRangeCzk: '€860k – €1.07M / yr (21.5M – 26.8M CZK)',
+      annualRevenueRangeCzk: 'USDC 860k – USDC 1.07M / yr',
       summary:
         'The BESS maintains reserved balancing capacity at the 22 kV Přeštice substation. Upon dispatch commands from transmission operator ČEPS via certified aggregator, inverters ramp instantly (WATTINO response < 10 ms, battery discharge rate up to 4C).',
       bulletPoints: [
         'Ancillary service products: FCR (Primary Frequency Containment Reserve ±200 mHz), aFRR+ / aFRR- (Secondary Automatic Frequency Restoration Reserve via 15-min auctions), and mFRR.',
-        'Availability payment (Capacity payment in €/MW/h): Guaranteed recurring capacity revenue for readiness (averaging €125k – €140k / MW / year in Central Europe).',
-        'Activated energy remuneration (€/MWh): Paid for delivered balancing energy during positive regulation (aFRR+) and compensated for absorbing excess power during negative regulation (aFRR-).',
+        'Availability payment (Capacity payment in USDC /MW/h): Guaranteed recurring capacity revenue for readiness (averaging USDC 125k – USDC 140k / MW / year in Central Europe).',
+        'Activated energy remuneration (USDC /MWh): Paid for delivered balancing energy during positive regulation (aFRR+) and compensated for absorbing excess power during negative regulation (aFRR-).',
       ],
     },
     {
       title: 'Revenue Pillar 2: Day-Ahead & Intraday Spot Arbitrage (OTE)',
       sharePercent: '30–40% of Revenue',
-      annualRevenueRangeCzk: '€380k – €725k / yr (9.44M – 18.1M CZK)',
+      annualRevenueRangeCzk: 'USDC 380k – USDC 725k / yr',
       summary:
         'WATTINO AI EMS algorithm forecasts price curves and executes automated spot trading on the OTE Day-Ahead and 15-minute Intraday power exchanges ("Buy low, sell high").',
       bulletPoints: [
-        'Charging at zero or negative prices: During midday solar generation peaks (11:00–15:00, when solar oversupply drives power prices to €0 down to -€60/MWh) and overnight wind lows (01:00–05:00, €20–€45/MWh).',
-        'Discharging during peak industrial demand: During morning ramp-up (07:00–09:00, €150–€190/MWh) and especially evening sunset peaks (17:00–21:00, when prices jump to €180–€320+/MWh).',
-        'Realized net spread margin: Average net spread after accounting for 92% round-trip DC efficiency reaches €95 – €98 / MWh (~2,350 – 2,400 CZK/MWh) across 1.1 to 1.2 equivalent daily cycles.',
+        'Charging at zero or negative prices: During midday solar generation peaks (11:00–15:00, when solar oversupply drives power prices to USDC 0 down to -USDC 60/MWh) and overnight wind lows (01:00–05:00, USDC 20–USDC 45/MWh).',
+        'Discharging during peak industrial demand: During morning ramp-up (07:00–09:00, USDC 150–USDC 190/MWh) and especially evening sunset peaks (17:00–21:00, when prices jump to USDC 180–USDC 320+/MWh).',
+        'Realized net spread margin: Average net spread after accounting for 92% round-trip DC efficiency reaches USDC 95 – USDC 98 / MWh across 1.1 to 1.2 equivalent daily cycles.',
       ],
     },
   ],
@@ -485,7 +485,7 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
       time: '00:00 – 05:00',
       title: 'Night Off-Peak Charging + aFRR-',
       category: 'charge',
-      priceEurMwh: '€25 – €45 / MWh',
+      priceUsdcMwh: 'USDC 25 – USDC 45 / MWh',
       description:
         'Low nighttime industrial baseline and wind surplus. Earns capacity fees while absorbing grid balancing energy.',
     },
@@ -493,7 +493,7 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
       time: '07:00 – 09:00',
       title: 'Morning Peak Discharge + FCR',
       category: 'discharge',
-      priceEurMwh: '€160 – €185 / MWh',
+      priceUsdcMwh: 'USDC 160 – USDC 185 / MWh',
       description:
         'Discharges into industrial morning factory ramp-up at premium prices while maintaining frequency containment readiness.',
     },
@@ -501,7 +501,7 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
       time: '11:00 – 15:00',
       title: 'Midday Solar Absorption (Negative Pricing)',
       category: 'charge',
-      priceEurMwh: '€0 down to -€60 / MWh',
+      priceUsdcMwh: 'USDC 0 down to -USDC 60 / MWh',
       description:
         'Regional solar oversupply pushes wholesale market prices negative. The BESS gets paid to charge and relieve grid congestion.',
     },
@@ -509,7 +509,7 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
       time: '17:00 – 21:00',
       title: 'Evening Sunset Peak + aFRR+',
       category: 'discharge',
-      priceEurMwh: '€210 – €260 / MWh (up to €320+)',
+      priceUsdcMwh: 'USDC 210 – USDC 260 / MWh (up to USDC 320+)',
       description:
         'Maximum system consumption peak after solar decline. Yields highest arbitrage spread margin and positive frequency dispatch.',
     },
@@ -518,7 +518,7 @@ export const BESS_PRESTICE_DOSSIER: ProjectDossier = {
     {
       index: 1,
       title:
-        'WATTINO hBESS Cabinet Hardware (Cabinets, PCS Inverters, BMS/EMS, Fire Suppression – ~€348/kWh)',
+        'WATTINO hBESS Cabinet Hardware (Cabinets, PCS Inverters, BMS/EMS, Fire Suppression – ~USDC 348/kWh)',
       phase1VarA: 62_640_000,
       phase2VarA: 24_360_000,
       totalVarA: 87_000_000,

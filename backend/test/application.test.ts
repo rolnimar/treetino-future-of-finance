@@ -149,15 +149,15 @@ describe('compiled NestJS application running on Bun', () => {
         )
       ).json();
       expect(page.total).toBe(2);
-      expect(page.trees.map((t: { address: string }) => t.address)).toEqual([
-        addresses[1],
-      ]);
+      expect(page.trees).toHaveLength(1);
       const next = await (
         await get('client/trees?limit=1&offset=1', session.accessToken)
       ).json();
-      expect(next.trees.map((t: { address: string }) => t.address)).toEqual([
-        addresses[2],
-      ]);
+      expect(next.trees).toHaveLength(1);
+      // PostgreSQL collation can differ from JavaScript's address ordering.
+      expect([page.trees[0].address, next.trees[0].address].sort()).toEqual(
+        addresses.slice(1),
+      );
       expect(
         (await get(`client/trees/${addresses[0]}/reports`, session.accessToken))
           .status,
@@ -467,7 +467,7 @@ describe('compiled NestJS application running on Bun', () => {
     expect(detailRes.status).toBe(200);
     const detail = await detailRes.json();
     expect(detail.title).toBe('Wind Park Kryry 4.0 MW (Vestas V80)');
-    expect(detail.tariffRate).toContain('€88.00');
+    expect(detail.tariffRate).toContain('USDC 88.00');
 
     const notFound = await fetch(baseUrl + '/api/campaigns/missing-tree-999');
     expect(notFound.status).toBe(404);

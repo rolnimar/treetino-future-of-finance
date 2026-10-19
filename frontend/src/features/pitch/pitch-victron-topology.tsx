@@ -162,7 +162,9 @@ export function PitchVictronTopology() {
             </div>
             <div className="border-t border-zinc-100 pt-1 flex items-center justify-between font-mono text-[10px] text-zinc-500">
               <span>Arbitrage Spread:</span>
-              <span className="font-bold text-zinc-900">€95–€98 / MWh</span>
+              <span className="font-bold text-zinc-900">
+                USDC 95–USDC 98 / MWh
+              </span>
             </div>
           </div>
         </foreignObject>

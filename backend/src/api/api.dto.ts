@@ -112,7 +112,7 @@ export class InvoicePricingDto implements InvoicePricing {
     type: String,
     nullable: true,
     description:
-      'Suggested invoice in six-decimal EURTree base units (1 EURTree = 1 EUR). Null for negative-price credits or amounts outside u64.',
+      'Suggested invoice in six-decimal USDC base units (1 USDC = 1 USD). Null for negative-price credits or amounts outside u64.',
   })
   amount!: string | null;
   @ApiProperty() priceSource!: string;

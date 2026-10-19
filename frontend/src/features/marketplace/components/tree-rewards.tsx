@@ -39,7 +39,7 @@ export function TreeRewards({
             {rewards.isError
               ? 'Rewards unavailable'
               : state
-                ? `${formatTokenAmount(state.claimable)} EURTree`
+                ? `${formatTokenAmount(state.claimable)} USDC`
                 : 'Loading rewards…'}
           </p>
           {state && !rewards.isError && state.claimable !== '0' && (

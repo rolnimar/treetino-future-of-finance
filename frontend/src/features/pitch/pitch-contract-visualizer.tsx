@@ -55,7 +55,7 @@ const STAGES: Stage[] = [
     signature: 'claim_rewards(ctx: Context<ClaimRewards>)',
     guarantee:
       'O(1) Precision: 10^18 global index accumulator ensures constant-time claims.',
-    statBadge: '< $0.0002 / Tx',
+    statBadge: '< USDC 0.0002 / Tx',
   },
 ];
 

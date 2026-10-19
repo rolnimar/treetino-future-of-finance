@@ -81,7 +81,7 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
         memoPayload: {
           asset: activePosition?.treeTitle || 'Clean Energy Facility',
           kwh_consumed: activePosition?.kwhConsumed,
-          amount_eurtree: amountUsd,
+          amount_usdc: amountUsd,
           tariff_kwh_usd: activePosition?.tariffKwhUsd,
           protocol: 'treetino_metered_billing',
         },
@@ -122,7 +122,7 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
             <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950">
               {hasActiveCollateral
                 ? 'Host Collateral & Marinade Staking Dashboard'
-                : 'Host Clean Energy Infrastructure at €0 Upfront CAPEX'}
+                : 'Host Clean Energy Infrastructure at USDC 0 Upfront CAPEX'}
             </h1>
             <p className="mt-1 text-sm text-zinc-500 max-w-2xl">
               {hasActiveCollateral
@@ -178,7 +178,7 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
                     )}
                   </div>
                   <span className="text-[11px] text-zinc-600">
-                    {activePosition.treeTitle} · €0 Upfront Hardware CAPEX
+                    {activePosition.treeTitle} · USDC 0 Upfront Hardware CAPEX
                   </span>
                 </div>
               </div>
@@ -292,10 +292,10 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
                 </div>
                 <div className="flex items-center gap-2 font-mono text-xs">
                   <span className="rounded-lg bg-zinc-100 px-2.5 py-1 text-zinc-700">
-                    Tariff: €{activePosition.tariffKwhUsd}/kWh
+                    Tariff: USDC {activePosition.tariffKwhUsd}/kWh
                   </span>
                   <span className="rounded-lg bg-blue-50 text-[#183d89] border border-blue-100 px-2.5 py-1 font-bold">
-                    Capex: €0.00 Free
+                    Capex: USDC 0.00 Free
                   </span>
                 </div>
               </div>
@@ -314,7 +314,7 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
                     Total Settled to Date:
                   </span>
                   <div className="font-mono text-xl font-bold text-zinc-900">
-                    €{activePosition.paidUsd.toFixed(2)} EURTree
+                    {activePosition.paidUsd.toFixed(2)} USDC
                   </div>
                 </div>
                 <div>
@@ -322,7 +322,7 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
                     Current Power Bill Due:
                   </span>
                   <div className="font-mono text-xl font-bold text-[#183d89]">
-                    €{energyDue.toFixed(2)} EURTree
+                    {energyDue.toFixed(2)} USDC
                   </div>
                 </div>
               </div>
@@ -349,7 +349,7 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
                     <span>
                       {isPayingBill
                         ? 'Signing in Phantom…'
-                        : `Pay Energy Bill (€${energyDue.toFixed(2)} EURTree)`}
+                        : `Pay Energy Bill (${energyDue.toFixed(2)} USDC)`}
                     </span>
                   </button>
                 )}
@@ -406,7 +406,7 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
               </p>
               <div className="pt-2">
                 <span className="font-mono text-xs font-bold text-[#183d89]">
-                  Upfront Cost: €0.00
+                  Upfront Cost: USDC 0.00
                 </span>
               </div>
             </div>
@@ -421,8 +421,8 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
               </h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
                 15-year corporate Power Purchase Agreement (PPA). You only pay
-                for the kilowatt-hours generated on your site at a fixed
-                €0.24/kWh tariff.
+                for the kilowatt-hours generated on your site at a fixed USDC
+                0.24/kWh tariff.
               </p>
               <div className="pt-2">
                 <span className="font-mono text-xs font-bold text-zinc-800">
@@ -490,7 +490,7 @@ function ClientAccessForWallet({ wallet }: { wallet: ConnectedWallet | null }) {
             <p className="mb-5 text-sm text-zinc-600 max-w-xl">
               Sign a message with your client wallet to view all on-chain
               assets, read 15-minute telemetry intervals, and settle official
-              energy invoices with EURTree (€).
+              energy invoices with USDC.
             </p>
             <Button
               disabled={login.isPending}

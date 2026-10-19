@@ -78,7 +78,7 @@ export function StreamingYieldTicker({
           <div className="flex items-center gap-2.5">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="font-semibold text-white">
-              Active Position (€{liveResult.amountUsdc} EURTree):
+              Active Position ({liveResult.amountUsdc} USDC):
             </span>
             <span className="text-zinc-400">
               {assetName} · Stake {liveResult.poolSharePercent}
@@ -95,7 +95,7 @@ export function StreamingYieldTicker({
                 </span>
               </div>
               <span className="font-semibold text-emerald-400 text-sm block mt-0.5">
-                {liveResult.formattedTotal} EURTree
+                {liveResult.formattedTotal}
               </span>
             </div>
 
@@ -147,7 +147,7 @@ export function StreamingYieldTicker({
         <div className="flex items-center gap-2.5">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span className="font-semibold text-white">
-            Active Position (€{shareUsdc} EURTree):
+            Active Position ({shareUsdc} USDC):
           </span>
           <span className="text-zinc-400">
             {assetName} · Stake {stakePercent ?? '0.10%'}
@@ -163,11 +163,11 @@ export function StreamingYieldTicker({
               </span>
             </div>
             <span className="font-semibold text-emerald-400 text-sm block mt-0.5">
-              +€{totalLegacy} EURTree
+              +{totalLegacy} USDC
             </span>
           </div>
           <span className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] text-zinc-300">
-            {hourlyRate ?? '+€0.042 / hr'}
+            {hourlyRate ?? '+USDC 0.042 / hr'}
           </span>
         </div>
       </div>
@@ -193,7 +193,7 @@ export function StreamingYieldTicker({
       <div className="flex items-center gap-3">
         <span className="text-zinc-400 text-[11px]">
           Pool Cashflow:{' '}
-          <strong className="text-white">+€{poolHourly}/hr</strong>
+          <strong className="text-white">+USDC {poolHourly}/hr</strong>
         </span>
         {onBackProject && (
           <button
@@ -201,7 +201,7 @@ export function StreamingYieldTicker({
             onClick={onBackProject}
             className="rounded-full bg-gradient-to-r from-[#183d89] to-[#2563eb] hover:from-[#1d4bb5] hover:to-[#3b82f6] px-4 py-1.5 text-xs font-semibold text-white shadow-xs transition active:scale-[0.98] cursor-pointer"
           >
-            Back with EURTree
+            Back with USDC
           </button>
         )}
       </div>

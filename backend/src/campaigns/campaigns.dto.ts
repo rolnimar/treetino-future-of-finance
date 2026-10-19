@@ -22,7 +22,7 @@ export class CampaignDossierDto implements CampaignDossier {
   @ApiProperty() city!: string;
   @ApiProperty() country!: string;
   @ApiProperty({ example: '14.2%' }) projectedApy!: string;
-  @ApiProperty({ example: '$0.40/kWh' }) tariffRate!: string;
+  @ApiProperty({ example: 'USDC 0.40/kWh' }) tariffRate!: string;
   @ApiProperty() offTakerName!: string;
   @ApiPropertyOptional() offTakerDescription?: string;
   @ApiPropertyOptional() supplierName?: string;
@@ -58,7 +58,7 @@ export class CreateCampaignRequestDto implements CreateCampaignDto {
   @ApiProperty() city!: string;
   @ApiProperty() country!: string;
   @ApiProperty({ example: '12.5%' }) projectedApy!: string;
-  @ApiProperty({ example: '$0.35 / kWh' }) tariffRate!: string;
+  @ApiProperty({ example: 'USDC 0.35 / kWh' }) tariffRate!: string;
   @ApiProperty() offTakerName!: string;
   @ApiPropertyOptional() offTakerDescription?: string;
   @ApiPropertyOptional() supplierName?: string;

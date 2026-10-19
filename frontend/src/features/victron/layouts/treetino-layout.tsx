@@ -118,7 +118,7 @@ export function TreetinoLayout({
   };
 
   const { dailyTotals, financials } = demo;
-  const clientPpaRate = 0.32; // €0.32 / kWh metered corporate PPA
+  const clientPpaRate = 0.32; // USDC 0.32 / kWh metered corporate PPA
   const dailyDisplacedSavings = (
     dailyTotals.solarYieldKwh * clientPpaRate
   ).toFixed(2);
@@ -274,13 +274,13 @@ export function TreetinoLayout({
         }}
         revenueOrSavings={{
           label: 'Metered PPA Revenue',
-          value: `+€${dailyDisplacedSavings} / day`,
-          subtext: 'Contracted tariff (€0.32/kWh direct corporate PPA)',
+          value: `+USDC ${dailyDisplacedSavings} / day`,
+          subtext: 'Contracted tariff (USDC 0.32/kWh direct corporate PPA)',
         }}
         investorYield={{
           apyPercent: financials.projectedApy,
           annualDistribution: annualPoolDistribution,
-          subtext: 'Programmatic EURTree distributions streamed on Solana',
+          subtext: 'Programmatic USDC distributions streamed on Solana',
         }}
       />
 
@@ -436,7 +436,7 @@ export function TreetinoLayout({
               subtext="Precision CNC Machining"
               sparklineData={loadTrend.slice(-10)}
               footerLabel="Contracted Tariff:"
-              footerValue="€0.32 / kWh"
+              footerValue="USDC 0.32 / kWh"
             />
 
             {/* Card 2.1: 12 Ducted VAWT Turbines */}
@@ -543,11 +543,11 @@ export function TreetinoLayout({
       <CashFlowDossier
         offTakerTitle="MKovo s.r.o. · Precision Tooling"
         offTakerBadge="Active Corporate PPA"
-        offTakerDescription="Czech precision metal fabrication facility in Central Bohemia region. Contracted a 10-year direct power purchase agreement (PPA) with Treetino at a fixed indexed rate of €0.32 / kWh to hedge against volatile industrial wholesale tariffs and decarbonize precision CNC machining lines."
+        offTakerDescription="Czech precision metal fabrication facility in Central Bohemia region. Contracted a 10-year direct power purchase agreement (PPA) with Treetino at a fixed indexed rate of USDC 0.32 / kWh to hedge against volatile industrial wholesale tariffs and decarbonize precision CNC machining lines."
         keyDetails={[
           {
             label: 'Conditional Purchase',
-            value: '€705,000',
+            value: 'USDC 705,000',
             subtext: '3 Commercial Units',
           },
           {
@@ -556,7 +556,7 @@ export function TreetinoLayout({
             subtext: 'Sub-metered (EM540)',
           },
         ]}
-        grossRevenueTitle="€30,080 / Year Gross Revenue"
+        grossRevenueTitle="USDC 30,080 / Year Gross Revenue"
         waterfallSteps={financials.cashFlowWaterfall}
       />
     </div>

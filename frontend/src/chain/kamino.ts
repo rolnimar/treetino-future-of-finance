@@ -28,7 +28,7 @@ export { kaminoVaultAddress };
  * Program ID: KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD (Kamino Lend V2 - verified executable on Devnet & Mainnet)
  * Kamino Vault Program ID: KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd (Kamino Vaults)
  * Main Market: 7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF (Primary SOL/USDC Lending Market)
- * Primary USDC Reserve: D6q6wuQSrifJKZYpR1M8R4YawnLDtDsMmWM1NbBmgJ59 ($120M+ TVL on Kamino)
+ * Primary USDC Reserve: D6q6wuQSrifJKZYpR1M8R4YawnLDtDsMmWM1NbBmgJ59 (USDC 120M+ TVL on Kamino)
  * Devnet / Fallback USDC Reserve: D6q6wuQSrifJKUvxsqgg5HrsbWUvui82dStLQTZxCdWD
  * kUSDC Mint: kUSDCcUPyR3v6hM4m1uN2K9J2CjWqR2e5GZkYv3y8E8
  */
@@ -243,7 +243,7 @@ export function calculateKaminoAccruedYield(
       baseDividend: Math.max(0, unclaimedUsdc),
       kaminoBonus: 0,
       totalAccrued: Math.max(0, unclaimedUsdc),
-      formattedBonus: '+€0.0000',
+      formattedBonus: '+USDC 0.0000',
     };
   }
 
@@ -257,7 +257,7 @@ export function calculateKaminoAccruedYield(
     baseDividend: unclaimedUsdc,
     kaminoBonus,
     totalAccrued,
-    formattedBonus: `+€${kaminoBonus.toFixed(4)}`,
+    formattedBonus: `+USDC ${kaminoBonus.toFixed(4)}`,
   };
 }
 

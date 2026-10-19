@@ -18,7 +18,7 @@ export function FundingBar({
           <strong className="text-zinc-950 font-bold">
             {formatTokenAmount(raised)}
           </strong>{' '}
-          / {formatTokenAmount(target)} EURTree
+          / {formatTokenAmount(target)} USDC
         </span>
         <span className="font-bold text-t-blue">{percent}% funded</span>
       </div>

@@ -29,7 +29,7 @@ describe('Investor Pitch Deck & 3-Minute Presentation Specification', () => {
     // Check interactive reveal steps
     expect(slide1.revealSteps).toBeDefined();
     const labels = slide1.revealSteps!.map((s) => s.label);
-    expect(labels).toContain('$3,000B');
+    expect(labels).toContain('USDC 3,000B');
     expect(labels).toContain('0%');
     expect(labels.some((l) => l === 'Tritenna' || l === 'Treetino')).toBe(true);
 
@@ -99,12 +99,12 @@ describe('Investor Pitch Deck & 3-Minute Presentation Specification', () => {
     expect(slide6.script).toContain('ninety-six');
   });
 
-  it('closes on the $3 trillion hook and hackathon achievements on Slide 7', () => {
+  it('closes on the USDC 3 trillion hook and hackathon achievements on Slide 7', () => {
     const slide7 = PITCH_SLIDES[6];
     expect(slide7.id).toBe('vision-round');
     expect(slide7.number).toBe(7);
     expect(slide7.timeRange).toBe('2:35 - 3:00');
-    expect(slide7.title).toContain('Unlocking the $3 Trillion Grid');
+    expect(slide7.title).toContain('Unlocking the USDC 3 Trillion Grid');
     expect(slide7.subtitle).toContain('Jakub Lustyk (CTO, Treetino)');
     expect(slide7.subtitle).toContain('Marian-Daniel Rolník (Cleevio)');
     expect(slide7.script).toContain('three trillion dollars');

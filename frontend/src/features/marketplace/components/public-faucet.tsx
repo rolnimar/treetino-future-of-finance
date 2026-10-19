@@ -30,10 +30,9 @@ export function PublicFaucet({
     defaultValues: { amount: '1000' },
   });
   return (
-    <Card title="EURTree Demo Faucet">
+    <Card title="USDC Demo Faucet">
       <p className="mb-4 text-sm text-zinc-500">
-        Mint EURTree to fund green energy projects. EURTree is our 1:1
-        Euro-pegged stablecoin for European renewable infrastructure.
+        Get test USDC on Solana devnet to fund green energy projects.
       </p>
       {connected ? (
         <form onSubmit={handleSubmit((data) => onMint(data.amount))}>
@@ -42,12 +41,12 @@ export function PublicFaucet({
             className="max-w-md space-y-3 disabled:opacity-60"
           >
             <Field
-              label="Faucet amount (EURTree)"
+              label="Faucet amount (USDC)"
               inputMode="decimal"
               {...register('amount')}
               error={errors.amount?.message}
             />
-            <Button type="submit">Mint EURTree</Button>
+            <Button type="submit">Mint USDC</Button>
           </fieldset>
         </form>
       ) : (

@@ -47,14 +47,14 @@ export function calculateAssetAccruedYield(
       hasActiveHolding: false,
       amountUsdc: 0,
       poolSharePercent: '0.00%',
-      hourlyRate: `+€${poolHourly.toFixed(3)} / hr`,
+      hourlyRate: `+USDC ${poolHourly.toFixed(3)} / hr`,
       hourlyRateNumber: poolHourly,
       baseDividend: 0,
       kaminoBonus: 0,
       totalAccrued: 0,
-      formattedTotal: '+€0.0000',
-      formattedBase: '€0.0000',
-      formattedKamino: '€0.0000',
+      formattedTotal: '+USDC 0.0000',
+      formattedBase: 'USDC 0.0000',
+      formattedKamino: 'USDC 0.0000',
       elapsedSeconds: 0,
       totalClaimedUsdc: 0,
     };
@@ -66,7 +66,7 @@ export function calculateAssetAccruedYield(
   const apyFraction = financials.projectedApy / 100;
   const annualDividend = holding.amountUsdc * apyFraction;
   const hourlyRateNumber = annualDividend / (365 * 24);
-  const hourlyRate = `+€${hourlyRateNumber.toFixed(hourlyRateNumber >= 0.01 ? 3 : 4)} / hr`;
+  const hourlyRate = `+USDC ${hourlyRateNumber.toFixed(hourlyRateNumber >= 0.01 ? 3 : 4)} / hr`;
 
   // Determine effective lastClaimedAt:
   // If the user has never claimed yield on this holding (totalClaimedUsdc is 0 or undefined),
@@ -107,9 +107,9 @@ export function calculateAssetAccruedYield(
     baseDividend,
     kaminoBonus,
     totalAccrued,
-    formattedTotal: `+€${totalAccrued.toFixed(4)}`,
-    formattedBase: `€${baseDividend.toFixed(4)}`,
-    formattedKamino: `€${kaminoBonus.toFixed(4)}`,
+    formattedTotal: `+USDC ${totalAccrued.toFixed(4)}`,
+    formattedBase: `USDC ${baseDividend.toFixed(4)}`,
+    formattedKamino: `USDC ${kaminoBonus.toFixed(4)}`,
     elapsedSeconds,
     totalClaimedUsdc: holding.totalClaimedUsdc || 0,
   };

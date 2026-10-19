@@ -195,25 +195,25 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
         estDailyRevenueUsdc: 2.33,
         estMonthlyRevenueUsdc: 70.83,
         estAnnualRevenueUsdc: 850.0,
-        tariffRate: '$0.40/kWh metered consumption',
+        tariffRate: 'USDC 0.40/kWh metered consumption',
         revenueModelDescription: 'Consumer pays per kWh consumed',
         cashFlowWaterfall: [
           {
             title: 'Gross Revenue',
             percentage: '100%',
-            amount: '$850.00 / yr',
+            amount: 'USDC 850.00 / yr',
             description: 'Consumer payments',
           },
           {
             title: 'O&M Reserve',
             percentage: '5%',
-            amount: '-$42.50 / yr',
+            amount: '-USDC 42.50 / yr',
             description: 'Cerbo GX LTE & insurance',
           },
           {
             title: 'Net Investor Distribution',
             percentage: '95%',
-            amount: '$807.50 / yr',
+            amount: 'USDC 807.50 / yr',
             description: 'Tokenholder yield',
           },
         ],
@@ -223,16 +223,16 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     const parsed = victronDemoItemSchema.parse(rawOffgrid);
     expect(parsed.financials.projectedApy).toBe(8.5);
 
-    // Test proportional distribution for a $500 investment:
+    // Test proportional distribution for a USDC 500 investment:
     const investment = 500;
     const poolShare = (investment / parsed.financials.targetUsdc) * 100;
     expect(poolShare).toBe(5.0); // 5% of pool
 
     const annualYield = investment * (parsed.financials.projectedApy / 100);
-    expect(annualYield).toBe(42.5); // $42.50 / year
+    expect(annualYield).toBe(42.5); // USDC 42.50 / year
 
     const monthlyYield = annualYield / 12;
-    expect(Number(monthlyYield.toFixed(2))).toBe(3.54); // $3.54 / month
+    expect(Number(monthlyYield.toFixed(2))).toBe(3.54); // USDC 3.54 / month
   });
 
   test('validates Commercial ESS Battery Arbitrage yields (14.2% APY)', () => {
@@ -329,25 +329,25 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
         estDailyRevenueUsdc: 19.45,
         estMonthlyRevenueUsdc: 591.67,
         estAnnualRevenueUsdc: 7100.0,
-        tariffRate: '$0.35/kWh peak spread + frequency reserve',
+        tariffRate: 'USDC 0.35/kWh peak spread + frequency reserve',
         revenueModelDescription: 'Arbitrage & grid regulation',
         cashFlowWaterfall: [
           {
             title: 'Gross Revenue',
             percentage: '100%',
-            amount: '$7,100.00 / yr',
+            amount: 'USDC 7,100.00 / yr',
             description: 'Peak export arbitrage',
           },
           {
             title: 'Grid Fees',
             percentage: '7%',
-            amount: '-$497.00 / yr',
+            amount: '-USDC 497.00 / yr',
             description: 'Interconnection',
           },
           {
             title: 'Net Investor Distribution',
             percentage: '93%',
-            amount: '$6,603.00 / yr',
+            amount: 'USDC 6,603.00 / yr',
             description: 'BESS token yield',
           },
         ],
@@ -357,13 +357,13 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     const parsed = victronDemoItemSchema.parse(rawEss);
     expect(parsed.financials.projectedApy).toBe(14.2);
 
-    // $1,000 investment:
+    // USDC 1,000 investment:
     const investment = 1000;
     const poolShare = (investment / parsed.financials.targetUsdc) * 100;
     expect(poolShare).toBe(2.0); // 2% of pool
 
     const annualYield = investment * (parsed.financials.projectedApy / 100);
-    expect(annualYield).toBe(142.0); // $142.00 / year
+    expect(annualYield).toBe(142.0); // USDC 142.00 / year
   });
 
   test('validates EV Fast-Charging Hub high-velocity transaction economics (18.5% APY)', () => {
@@ -465,25 +465,25 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
         estDailyRevenueUsdc: 50.68,
         estMonthlyRevenueUsdc: 1541.67,
         estAnnualRevenueUsdc: 18500.0,
-        tariffRate: '$0.42/kWh + $2.50 session fee',
+        tariffRate: 'USDC 0.42/kWh + USDC 2.50 session fee',
         revenueModelDescription: 'Point-of-sale EV charging micro-billing',
         cashFlowWaterfall: [
           {
             title: 'Gross Charging Revenue',
             percentage: '100%',
-            amount: '$18,500.00 / yr',
+            amount: 'USDC 18,500.00 / yr',
             description: 'EV driver payments',
           },
           {
             title: 'Site Lease & Processing',
             percentage: '8%',
-            amount: '-$1,480.00 / yr',
+            amount: '-USDC 1,480.00 / yr',
             description: 'Parking lease & gateway',
           },
           {
             title: 'Net Investor Distribution',
             percentage: '92%',
-            amount: '$17,020.00 / yr',
+            amount: 'USDC 17,020.00 / yr',
             description: 'EV hub token yield',
           },
         ],
@@ -493,13 +493,13 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     const parsed = victronDemoItemSchema.parse(rawEv);
     expect(parsed.financials.projectedApy).toBe(18.5);
 
-    // $2,500 investment:
+    // USDC 2,500 investment:
     const investment = 2500;
     const poolShare = (investment / parsed.financials.targetUsdc) * 100;
     expect(poolShare).toBe(2.5); // 2.5% of pool
 
     const annualYield = investment * (parsed.financials.projectedApy / 100);
-    expect(annualYield).toBe(462.5); // $462.50 / year
+    expect(annualYield).toBe(462.5); // USDC 462.50 / year
   });
 
   test('validates 3 distinct physical system topologies and node configurations', () => {
@@ -593,7 +593,7 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
         turbineRpm: 326,
         activeAiMode: 'Sun Tracking & Ducted Venturi Boost',
         clientName: 'MKovo s.r.o. (Precision Manufacturing)',
-        clientTariff: '$0.32 / kWh metered corporate PPA',
+        clientTariff: 'USDC 0.32 / kWh metered corporate PPA',
       },
       dailyTotals: {
         solarYieldKwh: 38.45,
@@ -664,28 +664,28 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
         estDailyRevenueUsdc: 82.41,
         estMonthlyRevenueUsdc: 2506.67,
         estAnnualRevenueUsdc: 30080.0,
-        tariffRate: '$0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
+        tariffRate: 'USDC 0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
         revenueModelDescription:
           'Dual revenue stream: direct metered corporate PPA payments from industrial client MKovo s.r.o. plus peak grid feed-in export.',
         cashFlowWaterfall: [
           {
             title: 'Gross Metered Energy Revenue',
             percentage: '100%',
-            amount: '$30,080.00 / yr',
+            amount: 'USDC 30,080.00 / yr',
             description:
               'Metered electricity payments collected from off-taker MKovo s.r.o.',
           },
           {
             title: 'O&M, Telemetry & Warranty Reserve',
             percentage: '8%',
-            amount: '-$2,406.40 / yr',
+            amount: '-USDC 2,406.40 / yr',
             description:
               'Victron Cerbo GX cloud connectivity and actuator inspection',
           },
           {
             title: 'Net Investor Distribution',
             percentage: '92%',
-            amount: '$27,673.60 / yr',
+            amount: 'USDC 27,673.60 / yr',
             description:
               'Direct programmatic yield distributions streamed to Treetino V1 tokenholders',
           },
@@ -700,7 +700,7 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     expect(parsed.financials.projectedApy).toBe(12.8);
     expect(parsed.treeDiagnostics?.clientName).toContain('MKovo s.r.o.');
     expect(parsed.treeDiagnostics?.clientTariff).toBe(
-      '$0.32 / kWh metered corporate PPA',
+      'USDC 0.32 / kWh metered corporate PPA',
     );
     expect(parsed.devices[1].modelName).toContain('Dunkermotoren');
   });
@@ -723,8 +723,8 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
   });
 
   test('validates investor dividend streaming mathematics and continuous accrual', () => {
-    const investment = 500; // $500 USDC
-    const target = 10000; // $10,000 pool
+    const investment = 500; // USDC 500 USDC
+    const target = 10000; // USDC 10,000 pool
     const apyPercent = 14.2; // 14.2% APY
 
     // 1. Ownership share
@@ -798,7 +798,7 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
       city: 'Prague',
       country: 'Czech Republic',
       projectedApy: '12.8%',
-      tariffRate: '$0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
+      tariffRate: 'USDC 0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
       offTakerName: 'MKovo s.r.o.',
       offTakerDescription: 'Long-term corporate power purchase agreement.',
       supplierName: 'Treetino CleanTech s.r.o.',
@@ -944,10 +944,10 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     expect(portfolioYield.kaminoBonus).toBe(productDetailYield.kaminoBonus);
     expect(portfolioYield.poolSharePercent).toBe('0.10%');
 
-    // Unclaimed initial holding has accrued SCADA telemetry ~€0.078 - €0.082
+    // Unclaimed initial holding has accrued SCADA telemetry ~USDC 0.078 - USDC 0.082
     expect(portfolioYield.totalAccrued).toBeGreaterThanOrEqual(0.078);
     expect(portfolioYield.totalAccrued).toBeLessThanOrEqual(0.082);
-    expect(portfolioYield.formattedTotal).toMatch(/^\+€0\.0[78]\d\d$/);
+    expect(portfolioYield.formattedTotal).toMatch(/^\+USDC 0\.0[78]\d\d$/);
 
     // Simulating claiming in wallet: lastClaimedAt resets to fixedNow, totalClaimedUsdc records payout
     const claimedHolding = {
@@ -967,11 +967,11 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
       fixedNow,
     );
 
-    // Immediate post-claim state is exactly 0.0000 EURTree on both pages
+    // Immediate post-claim state is exactly 0.0000 USDC on both pages
     expect(portfolioAfterClaim.totalAccrued).toBe(0);
-    expect(portfolioAfterClaim.formattedTotal).toBe('+€0.0000');
+    expect(portfolioAfterClaim.formattedTotal).toBe('+USDC 0.0000');
     expect(detailAfterClaim.totalAccrued).toBe(0);
-    expect(detailAfterClaim.formattedTotal).toBe('+€0.0000');
+    expect(detailAfterClaim.formattedTotal).toBe('+USDC 0.0000');
 
     // 10 seconds later: continuous streaming continues synchronously
     const streamPortfolio = calculateAssetAccruedYield(

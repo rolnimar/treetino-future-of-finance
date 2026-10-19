@@ -16,7 +16,7 @@ export const buySharesFormSchema = (balance: string, remaining: string) =>
     amount: tokenAmountInput()
       .refine(
         (value) => BigInt(value) <= BigInt(balance),
-        'Insufficient EURTree balance',
+        'Insufficient USDC balance',
       )
       .refine(
         (value) => BigInt(value) <= BigInt(remaining),

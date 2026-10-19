@@ -3,14 +3,14 @@ import type { FinancialVariant } from '../../types/investor-dossier';
 
 interface InteractiveFinancialModelProps {
   variants: Record<'var-a' | 'var-b', FinancialVariant>;
-  currency?: 'EUR' | 'USD' | 'CZK';
+  currency?: 'USDC' | 'CZK';
   currencySymbol?: string;
 }
 
 export function InteractiveFinancialModel({
   variants,
-  currency = 'EUR',
-  currencySymbol = '€',
+  currency = 'USDC',
+  currencySymbol = 'USDC ',
 }: InteractiveFinancialModelProps) {
   const [selectedVariantId, setSelectedVariantId] = useState<'var-a' | 'var-b'>(
     'var-a',
@@ -36,9 +36,8 @@ export function InteractiveFinancialModel({
   // Clean currency formatting
   const formatMln = (val: number) => {
     if (currency === 'CZK') {
-      const eurMln = val / 25_000_000;
-      const czkMln = val / 1_000_000;
-      return `${eurMln >= 0 ? '+' : ''}€${eurMln.toFixed(2)}M (${czkMln.toFixed(1)}M CZK)`;
+      const usdcMln = val / 25_000_000;
+      return `${usdcMln >= 0 ? '+' : ''}USDC ${usdcMln.toFixed(2)}M`;
     }
     if (Math.abs(val) >= 1_000_000) {
       return `${val >= 0 ? '+' : ''}${currencySymbol}${(val / 1_000_000).toFixed(2)}M`;
@@ -51,15 +50,15 @@ export function InteractiveFinancialModel({
 
   const formatCurrency = (val: number) => {
     if (currency === 'CZK') {
-      const eur = val / 25;
-      return `€${Math.round(eur).toLocaleString('en-US')} (${val.toLocaleString('cs-CZ')} CZK)`;
+      const usdc = val / 25;
+      return `USDC ${Math.round(usdc).toLocaleString('en-US')}`;
     }
     return `${currencySymbol}${val.toLocaleString('en-US')}`;
   };
 
   const formatShortValue = (val: number) => {
     if (currency === 'CZK') {
-      return `€${(val / 25_000_000).toFixed(2)}M`;
+      return `USDC ${(val / 25_000_000).toFixed(2)}M`;
     }
     if (val >= 1_000_000) {
       return `${currencySymbol}${(val / 1_000_000).toFixed(2)}M`;
@@ -425,7 +424,11 @@ export function InteractiveFinancialModel({
                 </td>
                 {variant.cashFlow10y.map((row) => (
                   <td key={row.year} className="py-2 px-2 text-center">
-                    {row.year === 0 ? '0.0' : row.svrRevenueMlnCzk.toFixed(1)}
+                    {row.year === 0
+                      ? '0.0'
+                      : (
+                          row.svrRevenueMlnCzk / (currency === 'CZK' ? 25 : 1)
+                        ).toFixed(1)}
                   </td>
                 ))}
               </tr>
@@ -435,7 +438,11 @@ export function InteractiveFinancialModel({
                 </td>
                 {variant.cashFlow10y.map((row) => (
                   <td key={row.year} className="py-2 px-2 text-center">
-                    {row.year === 0 ? '0.0' : row.spotRevenueMlnCzk.toFixed(1)}
+                    {row.year === 0
+                      ? '0.0'
+                      : (
+                          row.spotRevenueMlnCzk / (currency === 'CZK' ? 25 : 1)
+                        ).toFixed(1)}
                   </td>
                 ))}
               </tr>
@@ -450,7 +457,10 @@ export function InteractiveFinancialModel({
                   >
                     {row.year === 0
                       ? '0.0'
-                      : row.opexAndAggregatorMlnCzk.toFixed(1)}
+                      : (
+                          row.opexAndAggregatorMlnCzk /
+                          (currency === 'CZK' ? 25 : 1)
+                        ).toFixed(1)}
                   </td>
                 ))}
               </tr>
@@ -465,7 +475,9 @@ export function InteractiveFinancialModel({
                       row.year === 0 ? 'text-zinc-500' : 'text-emerald-700'
                     }`}
                   >
-                    {row.year === 0 ? '-' : `+${row.ebitdaMlnCzk.toFixed(1)}`}
+                    {row.year === 0
+                      ? '-'
+                      : `+${(row.ebitdaMlnCzk / (currency === 'CZK' ? 25 : 1)).toFixed(1)}`}
                   </td>
                 ))}
               </tr>
@@ -483,7 +495,9 @@ export function InteractiveFinancialModel({
                       }`}
                     >
                       {row.cumCfNoSubsidyMlnCzk > 0 ? '+' : ''}
-                      {row.cumCfNoSubsidyMlnCzk.toFixed(1)}
+                      {(
+                        row.cumCfNoSubsidyMlnCzk / (currency === 'CZK' ? 25 : 1)
+                      ).toFixed(1)}
                     </td>
                   );
                 })}
@@ -502,7 +516,10 @@ export function InteractiveFinancialModel({
                       }`}
                     >
                       {row.cumCfWithSubsidyMlnCzk > 0 ? '+' : ''}
-                      {row.cumCfWithSubsidyMlnCzk.toFixed(1)}
+                      {(
+                        row.cumCfWithSubsidyMlnCzk /
+                        (currency === 'CZK' ? 25 : 1)
+                      ).toFixed(1)}
                     </td>
                   );
                 })}

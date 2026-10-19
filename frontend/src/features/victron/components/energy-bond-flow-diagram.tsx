@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   ShieldCheckIcon,
-  CurrencyEuroIcon,
+  CurrencyDollarIcon,
   BoltIcon,
   ArrowRightIcon,
 } from '../victron-icons';
@@ -67,7 +67,7 @@ export function EnergyBondFlowDiagram() {
               01 / PLEDGE
             </span>
             <span className="font-mono text-[11px] font-medium text-zinc-500">
-              From €50
+              From USDC 50
             </span>
           </div>
 
@@ -195,7 +195,7 @@ export function EnergyBondFlowDiagram() {
 
           <div className="my-4 flex items-center gap-3.5">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-zinc-950 text-white group-hover:bg-[#183d89] shadow-xs group-hover:scale-105 transition-all">
-              <CurrencyEuroIcon className="h-6 w-6" />
+              <CurrencyDollarIcon className="h-6 w-6" />
             </div>
             <div>
               <h4 className="text-base font-semibold text-zinc-950">

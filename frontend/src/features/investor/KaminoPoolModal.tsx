@@ -23,8 +23,8 @@ import { requestWalletApproval } from '../../chain/wallet-action';
 interface KaminoPoolModalProps {
   isOpen: boolean;
   onClose: () => void;
-  unclaimedDividendsEur: number;
-  kaminoBonusEur: number;
+  unclaimedDividendsUsdc: number;
+  kaminoBonusUsdc: number;
   walletAddress?: string;
   wallet?: ConnectedWallet | null;
   onClaimSuccess?: (amount: number, bonus: number) => void;
@@ -33,8 +33,8 @@ interface KaminoPoolModalProps {
 export function KaminoPoolModal({
   isOpen,
   onClose,
-  unclaimedDividendsEur,
-  kaminoBonusEur,
+  unclaimedDividendsUsdc,
+  kaminoBonusUsdc,
   walletAddress = '4v7PkW2s4p1aM5DqH2qj6tY8Z9X2v7w1m3k5L8p9q4r1',
   wallet,
   onClaimSuccess,
@@ -98,7 +98,7 @@ export function KaminoPoolModal({
         wallet,
         {
           treeAddress: '8z7PkW2s4p1aM5DqH2qj6tY8Z9X2v7w1m3k5L8p9q4r2',
-          unclaimedAmountUsdc: Math.max(0.5, unclaimedDividendsEur),
+          unclaimedAmountUsdc: Math.max(0.5, unclaimedDividendsUsdc),
           callerWallet: wallet.address,
         },
         (sig) => setStatusMessage(`Submitted tx: ${sig.slice(0, 16)}…`),
@@ -108,15 +108,15 @@ export function KaminoPoolModal({
         signature: res.signature,
         action: 'compound',
         slot: res.slot,
-        amount: Math.max(0.5, unclaimedDividendsEur),
+        amount: Math.max(0.5, unclaimedDividendsUsdc),
       });
 
       // Also set simulated view for telemetry tab
       setCompoundResult({
         signature: res.signature,
-        unclaimedUsdc: Math.max(0.5, unclaimedDividendsEur),
+        unclaimedUsdc: Math.max(0.5, unclaimedDividendsUsdc),
         kUsdcMinted: Number(
-          (Math.max(0.5, unclaimedDividendsEur) / 1.0428).toFixed(4),
+          (Math.max(0.5, unclaimedDividendsUsdc) / 1.0428).toFixed(4),
         ),
         apyPercent: Number((currentApy * 100).toFixed(2)),
         kaminoVaultPda: wallet.address,
@@ -126,7 +126,7 @@ export function KaminoPoolModal({
           `Transaction confirmed on Solana Devnet (Slot ${res.slot})`,
           `Program ${KAMINO_LEND_PROGRAM_ID.toBase58()} invoke [1]`,
           `Program log: Instruction: DepositReserveLiquidityAndFilter`,
-          `Program log: Deposited ${Math.max(0.5, unclaimedDividendsEur).toFixed(4)} USDC into Kamino Liquidity Reserve`,
+          `Program log: Deposited ${Math.max(0.5, unclaimedDividendsUsdc).toFixed(4)} USDC into Kamino Liquidity Reserve`,
           `Program log: RockawayX Liquidity Multiplier activated: +${(currentApy * 100).toFixed(2)}% APY`,
           `Program ${KAMINO_LEND_PROGRAM_ID.toBase58()} success`,
         ],
@@ -152,8 +152,8 @@ export function KaminoPoolModal({
     setErrorMessage(null);
     setStatusMessage('Executing on-chain claim on Solana Devnet…');
 
-    const baseAmount = Math.max(0.5, unclaimedDividendsEur);
-    const bonusAmount = Math.max(0.015, kaminoBonusEur);
+    const baseAmount = Math.max(0.5, unclaimedDividendsUsdc);
+    const bonusAmount = Math.max(0.015, kaminoBonusUsdc);
 
     try {
       const res = await executeKaminoClaimWithBonusOnDevnet(
@@ -185,8 +185,8 @@ export function KaminoPoolModal({
         logs: [
           `Claim confirmed on Solana Devnet (Slot ${res.slot})`,
           `Program log: Instruction: ClaimRewards`,
-          `Program log: Redeemed compounded Kamino yield: +${bonusAmount.toFixed(4)} EURTree bonus`,
-          `Program log: Total payout credited to wallet: ${res.totalClaimedUsdc.toFixed(4)} EURTree`,
+          `Program log: Redeemed compounded Kamino yield: +${bonusAmount.toFixed(4)} USDC bonus`,
+          `Program log: Total payout credited to wallet: ${res.totalClaimedUsdc.toFixed(4)} USDC`,
           `Program log: Transfer success`,
         ],
       });
@@ -218,14 +218,14 @@ export function KaminoPoolModal({
           actionName: 'simulate_kamino_auto_compound',
           memoPayload: {
             tree: '8z7PkW2s4p1aM5DqH2qj6tY8Z9X2v7w1m3k5L8p9q4r2',
-            amount: Math.max(0.5, unclaimedDividendsEur),
+            amount: Math.max(0.5, unclaimedDividendsUsdc),
             protocol: 'kamino_preflight',
           },
         });
       }
       const res = await simulateKaminoAutoCompoundOnDevnet(connection, {
         treeAddress: '8z7PkW2s4p1aM5DqH2qj6tY8Z9X2v7w1m3k5L8p9q4r2',
-        unclaimedAmountUsdc: Math.max(0.5, unclaimedDividendsEur),
+        unclaimedAmountUsdc: Math.max(0.5, unclaimedDividendsUsdc),
         callerWallet: walletAddress,
       });
       setCompoundResult(res);
@@ -258,8 +258,8 @@ export function KaminoPoolModal({
           actionName: 'simulate_kamino_claim_bonus',
           memoPayload: {
             tree: '8z7PkW2s4p1aM5DqH2qj6tY8Z9X2v7w1m3k5L8p9q4r2',
-            base_dividend: Math.max(0.5, unclaimedDividendsEur),
-            kamino_bonus: Math.max(0.015, kaminoBonusEur),
+            base_dividend: Math.max(0.5, unclaimedDividendsUsdc),
+            kamino_bonus: Math.max(0.015, kaminoBonusUsdc),
             protocol: 'kamino_preflight',
           },
         });
@@ -267,8 +267,8 @@ export function KaminoPoolModal({
       const res = await simulateKaminoClaimWithBonus(connection, {
         treeAddress: '8z7PkW2s4p1aM5DqH2qj6tY8Z9X2v7w1m3k5L8p9q4r2',
         investorWallet: walletAddress,
-        baseDividend: Math.max(0.5, unclaimedDividendsEur),
-        kaminoBonus: Math.max(0.015, kaminoBonusEur),
+        baseDividend: Math.max(0.5, unclaimedDividendsUsdc),
+        kaminoBonus: Math.max(0.015, kaminoBonusUsdc),
       });
       setClaimResult(res);
       setCompoundResult(null);
@@ -390,7 +390,7 @@ export function KaminoPoolModal({
                   Unclaimed Yield
                 </span>
                 <span className="font-mono text-2xl font-black text-zinc-950 mt-1 block">
-                  €{unclaimedDividendsEur.toFixed(4)}
+                  USDC {unclaimedDividendsUsdc.toFixed(4)}
                 </span>
                 <span className="text-[10px] text-zinc-500">
                   Hardware kilowatt sales
@@ -402,7 +402,7 @@ export function KaminoPoolModal({
                   Kamino Bonus
                 </span>
                 <span className="font-mono text-2xl font-black text-emerald-700 mt-1 block">
-                  +€{kaminoBonusEur.toFixed(4)}
+                  +USDC {kaminoBonusUsdc.toFixed(4)}
                 </span>
                 <span className="text-[10px] text-emerald-600">
                   Accruing in kUSDC
@@ -436,7 +436,7 @@ export function KaminoPoolModal({
               <div className="flex justify-between items-center py-1 border-b border-zinc-200/60">
                 <span className="text-zinc-500">Total Reserve TVL</span>
                 <span className="font-bold text-emerald-600">
-                  ${(currentLiquidity / 1_000_000).toFixed(1)}M USDC (
+                  {(currentLiquidity / 1_000_000).toFixed(1)}M USDC (
                   {(currentUtilization * 100).toFixed(1)}% util)
                 </span>
               </div>

@@ -5,7 +5,7 @@ interface ItemizedBudgetExplorerProps {
   budget: CapexBudgetItem[];
   title?: string;
   subtitle?: string;
-  currency?: 'EUR' | 'USD' | 'CZK';
+  currency?: 'USDC' | 'CZK';
   currencySymbol?: string;
   advantages?: Array<{ title: string; desc: string }>;
 }
@@ -14,15 +14,14 @@ export function ItemizedBudgetExplorer({
   budget,
   title = 'Itemized CAPEX & OPEX Budget Breakdown',
   subtitle = 'Turnkey engineering, equipment procurement, civil works, grid interconnection, and commissioning breakdown.',
-  currency = 'EUR',
-  currencySymbol = '€',
+  currency = 'USDC',
+  currencySymbol = 'USDC ',
   advantages,
 }: ItemizedBudgetExplorerProps) {
   const formatVal = (val: number) => {
     if (currency === 'CZK') {
-      const eurMln = val / 25_000_000;
-      const czkMln = val / 1_000_000;
-      return `€${eurMln.toFixed(2)}M (${czkMln.toFixed(1)}M CZK)`;
+      const usdcMln = val / 25_000_000;
+      return `USDC ${usdcMln.toFixed(2)}M`;
     }
     if (Math.abs(val) >= 1_000_000) {
       return `${currencySymbol}${(val / 1_000_000).toFixed(2)}M`;

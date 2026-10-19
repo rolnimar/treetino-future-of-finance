@@ -16,7 +16,7 @@ export function ReportCharts({ report }: { report: IndexedReport }) {
       {data.prices.length > 0 && (
         <IntervalChart
           title={`15-minute spot price · ${date}`}
-          unit="CZK/kWh"
+          unit="USDC/kWh"
           points={data.prices}
         />
       )}

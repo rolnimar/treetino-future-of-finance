@@ -352,7 +352,7 @@ export function PitchDeck({ onExit }: PitchDeckProps) {
                 01 / Global Energy
               </div>
               <h1 className="text-8xl sm:text-9xl lg:text-[11rem] font-black tracking-tighter text-zinc-950 leading-none">
-                $3 Trillion.
+                USDC 3 Trillion.
               </h1>
               <p className="text-2xl sm:text-4xl font-bold text-zinc-600 tracking-tight max-w-4xl pt-2">
                 Poured into global energy last year alone. Larger than the
@@ -367,7 +367,7 @@ export function PitchDeck({ onExit }: PitchDeckProps) {
                   The Capital
                 </span>
                 <div className="text-4xl sm:text-5xl font-black text-zinc-950 font-mono">
-                  $3,000B
+                  USDC 3,000B
                 </div>
                 <p className="text-base font-bold text-zinc-600">
                   Global energy investment in 2025. Shut off from retail.
@@ -382,7 +382,8 @@ export function PitchDeck({ onExit }: PitchDeckProps) {
                   0% Access
                 </div>
                 <p className="text-base font-bold text-zinc-600">
-                  Anyone buys $10 of Bitcoin. Ordinary people only get the bill.
+                  Anyone buys USDC 10 of Bitcoin. Ordinary people only get the
+                  bill.
                 </p>
               </div>
 
@@ -452,7 +453,7 @@ export function PitchDeck({ onExit }: PitchDeckProps) {
                   Zero Fee Erosion
                 </span>
                 <div className="text-4xl sm:text-5xl font-black text-zinc-950 font-mono">
-                  $0.0002
+                  USDC 0.0002
                 </div>
                 <p className="text-base font-bold text-zinc-600">
                   Continuous micro-dividends stream directly to retail wallets
@@ -563,7 +564,7 @@ export function PitchDeck({ onExit }: PitchDeckProps) {
                   Net Annual EBITDA
                 </span>
                 <div className="text-4xl sm:text-5xl font-black text-zinc-950 font-mono">
-                  €1.0M–€1.5M
+                  USDC 1.0M–USDC 1.5M
                 </div>
                 <p className="text-base font-bold text-zinc-600">
                   Dual revenue: 24/7 grid balancing capacity fees + negative

@@ -148,7 +148,7 @@ function InvoiceForm({
           ))}
         </SelectField>
         <Field
-          label="Final invoice amount (EURTree)"
+          label="Final invoice amount (USDC)"
           {...register('amount')}
           error={errors.amount?.message}
         />

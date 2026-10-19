@@ -42,11 +42,11 @@ export function TreetinoBlueprintBanner({
 
         {/* Lead Paragraph */}
         <p className="mt-4 max-w-2xl text-base sm:text-lg text-zinc-200 font-normal leading-relaxed">
-          €3 trillion was added to energy markets last year, yet ordinary people
-          only pay the bills. Treetino changes that by tokenizing real operating
-          clean power assets — from 35% APY grid batteries to kinetic trees and
-          wind turbines — backed by signed utility PPAs, licenses, and certified
-          technicians.
+          USDC 3 trillion was added to energy markets last year, yet ordinary
+          people only pay the bills. Treetino changes that by tokenizing real
+          operating clean power assets — from 35% APY grid batteries to kinetic
+          trees and wind turbines — backed by signed utility PPAs, licenses, and
+          certified technicians.
         </p>
 
         {/* Action Buttons */}
@@ -66,8 +66,8 @@ export function TreetinoBlueprintBanner({
             className="rounded-full border border-white/20 bg-white/10 hover:bg-white/15 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-md shadow-xl transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
           >
             {faucetPending
-              ? 'Depositing EURTree…'
-              : '+ Deposit Test Capital (€1,000)'}
+              ? 'Depositing USDC…'
+              : '+ Deposit Test Capital (USDC 1,000)'}
           </button>
         </div>
 
@@ -75,7 +75,7 @@ export function TreetinoBlueprintBanner({
         <div className="mt-14 grid w-full grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/10 pt-10 text-center font-mono">
           <div>
             <span className="block text-2xl sm:text-3xl font-light text-white">
-              €3T+ Added
+              USDC 3T+ Added
             </span>
             <span className="mt-1 block text-xs text-blue-200/80 uppercase tracking-wider">
               Global Energy Market Opportunity

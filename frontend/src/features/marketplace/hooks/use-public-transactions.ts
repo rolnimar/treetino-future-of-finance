@@ -37,12 +37,7 @@ export function usePublicTransactions(wallet: ConnectedWallet | null) {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: [
-            'wallet',
-            'eurTree',
-            connection.rpcEndpoint,
-            wallet?.address,
-          ],
+          queryKey: ['wallet', 'usdc', connection.rpcEndpoint, wallet?.address],
         }),
         queryClient.invalidateQueries({
           queryKey: [

@@ -18,8 +18,8 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
       'Victron Certified Integrator Australia (Outback Clean Energy)',
     partnerCompany: 'Queensland Agricultural Station Homestead',
     investorPerTz: 'Treetino Rural DePIN Trust',
-    currency: 'USD',
-    currencySymbol: '$',
+    currency: 'USDC',
+    currencySymbol: 'USDC ',
     currencyScale: 1.0,
     currencyUnitLabel: 'k',
     capexTitle: 'Queensland Rural Microgrid Turnkey Installation Budget',
@@ -52,8 +52,8 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
     },
     {
       label: 'Contracted Solar Tariff',
-      value: '€0.40 / kWh',
-      subtext: '40% savings vs €0.65/kWh expensive diesel baseline',
+      value: 'USDC 0.40 / kWh',
+      subtext: '40% savings vs USDC 0.65/kWh expensive diesel baseline',
       highlight: true,
     },
     {
@@ -461,9 +461,9 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
     {
       title: 'Revenue Pillar 1: Contracted Solar Tariff vs Diesel Baseline',
       sharePercent: '80–85% of Revenue',
-      annualRevenueRangeCzk: '€6,450 – €7,600 / year',
+      annualRevenueRangeCzk: 'USDC 6,450 – USDC 7,600 / year',
       summary:
-        'The pastoral homestead pays an indexed €0.40 / kWh tariff for solar and battery power, saving ~40% compared to previous diesel fuel costs of €0.65 / kWh while funding protocol yield.',
+        'The pastoral homestead pays an indexed USDC 0.40 / kWh tariff for solar and battery power, saving ~40% compared to previous diesel fuel costs of USDC 0.65 / kWh while funding protocol yield.',
       bulletPoints: [
         '10-year exclusive energy services agreement with homestead station owner.',
         'Eliminates expensive remote bulk diesel logistics and frequent engine servicing.',
@@ -474,7 +474,7 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
       title:
         'Revenue Pillar 2: Clean Energy Regulator STC Credits & Fuel Rebates',
       sharePercent: '15–20% of Revenue',
-      annualRevenueRangeCzk: '€1,230 – €1,500 / year',
+      annualRevenueRangeCzk: 'USDC 1,230 – USDC 1,500 / year',
       summary:
         'Creation and monetization of Small-scale Technology Certificates (STCs) registered with the Australian Clean Energy Regulator, combined with diesel displacement credits.',
       bulletPoints: [
@@ -489,7 +489,7 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
       time: '06:00 – 10:00',
       title: 'Morning Solar Harvest & Water Pumping',
       category: 'charge',
-      priceEurMwh: '€0.40 / kWh Metered',
+      priceUsdcMwh: 'USDC 0.40 / kWh Metered',
       description:
         'Direct solar generation powers cattle borehole pumps and homestead cold rooms, while recharging battery bank.',
     },
@@ -497,7 +497,7 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
       time: '10:00 – 15:00',
       title: 'Peak Solar Absorption & Full Battery Top-Up',
       category: 'charge',
-      priceEurMwh: '€0.40 / kWh Metered',
+      priceUsdcMwh: 'USDC 0.40 / kWh Metered',
       description:
         'Maximum 28 kW solar harvest. Battery reaches 100% state of charge (SoC) while homestead air conditioning runs on pure solar.',
     },
@@ -505,7 +505,7 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
       time: '15:00 – 21:00',
       title: 'Homestead Evening Peak & Battery Discharging',
       category: 'discharge',
-      priceEurMwh: '€0.40 / kWh Metered',
+      priceUsdcMwh: 'USDC 0.40 / kWh Metered',
       description:
         'Victron MultiPlus inverters draw from the 60 kWh lithium bank to power residential cooking, lighting, and workshop machinery.',
     },
@@ -513,7 +513,7 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
       time: '21:00 – 06:00',
       title: 'Quiet Overnight Lithium Base Load',
       category: 'balancing',
-      priceEurMwh: '€0.40 / kWh Metered',
+      priceUsdcMwh: 'USDC 0.40 / kWh Metered',
       description:
         'Silent overnight battery operation with zero noise and zero diesel exhaust fumes. Automatic generator standby.',
     },
@@ -584,7 +584,7 @@ export const OFFGRID_HOMESTEAD_DOSSIER: ProjectDossier = {
       code: 'PPA Agreement',
       title: '10-Year Clean Energy Purchase Agreement',
       description:
-        'Signed binding off-take contract with station owner at guaranteed €0.40 / kWh.',
+        'Signed binding off-take contract with station owner at guaranteed USDC 0.40 / kWh.',
       status: 'completed',
     },
     {

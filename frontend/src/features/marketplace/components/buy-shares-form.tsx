@@ -35,7 +35,7 @@ export function BuySharesForm({
     >
       <fieldset disabled={disabled} className="space-y-3 disabled:opacity-60">
         <Field
-          label="Spend EURTree (€)"
+          label="Spend USDC"
           inputMode="decimal"
           {...register('amount')}
           error={errors.amount?.message}
@@ -57,8 +57,7 @@ export function BuySharesForm({
           </Button>
         </div>
         <p className="text-xs text-zinc-500">
-          1 EURTree (€1.00) buys 1 share. Your wallet pays transaction fees in
-          SOL.
+          1 USDC buys 1 share. Your wallet pays transaction fees in SOL.
         </p>
       </fieldset>
     </form>

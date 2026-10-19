@@ -4,7 +4,7 @@ import { useConnectedWallet } from '../wallet/use-connected-wallet';
 import { usePublicTransactions } from '../marketplace/hooks/use-public-transactions';
 import { parseTokenAmount } from '../../chain/amounts';
 import {
-  CurrencyEuroIcon,
+  CurrencyDollarIcon,
   CheckIcon,
   ExternalLinkIcon,
 } from '../victron/victron-icons';
@@ -78,19 +78,19 @@ export function DepositModal({
       dark={false}
       icon={
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 border border-blue-200 text-[#183d89] shadow-xs">
-          <CurrencyEuroIcon className="h-8 w-8" />
+          <CurrencyDollarIcon className="h-8 w-8" />
         </div>
       }
       tag="SOLANA DEVNET FAUCET"
-      title="Deposit Funds (EURTree)"
-      description="Mint devnet EURTree tokens backed 1:1 by Euro reserves to fund clean energy infrastructure pools."
+      title="Deposit Funds (USDC)"
+      description="Get test USDC on Solana devnet to fund clean energy infrastructure pools."
       mainPoint={
         <div className="space-y-3">
           {/* Amount Input Row */}
           <div className="flex items-center justify-between pb-2 border-b border-zinc-200/80">
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-light text-zinc-400 select-none">
-                €
+              <span className="text-sm font-medium text-zinc-400 select-none">
+                USDC
               </span>
               <input
                 id="deposit-amount-input"
@@ -106,9 +106,9 @@ export function DepositModal({
             </div>
             <div className="flex items-center gap-1.5 rounded-xl bg-blue-50 border border-blue-200 px-2.5 py-1 shadow-2xs font-mono text-xs font-bold text-[#183d89]">
               <div className="h-4 w-4 rounded-full bg-[#10b981] flex items-center justify-center text-white text-[10px] font-bold">
-                €
+                <CurrencyDollarIcon className="h-4 w-4" />
               </div>
-              <span>EURTree</span>
+              <span>USDC</span>
             </div>
           </div>
 
@@ -125,7 +125,7 @@ export function DepositModal({
                     : 'bg-white border border-zinc-200/80 text-zinc-700 hover:bg-zinc-100'
                 }`}
               >
-                +€{val}
+                +USDC {val}
               </button>
             ))}
           </div>
@@ -135,7 +135,7 @@ export function DepositModal({
             <div className="flex justify-between items-center">
               <span className="text-zinc-500">Current Balance</span>
               <span className="font-mono font-bold text-zinc-950">
-                {currentBalance ? `${currentBalance} EURTree` : '€0.00 EURTree'}
+                {currentBalance ? `${currentBalance} USDC` : '0.00 USDC'}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -143,7 +143,7 @@ export function DepositModal({
                 Estimated Yield (~15.2% APY)
               </span>
               <span className="font-mono font-bold text-[#183d89]">
-                +€{estAnnualYield}/yr
+                +USDC {estAnnualYield}/yr
               </span>
             </div>
           </div>
@@ -159,7 +159,7 @@ export function DepositModal({
             <div className="rounded-xl bg-blue-50 border border-blue-100 p-2.5 text-xs text-[#183d89] font-medium text-center space-y-1">
               <div className="font-bold flex items-center justify-center gap-1">
                 <CheckIcon className="h-3.5 w-3.5 text-[#183d89]" />
-                <span>+€{amountNum.toLocaleString()} EURTree Deposited!</span>
+                <span>+{amountNum.toLocaleString()} USDC Deposited!</span>
               </div>
               {publicTx.signature && (
                 <a
@@ -187,7 +187,7 @@ export function DepositModal({
           ? 'Connect Wallet to Deposit'
           : publicTx.isPending
             ? 'Confirming on Solana…'
-            : `Mint +€${amountNum.toLocaleString()} EURTree →`,
+            : `Mint +${amountNum.toLocaleString()} USDC →`,
         onClick: !wallet ? () => openWalletModal(true) : handleDeposit,
         isLoading: publicTx.isPending,
         disabled: publicTx.isPending || amountNum <= 0,

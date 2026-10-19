@@ -77,7 +77,7 @@ export function VictronAssetPage({
         memoPayload: {
           site_id: siteId,
           asset_title: demo.title,
-          claimed_amount_eurtree: Number((baseAmount + kaminoBonus).toFixed(4)),
+          claimed_amount_usdc: Number((baseAmount + kaminoBonus).toFixed(4)),
           base_dividend: Number(baseAmount.toFixed(4)),
           kamino_pool_bonus: Number(kaminoBonus.toFixed(4)),
         },
@@ -261,7 +261,7 @@ export function VictronAssetPage({
                     {demo.financials.fundedPercent}% funded
                   </span>
                   <span className="text-zinc-500">
-                    €
+                    USDC
                     {(
                       demo.financials.targetUsdc - demo.financials.fundedUsdc
                     ).toLocaleString()}{' '}
@@ -274,11 +274,11 @@ export function VictronAssetPage({
               <div className="space-y-4">
                 <div>
                   <span className="font-mono text-3xl font-semibold text-zinc-950 sm:text-4xl tracking-tight">
-                    €{demo.financials.fundedUsdc.toLocaleString()}
+                    USDC {demo.financials.fundedUsdc.toLocaleString()}
                   </span>
                   <span className="ml-2 text-xs text-zinc-500 font-normal">
-                    pledged of €{demo.financials.targetUsdc.toLocaleString()}{' '}
-                    goal
+                    pledged of USDC{' '}
+                    {demo.financials.targetUsdc.toLocaleString()} goal
                   </span>
                 </div>
 
@@ -368,7 +368,7 @@ export function VictronAssetPage({
                 }}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#183d89] to-[#2563eb] hover:from-[#1d4bb5] hover:to-[#3b82f6] px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] cursor-pointer"
               >
-                <span>Back this project with EURTree</span>
+                <span>Back this project with USDC</span>
                 <ArrowRightIcon className="h-4 w-4" />
               </button>
             </div>
@@ -587,7 +587,7 @@ export function VictronAssetPage({
               +{demo.financials.projectedApy}% APY
             </div>
             <div className="font-mono text-[10px] text-zinc-500">
-              {demo.financials.fundedPercent}% funded · Min €50
+              {demo.financials.fundedPercent}% funded · Min USDC 50
             </div>
           </div>
           <button

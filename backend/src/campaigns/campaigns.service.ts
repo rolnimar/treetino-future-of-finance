@@ -19,7 +19,7 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     narrative:
       'Two 2.0 MW Vestas V80 utility-scale wind turbines in Kryry, Czech Republic. Generates clean power fed directly into the 22 kV regional distribution network under a guaranteed 20-year concession agreement with ČEZ Distribuce.',
     story:
-      'Located in Kryry (Ústí nad Labem region, Czech Republic), this 4.0 MW wind park consists of two Vestas V80-2.0 MW turbines with 80m hub height and 80m rotor diameter. Supplying electricity directly into the ČEZ 22 kV medium-voltage distribution grid under a guaranteed long-term feed-in tariff (€88.00/MWh), it delivers 14.2% APY with on-site maintenance by certified Czech technicians.',
+      'Located in Kryry (Ústí nad Labem region, Czech Republic), this 4.0 MW wind park consists of two Vestas V80-2.0 MW turbines with 80m hub height and 80m rotor diameter. Supplying electricity directly into the ČEZ 22 kV medium-voltage distribution grid under a guaranteed long-term feed-in tariff (USDC 88.00/MWh), it delivers 14.2% APY with on-site maintenance by certified Czech technicians.',
     investorHighlight:
       '4.0 MW industrial wind power on Solana: 20-year ČEZ concession, 22 kV grid feed-in, and 14.2% APY distributed on-chain.',
     victronSiteId: 209689,
@@ -27,7 +27,7 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     country: 'Czech Republic',
     projectedApy: '14.2%',
     tariffRate:
-      '€88.00 / MWh guaranteed grid feed-in tariff (Vestas V80 2× 2.0 MW)',
+      'USDC 88.00 / MWh guaranteed grid feed-in tariff (Vestas V80 2× 2.0 MW)',
     offTakerName: 'ČEZ Distribuce a.s. (20-Year Concession)',
     offTakerDescription:
       'High-voltage 22 kV utility distribution network purchasing all metered wind output.',
@@ -81,7 +81,7 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     narrative:
       'Multi-bay commercial EV charging plaza buffered with solar and storage. Processes high daily energy throughput, laying the foundation for autonomous vehicle micro-billing and native energy stablecoins.',
     story:
-      'Located at a high-traffic logistics hub near Paris, this installation deploys 10 high-power Victron EV Charging Stations backed by a 150 kW rooftop canopy and 200 kWh buffer storage. Retail drivers and fleet vehicles charge daily, paying €0.42/kWh plus connection fees directly into the protocol.',
+      'Located at a high-traffic logistics hub near Paris, this installation deploys 10 high-power Victron EV Charging Stations backed by a 150 kW rooftop canopy and 200 kWh buffer storage. Retail drivers and fleet vehicles charge daily, paying USDC 0.42/kWh plus connection fees directly into the protocol.',
     investorHighlight:
       'High-velocity recurring transaction volume directly from EV fleet operators and retail drivers.',
     victronSiteId: 374891,
@@ -89,7 +89,7 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     country: 'France',
     projectedApy: '18.5%',
     tariffRate:
-      '€0.42 / kWh delivered + €2.50 session connection fee per charge',
+      'USDC 0.42 / kWh delivered + USDC 2.50 session connection fee per charge',
     offTakerName: 'Commercial Fleet Operators & Retail EV Drivers',
     offTakerDescription:
       'Automated point-of-sale micro-transactions across 10 commercial charging bays.',
@@ -119,7 +119,7 @@ const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
     city: 'Prague / Central Bohemia',
     country: 'Czech Republic',
     projectedApy: '12.8%',
-    tariffRate: '€0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
+    tariffRate: 'USDC 0.32 / kWh metered corporate PPA (MKovo s.r.o.)',
     offTakerName: 'MKovo s.r.o. (Precision Manufacturing)',
     offTakerDescription:
       'Long-term corporate power purchase agreement indexed to European industrial tariffs.',

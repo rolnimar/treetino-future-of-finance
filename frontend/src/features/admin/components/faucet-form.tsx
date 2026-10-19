@@ -21,10 +21,9 @@ export function FaucetForm() {
     defaultValues: { amount: '1000' },
   });
   return (
-    <Card title="Get demo EURTree">
+    <Card title="Get demo USDC">
       <p className="mb-4 text-sm">
-        Mint test EURTree tokens into your payment ATA. EURTree is the
-        Euro-backed settlement token for Treetino.
+        Mint test USDC tokens into your payment account on Solana devnet.
       </p>
       <form
         onSubmit={handleSubmit((data) =>
@@ -36,11 +35,11 @@ export function FaucetForm() {
           className="max-w-md space-y-4 disabled:opacity-60"
         >
           <Field
-            label="Amount (EURTree)"
+            label="Amount (USDC)"
             {...register('amount')}
             error={errors.amount?.message}
           />
-          <Button type="submit">Mint EURTree</Button>
+          <Button type="submit">Mint USDC</Button>
         </fieldset>
       </form>
     </Card>

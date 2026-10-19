@@ -59,7 +59,7 @@ export const ASSET_COPY: Record<AssetKey, AssetCopy> = {
     facts: [
       { label: 'Peak output', value: '45 kW' },
       { label: 'Footprint', value: '1.2 m²' },
-      { label: 'Contract', value: '€0.32 / kWh' },
+      { label: 'Contract', value: 'USDC 0.32 / kWh' },
       { label: 'Payback', value: '5.2–7.1 years' },
     ],
   },
@@ -78,7 +78,7 @@ export const ASSET_COPY: Record<AssetKey, AssetCopy> = {
     facts: [
       { label: 'Peak power', value: '350 kW' },
       { label: 'Solar + storage', value: '150 kWp / 200 kWh' },
-      { label: 'Tariff', value: '€0.42 / kWh' },
+      { label: 'Tariff', value: 'USDC 0.42 / kWh' },
       { label: 'Payback', value: '3.9–5.4 years' },
     ],
   },
@@ -96,7 +96,7 @@ export const ASSET_COPY: Record<AssetKey, AssetCopy> = {
     backers: 64,
     facts: [
       { label: 'Capacity', value: '4.0 MW' },
-      { label: 'Feed-in tariff', value: '€95 / MWh' },
+      { label: 'Feed-in tariff', value: 'USDC 95 / MWh' },
       { label: 'Concession', value: '20 years' },
       { label: 'Availability', value: '> 98%' },
     ],
@@ -122,21 +122,11 @@ export function copyFor(demo: VictronDemoItem): AssetCopy {
 // Formatting
 // ---------------------------------------------------------------------------------------------
 
-const eurFmt = new Intl.NumberFormat('en-IE', {
-  style: 'currency',
-  currency: 'EUR',
-  maximumFractionDigits: 0,
-});
-
-const eurFmt2 = new Intl.NumberFormat('en-IE', {
-  style: 'currency',
-  currency: 'EUR',
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
-export function eur(value: number, decimals: 0 | 2 = 0): string {
-  return decimals === 2 ? eurFmt2.format(value) : eurFmt.format(value);
+export function usdc(value: number, decimals: 0 | 2 = 0): string {
+  return `USDC ${new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(value)}`;
 }
 
 export function pct(value: number, decimals = 1): string {
