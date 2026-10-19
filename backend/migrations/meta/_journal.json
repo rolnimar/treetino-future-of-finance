@@ -57,6 +57,13 @@
       "when": 1792431600000,
       "tag": "0007_device_ledger",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792435200000,
+      "tag": "0008_charging_card_payments",
+      "breakpoints": true
     }
   ]
 }

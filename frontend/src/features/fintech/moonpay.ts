@@ -32,6 +32,8 @@ export const paymentReceiptSchema = z.object({
   transactionId: z.string().nullable(),
   completedAt: z.number().nullable(),
   simulated: z.literal(true),
+  chargingSessionId: z.string().uuid().nullable().optional(),
+  settledAt: z.number().nullable().optional(),
 });
 export const paymentOrderSchema = paymentReceiptSchema.extend({
   publicKey: z.string().startsWith('pk_test_'),

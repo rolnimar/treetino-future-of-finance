@@ -11,7 +11,7 @@ storage and projected APY do not create holdings or earned yield.
 - Every new demo wallet starts with 10,000 demo USDC. **Add test funds** persists a
   deposit in the backend. These credits do not represent SPL transfers.
 - Open `/#charge/374891` for the EV station payment screen. Start a session, stop
-  and review its bill, then pay with demo USDC. The server simulates the meter at
+  and review its bill, then pay with demo USDC or **Card via MoonPay sandbox**. The server simulates the meter at
   120x speed and fixes the tariff when the session starts (initially 0.42 USDC/kWh
   plus a 2.50 USDC connection fee).
 - A paid session distributes 100% of its revenue among the contributors recorded
@@ -42,14 +42,25 @@ API entry points (documented at `/api/docs`):
 - `POST /api/devices/:siteId/investments`, `POST /api/devices/:siteId/claims`
 - `POST /api/devices/:siteId/sessions`, `GET /api/devices/:siteId/sessions?wallet=...`
 - `GET /api/device-sessions/:id`, `POST /api/device-sessions/:id/stop|pay|cancel`
+- `POST /api/payments/moonpay/charging/:sessionId/orders|status`
 
 Mutations require a wallet-authenticated bearer session from the existing client
 challenge/login endpoints. The authenticated wallet owns the action; request-body
 wallets, yield totals, meter readings, and payment amounts cannot override it.
 
-MoonPay remains sandbox-only. Its verified net USD principal becomes a saved demo
-investment; closing an unpaid checkout allows cancellation or switching to USDC.
-Processing payments remain tracked. Set backend `MOONPAY_PUBLIC_KEY` and
+MoonPay remains sandbox-only and uses its actual embedded widget. Investment
+checkouts save the verified net USD principal as device funding. Charging checkouts
+instead credit that principal to the driver's demo balance, automatically pay the
+saved charging bill, and leave the excess in the driver's balance. They never create
+an investment. The backend quotes at least USD 20 and increases the checkout amount
+when needed to cover the bill after fees. Final provider fees determine the credit.
+Closing checkout leaves a **Cancel card checkout** action; USDC and session
+cancellation stay locked until the card checkout is cancelled or completed.
+Processing payments remain tracked. Provider verification, wallet credit, and revenue
+distribution recover after browser closure or retry, without duplicate credits or
+yield. A late completion of an already paid/cancelled session only credits the wallet.
+If a changed provider fee leaves an empty wallet short, the bill stays unpaid and
+the received funds remain in its balance. Set backend `MOONPAY_PUBLIC_KEY` and
 `MOONPAY_SECRET_KEY` with sandbox keys only. The program and chain tooling below
 remain available separately from the backend demo flow.
 

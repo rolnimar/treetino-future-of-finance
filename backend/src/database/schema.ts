@@ -286,25 +286,35 @@ export interface DemoPaymentAmounts {
   checkoutCents: number;
 }
 
-export const demoPayments = pgTable('demo_payments', {
-  id: uuidPrimaryKey(),
-  wallet: text('wallet').notNull(),
-  siteId: integer('site_id').notNull(),
-  amountCents: integer('amount_cents').notNull(),
-  status: text('status').notNull().default('pending'),
-  transactionId: text('transaction_id').unique(),
-  createdAt: bigint('created_at', { mode: 'number' }).notNull(),
-  completedAt: bigint('completed_at', { mode: 'number' }),
-  cancelledAt: bigint('cancelled_at', { mode: 'number' }),
-  paymentAmounts: jsonb('payment_amounts').$type<DemoPaymentAmounts>(),
-  fiatCurrency: text('fiat_currency').$type<'USD'>().notNull().default('USD'),
-  usdcAllocation: jsonb('usdc_allocation').$type<{
-    amountUsdc: number;
-    rate: number;
-    rateDate: string;
-    source: 'USD';
-  }>(),
-});
+export const demoPayments = pgTable(
+  'demo_payments',
+  {
+    id: uuidPrimaryKey(),
+    wallet: text('wallet').notNull(),
+    siteId: integer('site_id').notNull(),
+    amountCents: integer('amount_cents').notNull(),
+    status: text('status').notNull().default('pending'),
+    transactionId: text('transaction_id').unique(),
+    createdAt: bigint('created_at', { mode: 'number' }).notNull(),
+    completedAt: bigint('completed_at', { mode: 'number' }),
+    cancelledAt: bigint('cancelled_at', { mode: 'number' }),
+    paymentAmounts: jsonb('payment_amounts').$type<DemoPaymentAmounts>(),
+    fiatCurrency: text('fiat_currency').$type<'USD'>().notNull().default('USD'),
+    usdcAllocation: jsonb('usdc_allocation').$type<{
+      amountUsdc: number;
+      rate: number;
+      rateDate: string;
+      source: 'USD';
+    }>(),
+    chargingSessionId: uuid('charging_session_id').references(
+      () => usageSessions.id,
+    ),
+    settledAt: bigint('settled_at', { mode: 'number' }),
+  },
+  (table) => [
+    index('demo_payments_charging_session').on(table.chargingSessionId),
+  ],
+);
 
 export const devices = pgTable('devices', {
   siteId: integer('site_id').primaryKey(),
@@ -372,6 +382,7 @@ export const usageSessions = pgTable('usage_sessions', {
   startedAt: bigint('started_at', { mode: 'number' }).notNull(),
   stoppedAt: bigint('stopped_at', { mode: 'number' }),
   paidAt: bigint('paid_at', { mode: 'number' }),
+  paymentMethod: text('payment_method').$type<'usdc' | 'card'>(),
   memoReference: text('memo_reference'),
 });
 export const deviceClaims = pgTable('device_claims', {

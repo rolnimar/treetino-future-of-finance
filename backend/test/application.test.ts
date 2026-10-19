@@ -389,6 +389,8 @@ describe('compiled NestJS application running on Bun', () => {
       '/api/events',
       '/api/events/status',
       '/api/health',
+      '/api/payments/moonpay/charging/{sessionId}/orders',
+      '/api/payments/moonpay/charging/{sessionId}/status',
       '/api/payments/moonpay/orders',
       '/api/payments/moonpay/orders/{id}/cancel',
       '/api/payments/moonpay/orders/{id}/checkout',
@@ -546,6 +548,36 @@ describe('compiled NestJS application running on Bun', () => {
       amount: '1',
     });
     expect(unknown.status).toBe(404);
+    const charging = await app
+      .get(DeviceLedgerService)
+      .start(wallet, 374891, { id: crypto.randomUUID(), kwh: '1' });
+    for (const action of ['orders', 'status']) {
+      expect(
+        (
+          await post(
+            `payments/moonpay/charging/${charging.id}/${action}`,
+            {},
+            false,
+          )
+        ).status,
+      ).toBe(401);
+    }
+    const cardStatus = await post(
+      `payments/moonpay/charging/${charging.id}/status`,
+      { wallet: other, amount: 9999 },
+    );
+    expect(cardStatus.status).toBe(201);
+    expect(await cardStatus.json()).toEqual({ order: null });
+    const otherSession = await app
+      .get(DeviceLedgerService)
+      .start(other, 374891, { id: crypto.randomUUID(), kwh: '1' });
+    expect(
+      (
+        await post(`payments/moonpay/charging/${otherSession.id}/status`, {
+          wallet: other,
+        })
+      ).status,
+    ).toBe(403);
   });
 
   test('first-time charging wallets receive explicit JSON null instead of an empty success response', async () => {

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
-import { and, asc, eq, gt, gte } from 'drizzle-orm';
+import { and, asc, eq, gt, gte, or, isNull, isNotNull } from 'drizzle-orm';
 import { DatabaseService } from '../database/database.service';
 import { demoPayments } from '../database/schema';
 import { MoonpayClient } from './moonpay.client';
@@ -35,7 +35,14 @@ export class PaymentsReconciler {
         .from(demoPayments)
         .where(
           and(
-            eq(demoPayments.status, 'pending'),
+            or(
+              eq(demoPayments.status, 'pending'),
+              and(
+                eq(demoPayments.status, 'completed'),
+                isNotNull(demoPayments.chargingSessionId),
+                isNull(demoPayments.settledAt),
+              ),
+            ),
             gte(demoPayments.createdAt, Date.now() - 7 * 86400_000),
             this.cursor ? gt(demoPayments.id, this.cursor) : undefined,
           ),

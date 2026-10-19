@@ -3,11 +3,13 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PublicKey } from '@solana/web3.js';
 import { and, eq, isNull } from 'drizzle-orm';
 import { DatabaseService } from '../database/database.service';
 import { demoPayments } from '../database/schema';
+import { DeviceLedgerService } from '../devices/device-ledger.service';
 import {
   checkoutAmountCents,
   MoonpayClient,
@@ -45,6 +47,8 @@ export function paymentReceipt(order: Order) {
     transactionId: order.transactionId,
     completedAt: order.completedAt,
     simulated: true as const,
+    chargingSessionId: order.chargingSessionId,
+    settledAt: order.settledAt,
   };
 }
 
@@ -53,10 +57,63 @@ export class PaymentsService {
   constructor(
     private readonly database: DatabaseService,
     private readonly moonpay: MoonpayClient,
+    private readonly ledger: DeviceLedgerService,
   ) {}
 
   quote(amount: unknown) {
     return this.moonpay.quote(this.validateAmount(amount));
+  }
+
+  async chargingOrder(wallet: string, sessionId: string) {
+    const order = await this.ledger.chargingCardOrder(wallet, sessionId);
+    if (!order) return { order: null };
+    // Cancelled checkout no longer locks the bill even if MoonPay is offline.
+    // The background reconciler still checks for a possible late completion.
+    if (order.status === 'pending' && order.cancelledAt)
+      return {
+        order: { ...paymentReceipt(order), publicKey: this.moonpay.publicKey },
+      };
+    const receipt = await this.verify(order.id);
+    return { order: { ...receipt, publicKey: this.moonpay.publicKey } };
+  }
+
+  async createCharging(wallet: string, sessionId: string) {
+    this.moonpay.assertConfigured();
+    const session = await this.ledger.getSession(sessionId);
+    if (session.wallet !== wallet)
+      throw new ForbiddenException('This session belongs to another wallet.');
+    if (session.status !== 'awaiting_payment')
+      throw new ConflictException('Stop charging before paying.');
+    const existing = await this.ledger.chargingCardOrder(wallet, sessionId);
+    if (existing?.status === 'pending' && !existing.cancelledAt) {
+      return { ...paymentReceipt(existing), publicKey: this.moonpay.publicKey };
+    }
+    // MoonPay's on-ramp has a minimum purchase. Quote enough net principal to
+    // cover the immutable bill; the unused allocation stays in the demo wallet.
+    let amountCents = Math.max(
+      2000,
+      Math.ceil(Number(session.amountUnits) / 10000),
+    );
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const estimate = await this.moonpay.quote(
+        this.validateAmount(amountCents / 100),
+      );
+      const shortfall =
+        Number(session.amountUnits) / 10000 -
+        Math.round(estimate.netInvested * 100);
+      if (shortfall <= 0) {
+        const order = await this.ledger.createChargingCardOrder(
+          wallet,
+          sessionId,
+          amountCents,
+        );
+        return { ...paymentReceipt(order), publicKey: this.moonpay.publicKey };
+      }
+      amountCents += Math.ceil(shortfall) + 100;
+    }
+    throw new ConflictException(
+      'Could not quote enough card funds for this bill. Retry checkout.',
+    );
   }
 
   private validateAmount(amount: unknown) {
@@ -136,7 +193,7 @@ export class PaymentsService {
     if (receipt.status === 'completed') return receipt;
     if (receipt.transactionId)
       throw new ConflictException(
-        'MoonPay is already processing this payment. Check its status before making another investment. Closing checkout does not cancel a submitted payment.',
+        'MoonPay is already processing this payment. Check its status before making another payment. Closing checkout does not cancel a submitted payment.',
       );
     const [cancelled] = await this.database.db
       .update(demoPayments)
@@ -221,8 +278,7 @@ export class PaymentsService {
 
   async verify(id: string) {
     const order = await this.order(id);
-    if (order.status === 'completed')
-      return paymentReceipt(await this.withAllocation(order));
+    if (order.status === 'completed') return this.complete(order);
     // Browser callbacks are hints only. Fetch authoritative status using our own API key.
     const transactions = await this.moonpay.transactions(id);
     const linked = transactions.filter(
@@ -274,9 +330,16 @@ export class PaymentsService {
       })
       .where(and(eq(demoPayments.id, id), eq(demoPayments.status, 'pending')))
       .returning();
-    return paymentReceipt(
-      await this.withAllocation(completed ?? (await this.order(id))),
-    );
+    return this.complete(completed ?? (await this.order(id)));
+  }
+
+  private async complete(order: Order) {
+    const allocated = await this.withAllocation(order);
+    if (allocated.chargingSessionId) {
+      await this.ledger.settleChargingCardOrder(order.id);
+      return paymentReceipt(await this.order(order.id));
+    }
+    return paymentReceipt(allocated);
   }
 
   private async withAllocation(order: Order): Promise<Order> {
@@ -304,6 +367,7 @@ export class PaymentsService {
         and(
           eq(demoPayments.wallet, validateWallet(wallet)),
           eq(demoPayments.status, 'completed'),
+          isNull(demoPayments.chargingSessionId),
         ),
       );
     return Promise.all(

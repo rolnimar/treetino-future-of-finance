@@ -8,7 +8,13 @@ import {
 } from '../dist/payments/moonpay.client.js';
 import { PaymentsService } from '../dist/payments/payments.service.js';
 import { PaymentsReconciler } from '../dist/payments/payments-reconciler.service.js';
+import { DeviceCatalogService } from '../dist/devices/device-catalog.service.js';
+import { DeviceLedgerService } from '../dist/devices/device-ledger.service.js';
+import { VictronService } from '../dist/victron/victron.service.js';
 import { testDatabase } from './database.fixture';
+import { Keypair } from '@solana/web3.js';
+import { eq } from 'drizzle-orm';
+import { demoPayments, demoWallets } from '../dist/database/schema.js';
 
 const wallet = '11111111111111111111111111111111';
 const cleanup: (() => void | Promise<void>)[] = [];
@@ -37,9 +43,12 @@ async function fixture() {
   const db = await DatabaseService.create(database.config);
   cleanup.push(() => db.onApplicationShutdown());
   const moonpay = client();
-  const service = new PaymentsService(db, moonpay);
+  const catalog = new DeviceCatalogService(db, new VictronService());
+  await catalog.seed();
+  const ledger = new DeviceLedgerService(db, catalog);
+  const service = new PaymentsService(db, moonpay, ledger);
   const order = await service.create({ wallet, siteId: 219742, amount: 500 });
-  return { service, moonpay, order, db };
+  return { service, moonpay, order, db, ledger };
 }
 
 function transaction(order: { id: string }) {
@@ -58,8 +67,236 @@ function transaction(order: { id: string }) {
   };
 }
 
+async function chargingFixture() {
+  const f = await fixture();
+  const alice = Keypair.generate().publicKey.toBase58(),
+    bob = Keypair.generate().publicKey.toBase58();
+  await f.ledger.invest(alice, 374891, {
+    id: crypto.randomUUID(),
+    amount: '100',
+  });
+  await f.ledger.invest(bob, 374891, {
+    id: crypto.randomUUID(),
+    amount: '300',
+  });
+  let now = Date.now();
+  const clock = spyOn(Date, 'now').mockImplementation(() => now);
+  cleanup.push(() => clock.mockRestore());
+  const session = await f.ledger.start(wallet, 374891, {
+    id: crypto.randomUUID(),
+    kwh: '1',
+  });
+  now += 4000;
+  await f.ledger.stop(wallet, session.id);
+  const quote = spyOn(f.moonpay, 'quote').mockImplementation(async (cents) => ({
+    amountPaid: cents / 100,
+    moonpayFee: 3.99,
+    networkFee: 0.29,
+    extraFee: 0,
+    totalFees: 4.28,
+    netInvested: (cents - 428) / 100,
+  }));
+  const provider = spyOn(f.moonpay, 'transactions').mockResolvedValue([]);
+  cleanup.push(
+    () => quote.mockRestore(),
+    () => provider.mockRestore(),
+  );
+  const paidTransaction = (id: string) => ({
+    ...transaction({ id }),
+    baseCurrencyAmount: 15.72,
+    feeAmount: 3.99,
+    networkFeeAmount: 0.29,
+    areFeesIncluded: true,
+  });
+  return {
+    ...f,
+    session,
+    alice,
+    bob,
+    provider,
+    quote,
+    paidTransaction,
+    advance: (ms: number) => {
+      now += ms;
+    },
+  };
+}
+
+test('MoonPay charging checkout resumes, pays the immutable bill, credits excess funds and distributes exactly once', async () => {
+  const {
+    service,
+    ledger,
+    session,
+    provider,
+    paidTransaction,
+    alice,
+    bob,
+    db,
+    moonpay,
+  } = await chargingFixture();
+  expect(await service.chargingOrder(wallet, session.id)).toEqual({
+    order: null,
+  });
+  await expect(service.createCharging(alice, session.id)).rejects.toThrow(
+    'another wallet',
+  );
+  const orders = await Promise.all(
+    Array.from({ length: 4 }, () => service.createCharging(wallet, session.id)),
+  );
+  const order = orders[0];
+  expect(new Set(orders.map((o) => o.id)).size).toBe(1);
+  expect(order).toMatchObject({
+    chargingSessionId: session.id,
+    checkoutAmount: 20,
+    status: 'pending',
+  });
+  expect((await service.chargingOrder(wallet, session.id)).order?.id).toBe(
+    order.id,
+  );
+  await expect(ledger.pay(wallet, session.id, undefined)).rejects.toThrow(
+    'current card checkout',
+  );
+  await expect(ledger.cancelSession(wallet, session.id)).rejects.toThrow(
+    'current card checkout',
+  );
+  expect((await ledger.portfolio(alice)).totals.earnedUsdc).toBe(0);
+  const tx = paidTransaction(order.id);
+  provider.mockResolvedValue([tx]);
+  const results = await Promise.all(
+    Array.from({ length: 5 }, () => service.verify(order.id)),
+  );
+  expect(new Set(results.map((r) => r.settledAt)).size).toBe(1);
+  expect(await ledger.getSession(session.id)).toMatchObject({
+    status: 'paid',
+    amountUnits: '2920000',
+    paymentMethod: 'card',
+    memoReference: tx.id,
+  });
+  expect((await ledger.balance(wallet)).balance).toBe('10012800000');
+  expect((await ledger.portfolio(alice)).totals.earnedUsdc).toBe(0.73);
+  expect((await ledger.portfolio(bob)).totals.earnedUsdc).toBe(2.19);
+  expect(
+    (await ledger.catalogResponse()).demos.find((d) => d.siteId === 374891)
+      ?.financials.fundedUsdc,
+  ).toBe(400);
+  expect((await ledger.portfolio(wallet)).totals.investedUsdc).toBe(0);
+  expect(await service.list(wallet)).toEqual([]);
+  const reopened = new PaymentsService(db, moonpay, ledger);
+  provider.mockRejectedValue(new Error('offline'));
+  await reopened.verify(order.id);
+  await ledger.pay(wallet, session.id, undefined);
+  expect((await ledger.balance(wallet)).balance).toBe('10012800000');
+  expect((await ledger.portfolio(alice)).totals.earnedUsdc).toBe(0.73);
+});
+
+test('cancelling an unsubmitted charging checkout unlocks USDC; late card completion credits funds without double revenue', async () => {
+  const { service, ledger, session, provider, paidTransaction, alice } =
+    await chargingFixture();
+  const order = await service.createCharging(wallet, session.id);
+  expect((await service.cancel(order.id)).status).toBe('cancelled');
+  provider.mockRejectedValue(new Error('MoonPay temporarily unavailable'));
+  expect((await service.chargingOrder(wallet, session.id)).order?.status).toBe(
+    'cancelled',
+  );
+  expect((await ledger.getSession(session.id)).status).toBe('awaiting_payment');
+  await ledger.pay(wallet, session.id, 'direct-usdc');
+  expect((await ledger.balance(wallet)).balance).toBe('9997080000');
+  provider.mockResolvedValue([paidTransaction(order.id)]);
+  await service.verify(order.id);
+  expect((await ledger.balance(wallet)).balance).toBe('10012800000');
+  expect((await ledger.getSession(session.id)).paymentMethod).toBe('usdc');
+  expect((await ledger.portfolio(alice)).totals.earnedUsdc).toBe(0.73);
+});
+
+test('processing card orders cannot be cancelled; a fee-adjusted checkout covers larger charging bills', async () => {
+  const {
+    service,
+    ledger,
+    session,
+    provider,
+    paidTransaction,
+    quote,
+    advance,
+  } = await chargingFixture();
+  const order = await service.createCharging(wallet, session.id);
+  provider.mockResolvedValue([
+    { ...paidTransaction(order.id), status: 'waitingPayment' },
+  ]);
+  await expect(service.cancel(order.id)).rejects.toThrow('already processing');
+  await expect(ledger.pay(wallet, session.id, undefined)).rejects.toThrow(
+    'current card checkout',
+  );
+  provider.mockResolvedValue([]);
+  await service.cancel(order.id);
+  await ledger.cancelSession(wallet, session.id);
+  await expect(service.createCharging(wallet, session.id)).rejects.toThrow(
+    'Stop charging',
+  );
+  // A larger saved bill requires fees on top of its USD principal.
+  const large = await ledger.start(wallet, 374891, {
+    id: crypto.randomUUID(),
+    kwh: '200',
+  });
+  advance(600000);
+  expect((await ledger.stop(wallet, large.id)).amountUsdc).toBe(86.5);
+  expect((await service.createCharging(wallet, large.id)).checkoutAmount).toBe(
+    91.78,
+  );
+  expect(quote.mock.calls.map((args) => args[0])).toEqual([2000, 8650, 9178]);
+});
+
+test('a completed card payment interrupted before settlement is reconciled without an open browser', async () => {
+  const { service, ledger, session, provider, paidTransaction, db, moonpay } =
+    await chargingFixture();
+  const order = await service.createCharging(wallet, session.id);
+  provider.mockResolvedValue([paidTransaction(order.id)]);
+  const settle = spyOn(ledger, 'settleChargingCardOrder').mockRejectedValueOnce(
+    new Error('database temporarily unavailable'),
+  );
+  await expect(service.verify(order.id)).rejects.toThrow(
+    'temporarily unavailable',
+  );
+  settle.mockRestore();
+  expect(
+    (
+      await db.db
+        .select()
+        .from(demoPayments)
+        .where(eq(demoPayments.id, order.id))
+    )[0],
+  ).toMatchObject({ status: 'completed', settledAt: null });
+  const previous = process.env.PAYMENTS_RECONCILE_ENABLED;
+  process.env.PAYMENTS_RECONCILE_ENABLED = 'true';
+  try {
+    await new PaymentsReconciler(db, service, moonpay).reconcile();
+  } finally {
+    if (previous === undefined) delete process.env.PAYMENTS_RECONCILE_ENABLED;
+    else process.env.PAYMENTS_RECONCILE_ENABLED = previous;
+  }
+  expect((await ledger.getSession(session.id)).status).toBe('paid');
+  expect((await ledger.balance(wallet)).balance).toBe('10012800000');
+});
+
+test('unexpectedly insufficient net card funds remain in the wallet without marking a charging bill paid', async () => {
+  const { service, ledger, session, provider, paidTransaction, db, alice } =
+    await chargingFixture();
+  const order = await service.createCharging(wallet, session.id);
+  await ledger.balance(wallet);
+  await db.db
+    .update(demoWallets)
+    .set({ balanceUnits: '0' })
+    .where(eq(demoWallets.wallet, wallet));
+  provider.mockResolvedValue([
+    { ...paidTransaction(order.id), baseCurrencyAmount: 1, feeAmount: 18.71 },
+  ]);
+  await service.verify(order.id);
+  expect((await ledger.getSession(session.id)).status).toBe('awaiting_payment');
+  expect((await ledger.balance(wallet)).balance).toBe('1000000');
+  expect((await ledger.portfolio(alice)).totals.earnedUsdc).toBe(0);
+});
+
 test('only completed provider payments allocate, with concurrent and repeated verification idempotent', async () => {
-  const { service, moonpay, order, db } = await fixture();
+  const { service, moonpay, order, db, ledger } = await fixture();
   const tx = transaction(order);
   const fetch = spyOn(moonpay, 'transactions').mockResolvedValue([
     { ...tx, status: 'pending' },
@@ -85,7 +322,7 @@ test('only completed provider payments allocate, with concurrent and repeated ve
   });
   fetch.mockRejectedValue(new Error('Provider temporarily unavailable'));
   expect(await service.verify(order.id)).toEqual(completed[0]);
-  const reopened = new PaymentsService(db, client());
+  const reopened = new PaymentsService(db, client(), ledger);
   expect(await reopened.list(wallet)).toEqual([completed[0]]);
   expect(
     await reopened.list('So11111111111111111111111111111111111111112'),

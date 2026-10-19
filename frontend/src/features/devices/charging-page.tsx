@@ -9,6 +9,7 @@ import { formatTokenAmount } from '../../chain/amounts';
 import { requestWalletApproval } from '../../chain/wallet-action';
 import { api } from '../../lib/api';
 import { chargingSessionSchema, demoPost } from './device-api';
+import { ChargingCardPayment } from './charging-card-payment';
 export function ChargingPage({ siteId }: { siteId: number }) {
   const wallet = useConnectedWallet(),
     { connection } = useConnection(),
@@ -18,6 +19,7 @@ export function ChargingPage({ siteId }: { siteId: number }) {
     device = demos.find((d) => d.siteId === siteId),
     balance = useUsdc(wallet?.address);
   const [kwh, setKwh] = useState('10'),
+    [cardLocked, setCardLocked] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
     nextId = useRef(crypto.randomUUID());
@@ -119,7 +121,7 @@ export function ChargingPage({ siteId }: { siteId: number }) {
                 Type 2 · {device?.usage?.powerKw ?? 11} kW
               </span>
               <span className="rounded-full border border-blue-400/40 bg-white/10 px-3 py-1.5">
-                USDC payments
+                Card & USDC payments
               </span>
               <span className="rounded-full bg-emerald-400/15 px-3 py-1.5 text-emerald-200">
                 {current?.status === 'charging' ? 'Charging' : 'Station ready'}
@@ -128,9 +130,9 @@ export function ChargingPage({ siteId }: { siteId: number }) {
           </div>
           <div className="space-y-6 p-6 sm:p-8">
             <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-xs leading-relaxed text-blue-900">
-              Demo mode · The meter runs at 120× speed. Payments use demo USDC
-              and share revenue with this device’s contributors. No real money
-              is charged.
+              Demo mode · The meter runs at 120× speed. Pay with demo USDC or a
+              card through MoonPay sandbox. Payments share revenue with this
+              device’s contributors. No real money is charged.
             </div>
             {(error || deviceError || session.error) && (
               <p
@@ -273,6 +275,16 @@ export function ChargingPage({ siteId }: { siteId: number }) {
                       {current.amountUsdc.toFixed(6)} USDC
                     </strong>
                   </p>
+                  {paid && (
+                    <p className="flex justify-between">
+                      <span>Payment method</span>
+                      <strong>
+                        {current.paymentMethod === 'card'
+                          ? 'Card · MoonPay sandbox'
+                          : 'Direct demo USDC'}
+                      </strong>
+                    </p>
+                  )}
                 </div>
                 {paid ? (
                   <>
@@ -306,7 +318,9 @@ export function ChargingPage({ siteId }: { siteId: number }) {
                 ) : (
                   <>
                     <button
-                      disabled={busy}
+                      disabled={
+                        busy || (current.status !== 'charging' && cardLocked)
+                      }
                       onClick={() =>
                         void action(
                           current.status === 'charging' ? 'stop' : 'pay',
@@ -320,8 +334,16 @@ export function ChargingPage({ siteId }: { siteId: number }) {
                           ? 'Stop charging & review bill'
                           : `Pay ${current.amountUsdc.toFixed(6)} demo USDC`}
                     </button>
+                    {current.status === 'awaiting_payment' && wallet && (
+                      <ChargingCardPayment
+                        key={`${current.id}:${wallet.address}`}
+                        wallet={wallet}
+                        session={current}
+                        onLockedChange={setCardLocked}
+                      />
+                    )}
                     <button
-                      disabled={busy}
+                      disabled={busy || cardLocked}
                       onClick={() => void action('cancel')}
                       className="w-full rounded-2xl border py-3 text-sm text-zinc-600"
                     >

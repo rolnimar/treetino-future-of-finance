@@ -9,7 +9,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
+import {
+  ClientGuard,
+  type ClientRequest as WalletRequest,
+} from '../auth/auth.controller';
 
 interface ClientRequest {
   headers: Record<string, string | string[] | undefined>;
@@ -31,6 +36,26 @@ function clientIp(request: ClientRequest) {
 @UseGuards(ThrottlerGuard)
 export class PaymentsController {
   constructor(private readonly payments: PaymentsService) {}
+
+  @Post('charging/:sessionId/orders')
+  @ApiBearerAuth()
+  @UseGuards(ClientGuard)
+  createCharging(
+    @Param('sessionId') id: string,
+    @Req() request: WalletRequest,
+  ) {
+    return this.payments.createCharging(request.client.wallet, id);
+  }
+
+  @Post('charging/:sessionId/status')
+  @ApiBearerAuth()
+  @UseGuards(ClientGuard)
+  chargingStatus(
+    @Param('sessionId') id: string,
+    @Req() request: WalletRequest,
+  ) {
+    return this.payments.chargingOrder(request.client.wallet, id);
+  }
 
   @Post('quote')
   quote(@Body() body: { amount?: unknown }) {

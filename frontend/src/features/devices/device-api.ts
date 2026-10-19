@@ -107,6 +107,7 @@ export const chargingSessionSchema = z.object({
   startedAt: z.number(),
   stoppedAt: z.number().nullable(),
   paidAt: z.number().nullable(),
+  paymentMethod: z.enum(['usdc', 'card']).nullable(),
   contributors: z.array(z.object({ wallet: z.string(), units: z.string() })),
   simulated: z.literal(true),
 });

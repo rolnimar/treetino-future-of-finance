@@ -89,7 +89,12 @@ export class DeviceLedgerService {
       const cards = await tx
         .select()
         .from(demoPayments)
-        .where(eq(demoPayments.status, 'completed'));
+        .where(
+          and(
+            eq(demoPayments.status, 'completed'),
+            isNull(demoPayments.chargingSessionId),
+          ),
+        );
       for (const payment of cards) {
         if (
           !bySite.has(payment.siteId) ||
@@ -607,26 +612,143 @@ export class DeviceLedgerService {
       if (session.status === 'paid') return this.present(session);
       if (session.status !== 'awaiting_payment')
         throw new ConflictException('Stop charging before paying.');
+      await this.assertNoCardPayment(tx, id);
       await this.debit(tx, wallet, BigInt(session.amountUnits));
-      const now = Date.now();
-      const shares = splitRevenue(
-        BigInt(session.amountUnits),
-        session.contributors,
+      return this.recordPayment(tx, session, 'usdc', memoReference);
+    });
+  }
+  private async recordPayment(
+    tx: Db,
+    session: Session,
+    paymentMethod: 'usdc' | 'card',
+    memoReference: string | null,
+  ) {
+    const now = Date.now(),
+      id = session.id;
+    const shares = splitRevenue(
+      BigInt(session.amountUnits),
+      session.contributors,
+    );
+    for (const share of shares)
+      await tx.insert(deviceDistributions).values({
+        sessionId: id,
+        siteId: session.siteId,
+        wallet: share.wallet,
+        units: share.units,
+        createdAt: now,
+      });
+    const [paid] = await tx
+      .update(usageSessions)
+      .set({ status: 'paid', paidAt: now, memoReference, paymentMethod })
+      .where(eq(usageSessions.id, id))
+      .returning();
+    return this.present(paid!);
+  }
+  private async assertNoCardPayment(tx: Db, sessionId: string) {
+    const [open] = await tx
+      .select()
+      .from(demoPayments)
+      .where(
+        and(
+          eq(demoPayments.chargingSessionId, sessionId),
+          sql`((${demoPayments.status} = 'pending' AND ${demoPayments.cancelledAt} IS NULL) OR (${demoPayments.status} = 'completed' AND ${demoPayments.settledAt} IS NULL))`,
+        ),
+      )
+      .limit(1);
+    if (open)
+      throw new ConflictException(
+        'Cancel or finish the current card checkout before using another payment method or cancelling the session.',
       );
-      for (const share of shares)
-        await tx.insert(deviceDistributions).values({
-          sessionId: id,
-          siteId: session.siteId,
-          wallet: share.wallet,
-          units: share.units,
-          createdAt: now,
-        });
-      const [paid] = await tx
-        .update(usageSessions)
-        .set({ status: 'paid', paidAt: now, memoReference })
-        .where(eq(usageSessions.id, id))
-        .returning();
-      return this.present(paid!);
+  }
+  async chargingCardOrder(wallet: string, id: string) {
+    this.owner(await this.session(id), wallet);
+    return (
+      (
+        await this.database.db
+          .select()
+          .from(demoPayments)
+          .where(eq(demoPayments.chargingSessionId, id))
+          .orderBy(sql`${demoPayments.createdAt} DESC`)
+          .limit(1)
+      )[0] ?? null
+    );
+  }
+  async createChargingCardOrder(
+    wallet: string,
+    id: string,
+    amountCents: number,
+  ) {
+    return this.locked(async (tx) => {
+      const session = await this.session(id, tx);
+      this.owner(session, wallet);
+      if (session.status !== 'awaiting_payment')
+        throw new ConflictException('Stop charging before paying.');
+      const [open] = await tx
+        .select()
+        .from(demoPayments)
+        .where(
+          and(
+            eq(demoPayments.chargingSessionId, id),
+            eq(demoPayments.status, 'pending'),
+            isNull(demoPayments.cancelledAt),
+          ),
+        )
+        .limit(1);
+      if (open) return open;
+      await this.assertNoCardPayment(tx, id);
+      return (
+        await tx
+          .insert(demoPayments)
+          .values({
+            wallet,
+            siteId: session.siteId,
+            chargingSessionId: id,
+            amountCents,
+            fiatCurrency: 'USD',
+            createdAt: Date.now(),
+          })
+          .returning()
+      )[0]!;
+    });
+  }
+  async settleChargingCardOrder(id: string) {
+    return this.locked(async (tx) => {
+      const [order] = await tx
+        .select()
+        .from(demoPayments)
+        .where(eq(demoPayments.id, requestId(id)));
+      if (
+        !order?.chargingSessionId ||
+        order.status !== 'completed' ||
+        !order.transactionId ||
+        !order.usdcAllocation ||
+        order.settledAt
+      )
+        return;
+      const session = await this.session(order.chargingSessionId, tx);
+      this.owner(session, order.wallet);
+      const principal =
+        BigInt(order.paymentAmounts?.principalCents ?? order.amountCents) *
+        10000n;
+      const account = await this.wallet(tx, order.wallet);
+      const credited = BigInt(account.balanceUnits) + principal;
+      await tx
+        .update(demoWallets)
+        .set({ balanceUnits: credited.toString() })
+        .where(eq(demoWallets.wallet, order.wallet));
+      // A late provider completion still credits the driver, but cannot pay a
+      // cancelled/already-paid bill or distribute its revenue for a second time.
+      if (
+        session.status === 'awaiting_payment' &&
+        credited >= BigInt(session.amountUnits)
+      ) {
+        await this.debit(tx, order.wallet, BigInt(session.amountUnits));
+        await this.recordPayment(tx, session, 'card', order.transactionId);
+      }
+      await tx
+        .update(demoPayments)
+        .set({ settledAt: Date.now() })
+        .where(eq(demoPayments.id, order.id));
     });
   }
   async cancelSession(wallet: string, id: string) {
@@ -635,6 +757,7 @@ export class DeviceLedgerService {
       this.owner(session, wallet);
       if (session.status === 'paid')
         throw new ConflictException('This session is already paid.');
+      await this.assertNoCardPayment(tx, id);
       const [cancelled] = await tx
         .update(usageSessions)
         .set({ status: 'cancelled' })
