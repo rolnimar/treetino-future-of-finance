@@ -5,6 +5,8 @@ import type { ConnectedWallet } from '../../../chain/wallet';
 import { buildPublicTransaction } from '../../../chain/public';
 import { sendWalletTransaction } from '../../../chain/transaction';
 import type { PublicAction } from '../schemas';
+import { demoPost, demoBalanceSchema } from '../../devices/device-api';
+import { formatTokenAmount } from '../../../chain/amounts';
 
 export function usePublicTransactions(wallet: ConnectedWallet | null) {
   const { connection } = useConnection();
@@ -18,6 +20,14 @@ export function usePublicTransactions(wallet: ConnectedWallet | null) {
       const current = new AbortController();
       controller.current = current;
       setSignature(null);
+      if (action.action === 'giveMeMoney') {
+        const id = crypto.randomUUID();
+        await demoPost(wallet, 'demo-wallet/deposits', demoBalanceSchema, {
+          id,
+          amount: formatTokenAmount(action.amount),
+        });
+        return id;
+      }
       const transaction = await buildPublicTransaction(
         connection,
         wallet.address,
@@ -36,6 +46,7 @@ export function usePublicTransactions(wallet: ConnectedWallet | null) {
     },
     onSuccess: async () => {
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['device-portfolio'] }),
         queryClient.invalidateQueries({
           queryKey: ['wallet', 'usdc', connection.rpcEndpoint, wallet?.address],
         }),

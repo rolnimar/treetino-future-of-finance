@@ -11,8 +11,10 @@ import {
   text,
   uniqueIndex,
   unique,
+  numeric,
 } from 'drizzle-orm/pg-core';
 import type { TreePhase, InvoicePricing } from '@treetino/contracts';
+import type { VictronDemoItemDto } from '../victron/victron.dto';
 
 const uuidPrimaryKey = () => uuid('id').primaryKey().defaultRandom();
 
@@ -302,4 +304,108 @@ export const demoPayments = pgTable('demo_payments', {
     rateDate: string;
     source: 'USD';
   }>(),
+});
+
+export const devices = pgTable('devices', {
+  siteId: integer('site_id').primaryKey(),
+  treeAddress: text('tree_address').notNull().unique(),
+  kind: text('kind').notNull(),
+  catalog: jsonb('catalog').$type<VictronDemoItemDto>().notNull(),
+  tariffUnitsPerKwh: numeric('tariff_units_per_kwh', {
+    precision: 30,
+    scale: 0,
+  }).notNull(),
+  connectionFeeUnits: numeric('connection_fee_units', {
+    precision: 30,
+    scale: 0,
+  }).notNull(),
+  chargingPowerWatts: integer('charging_power_watts').notNull().default(11000),
+});
+export const demoWallets = pgTable('demo_wallets', {
+  wallet: text('wallet').primaryKey(),
+  balanceUnits: numeric('balance_units', { precision: 30, scale: 0 })
+    .notNull()
+    .default('10000000000'),
+});
+export const deviceInvestments = pgTable('device_investments', {
+  id: uuidPrimaryKey(),
+  source: text('source').notNull().unique(),
+  siteId: integer('site_id')
+    .notNull()
+    .references(() => devices.siteId),
+  wallet: text('wallet').notNull(),
+  units: numeric('units', { precision: 30, scale: 0 }).notNull(),
+  method: text('method').notNull(),
+  createdAt: bigint('created_at', { mode: 'number' }).notNull(),
+  memoReference: text('memo_reference'),
+});
+export const demoDeposits = pgTable('demo_deposits', {
+  id: uuid('id').primaryKey(),
+  wallet: text('wallet').notNull(),
+  units: numeric('units', { precision: 30, scale: 0 }).notNull(),
+});
+export const usageSessions = pgTable('usage_sessions', {
+  id: uuid('id').primaryKey(),
+  siteId: integer('site_id')
+    .notNull()
+    .references(() => devices.siteId),
+  wallet: text('wallet').notNull(),
+  status: text('status').notNull().default('charging'),
+  targetWh: integer('target_wh').notNull(),
+  deliveredWh: integer('delivered_wh').notNull().default(0),
+  powerWatts: integer('power_watts').notNull(),
+  speed: integer('speed').notNull(),
+  tariffUnitsPerKwh: numeric('tariff_units_per_kwh', {
+    precision: 30,
+    scale: 0,
+  }).notNull(),
+  connectionFeeUnits: numeric('connection_fee_units', {
+    precision: 30,
+    scale: 0,
+  }).notNull(),
+  amountUnits: numeric('amount_units', { precision: 30, scale: 0 })
+    .notNull()
+    .default('0'),
+  contributors: jsonb('contributors')
+    .$type<{ wallet: string; units: string }[]>()
+    .notNull(),
+  startedAt: bigint('started_at', { mode: 'number' }).notNull(),
+  stoppedAt: bigint('stopped_at', { mode: 'number' }),
+  paidAt: bigint('paid_at', { mode: 'number' }),
+  memoReference: text('memo_reference'),
+});
+export const deviceClaims = pgTable('device_claims', {
+  id: uuid('id').primaryKey(),
+  wallet: text('wallet').notNull(),
+  siteId: integer('site_id')
+    .notNull()
+    .references(() => devices.siteId),
+  units: numeric('units', { precision: 30, scale: 0 }).notNull(),
+  createdAt: bigint('created_at', { mode: 'number' }).notNull(),
+  memoReference: text('memo_reference'),
+});
+export const deviceDistributions = pgTable(
+  'device_distributions',
+  {
+    id: uuidPrimaryKey(),
+    sessionId: uuid('session_id')
+      .notNull()
+      .references(() => usageSessions.id),
+    siteId: integer('site_id')
+      .notNull()
+      .references(() => devices.siteId),
+    wallet: text('wallet').notNull(),
+    units: numeric('units', { precision: 30, scale: 0 }).notNull(),
+    claimId: uuid('claim_id').references(() => deviceClaims.id),
+    createdAt: bigint('created_at', { mode: 'number' }).notNull(),
+  },
+  (t) => [
+    uniqueIndex('device_distributions_session_wallet').on(
+      t.sessionId,
+      t.wallet,
+    ),
+  ],
+);
+export const deviceProjection = pgTable('device_projection', {
+  source: text('source').primaryKey(),
 });

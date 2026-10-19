@@ -8,7 +8,7 @@ import type {
   CreateCampaignDto,
 } from '@treetino/contracts';
 
-const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
+export const DEFAULT_FLAGSHIP_CAMPAIGNS: CampaignDossier[] = [
   {
     id: 'demo-campaign-209689',
     treeAddress: '48e7da86e0d9_victron_offgrid',

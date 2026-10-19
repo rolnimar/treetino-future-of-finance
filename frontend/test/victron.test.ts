@@ -907,86 +907,41 @@ describe('Victron Green Energy DePIN archetypes and investor financials', () => 
     expect(highYield.map((c) => c.key)).toEqual(['ess', 'offgrid']);
   });
 
-  test('guarantees 100% identical yield amounts between Portfolio and Product Detail', () => {
-    const fixedNow = 1776000000000;
+  test('portfolio and device detail display backend yield without inventing time or APY rewards', () => {
+    const financials = { projectedApy: 35, targetUsdc: 100000 };
     const holding = {
       amountUsdc: 100,
-      investedAt: fixedNow - 30 * 60 * 1000, // backed 30 mins ago
-      lastClaimedAt: fixedNow - 30 * 60 * 1000,
+      investedAt: 1000,
+      lastClaimedAt: 0,
       totalClaimedUsdc: 0,
+      claimableUsdc: 1.234567,
+      earnedUsdc: 1.234567,
+      poolSharePercent: '25.00',
     };
-    const financials = {
-      projectedApy: 18.5,
-      targetUsdc: 100000,
-      fundedUsdc: 85000,
-      estDailyRevenueUsdc: 50.68,
-    };
-
-    // Calculate on "Portfolio" view
-    const portfolioYield = calculateAssetAccruedYield(
+    const first = calculateAssetAccruedYield(holding, financials, 1000);
+    const later = calculateAssetAccruedYield(
       holding,
       financials,
-      fixedNow,
+      1000 + 10 * 365 * 86400000,
     );
-
-    // Calculate on "Product Detail" view (same holding, same financials, same time)
-    const productDetailYield = calculateAssetAccruedYield(
-      holding,
-      financials,
-      fixedNow,
+    expect(first).toEqual(later);
+    expect(first.totalAccrued).toBe(1.234567);
+    expect(first.kaminoBonus).toBe(0);
+    expect(first.poolSharePercent).toBe('25.00%');
+    expect(
+      calculateAssetAccruedYield(
+        { ...holding, claimableUsdc: 0, totalClaimedUsdc: 1.234567 },
+        financials,
+      ).totalAccrued,
+    ).toBe(0);
+    expect(
+      calculateAssetAccruedYield(
+        { ...holding, claimableUsdc: undefined },
+        financials,
+      ).totalAccrued,
+    ).toBe(0);
+    expect(calculateAssetAccruedYield(undefined, financials).totalAccrued).toBe(
+      0,
     );
-
-    expect(portfolioYield.formattedTotal).toBe(
-      productDetailYield.formattedTotal,
-    );
-    expect(portfolioYield.totalAccrued).toBe(productDetailYield.totalAccrued);
-    expect(portfolioYield.baseDividend).toBe(productDetailYield.baseDividend);
-    expect(portfolioYield.kaminoBonus).toBe(productDetailYield.kaminoBonus);
-    expect(portfolioYield.poolSharePercent).toBe('0.10%');
-
-    // Unclaimed initial holding has accrued SCADA telemetry ~USDC 0.078 - USDC 0.082
-    expect(portfolioYield.totalAccrued).toBeGreaterThanOrEqual(0.078);
-    expect(portfolioYield.totalAccrued).toBeLessThanOrEqual(0.082);
-    expect(portfolioYield.formattedTotal).toMatch(/^\+USDC 0\.0[78]\d\d$/);
-
-    // Simulating claiming in wallet: lastClaimedAt resets to fixedNow, totalClaimedUsdc records payout
-    const claimedHolding = {
-      ...holding,
-      lastClaimedAt: fixedNow,
-      totalClaimedUsdc: portfolioYield.totalAccrued,
-    };
-
-    const portfolioAfterClaim = calculateAssetAccruedYield(
-      claimedHolding,
-      financials,
-      fixedNow,
-    );
-    const detailAfterClaim = calculateAssetAccruedYield(
-      claimedHolding,
-      financials,
-      fixedNow,
-    );
-
-    // Immediate post-claim state is exactly 0.0000 USDC on both pages
-    expect(portfolioAfterClaim.totalAccrued).toBe(0);
-    expect(portfolioAfterClaim.formattedTotal).toBe('+USDC 0.0000');
-    expect(detailAfterClaim.totalAccrued).toBe(0);
-    expect(detailAfterClaim.formattedTotal).toBe('+USDC 0.0000');
-
-    // 10 seconds later: continuous streaming continues synchronously
-    const streamPortfolio = calculateAssetAccruedYield(
-      claimedHolding,
-      financials,
-      fixedNow + 10_000,
-    );
-    const streamDetail = calculateAssetAccruedYield(
-      claimedHolding,
-      financials,
-      fixedNow + 10_000,
-    );
-
-    expect(streamPortfolio.totalAccrued).toBe(streamDetail.totalAccrued);
-    expect(streamPortfolio.totalAccrued).toBeGreaterThan(0);
-    expect(streamPortfolio.formattedTotal).toBe(streamDetail.formattedTotal);
   });
 });

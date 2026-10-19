@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { readUsdcBalance } from '../../../chain/public';
+import { api } from '../../../lib/api';
+import { demoBalanceSchema } from '../../devices/device-api';
 
 export function useUsdc(address: string | undefined) {
   const { connection } = useConnection();
@@ -9,7 +10,9 @@ export function useUsdc(address: string | undefined) {
     enabled: !!address,
     queryFn: async ({ signal }) => {
       if (!address) throw new Error('Wallet connection required');
-      const balance = await readUsdcBalance(connection, address);
+      const balance = await api(`demo-wallet/${address}`, demoBalanceSchema, {
+        signal,
+      });
       signal.throwIfAborted();
       return balance;
     },

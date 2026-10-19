@@ -374,6 +374,17 @@ describe('compiled NestJS application running on Bun', () => {
       '/api/client/me',
       '/api/client/trees',
       '/api/client/trees/{address}/reports',
+      '/api/demo-wallet/deposits',
+      '/api/demo-wallet/{wallet}',
+      '/api/device-sessions/{id}',
+      '/api/device-sessions/{id}/cancel',
+      '/api/device-sessions/{id}/pay',
+      '/api/device-sessions/{id}/stop',
+      '/api/devices',
+      '/api/devices/portfolio/{wallet}',
+      '/api/devices/{siteId}/claims',
+      '/api/devices/{siteId}/investments',
+      '/api/devices/{siteId}/sessions',
       '/api/events',
       '/api/events/status',
       '/api/health',
@@ -452,6 +463,88 @@ describe('compiled NestJS application running on Bun', () => {
     for (const query of ['after=-1', 'limit=1001', 'after=1.5', 'limit=abc']) {
       expect((await fetch(baseUrl + '/api/events?' + query)).status).toBe(400);
     }
+  });
+
+  test('demo device mutations authenticate the wallet and ignore forged accounting fields', async () => {
+    const wallet = Keypair.generate().publicKey.toBase58(),
+      other = Keypair.generate().publicKey.toBase58();
+    const token = await new SignJWT({ wallet, role: 'client' })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject(wallet)
+      .setIssuer('treetino')
+      .setAudience('treetino-client')
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(new TextEncoder().encode('test-only-secret-32-bytes-or-longer'));
+    const post = (path: string, body: unknown, authorized = true) =>
+      fetch(baseUrl + '/api/' + path, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authorized ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(body),
+      });
+    expect(
+      (
+        await post(
+          'devices/374891/investments',
+          { id: crypto.randomUUID(), amount: '100' },
+          false,
+        )
+      ).status,
+    ).toBe(401);
+    const id = crypto.randomUUID();
+    const result = await post('devices/374891/investments', {
+      id,
+      amount: '100',
+      wallet: other,
+      claimableUsdc: 999999,
+    });
+    expect(result.status).toBe(201);
+    expect(await result.json()).toMatchObject({
+      wallet,
+      siteId: 374891,
+      units: '100000000',
+    });
+    const portfolio = await (
+      await fetch(baseUrl + '/api/devices/portfolio/' + wallet)
+    ).json();
+    expect(portfolio.investments['374891']).toMatchObject({
+      amountUsdc: 100,
+      claimableUsdc: 0,
+    });
+    expect(
+      (
+        await post('devices/374891/claims', {
+          id: crypto.randomUUID(),
+          amount: '99999',
+        })
+      ).status,
+    ).toBe(409);
+    expect(
+      (
+        await post(
+          'demo-wallet/deposits',
+          { id: crypto.randomUUID(), amount: '100' },
+          false,
+        )
+      ).status,
+    ).toBe(401);
+    expect(
+      (
+        await post(
+          'devices/374891/sessions',
+          { id: crypto.randomUUID(), kwh: '1' },
+          false,
+        )
+      ).status,
+    ).toBe(401);
+    const unknown = await post('devices/999/investments', {
+      id: crypto.randomUUID(),
+      amount: '1',
+    });
+    expect(unknown.status).toBe(404);
   });
 
   test('serves public clean energy campaigns and detail dossiers', async () => {

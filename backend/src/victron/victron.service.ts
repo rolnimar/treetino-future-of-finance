@@ -257,6 +257,10 @@ export class VictronService {
   private cache: CachedData | null = null;
   private token: { value: string; expiresAt: number } | null = null;
 
+  getCatalogSeeds() {
+    return this.getFallbackData().demos;
+  }
+
   async getDemos(): Promise<VictronDemosResponseDto> {
     if (this.cache && Date.now() < this.cache.expiresAt) {
       return this.cache.data;

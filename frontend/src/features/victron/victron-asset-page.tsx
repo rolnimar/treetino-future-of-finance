@@ -83,10 +83,10 @@ export function VictronAssetPage({
         },
       });
 
-      claimYield(siteId, baseAmount, kaminoBonus);
+      const claim = await claimYield(siteId, res.signature);
 
       setClaimSuccessText(
-        `Claim confirmed on Solana Devnet (tx: ${res.signature.slice(0, 8)}…). Unclaimed dividend reset.`,
+        `Demo payout of ${claim.amountUsdc.toFixed(6)} USDC recorded in your portfolio.`,
       );
       setTimeout(() => setClaimSuccessText(null), 6000);
     } catch (err: unknown) {
@@ -371,6 +371,14 @@ export function VictronAssetPage({
                 <span>Back this project with USDC</span>
                 <ArrowRightIcon className="h-4 w-4" />
               </button>
+              {demo.key === 'ev' && (
+                <a
+                  href={`#charge/${demo.siteId}`}
+                  className="mt-3 block rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-center text-sm font-semibold text-blue-900"
+                >
+                  Open EV charging payment screen →
+                </a>
+              )}
             </div>
           </div>
         </div>

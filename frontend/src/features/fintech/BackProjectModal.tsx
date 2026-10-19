@@ -137,6 +137,10 @@ function FiatBacking({
       await queryClient.invalidateQueries({
         queryKey: ['moonpay-receipts', currentOrder.wallet],
       });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['device-portfolio'] }),
+        queryClient.invalidateQueries({ queryKey: ['device-catalog'] }),
+      ]);
     },
     [queryClient],
   );

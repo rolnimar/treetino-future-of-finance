@@ -1,13 +1,4 @@
-import { useState, useEffect } from 'react';
 import type { InvestmentRecord } from './use-victron-investments';
-import {
-  calculateKaminoAccruedYield,
-  KAMINO_TOTAL_APY,
-} from '../../chain/kamino';
-
-export const INITIAL_TELEMETRY_HOURS = 37.5;
-export const SECONDS_PER_YEAR = 365 * 24 * 3600;
-
 export interface AccruedYieldResult {
   hasActiveHolding: boolean;
   amountUsdc: number;
@@ -23,118 +14,33 @@ export interface AccruedYieldResult {
   elapsedSeconds: number;
   totalClaimedUsdc: number;
 }
-
-/**
- * Calculates continuous streaming yield and Kamino pool bonus for an asset holding.
- * Uses exact timestamp offsets so that the Portfolio page and Product Detail page
- * always evaluate to the exact same value at any given second.
- */
+// Presentation only: earned and claimable amounts always come from the backend ledger.
 export function calculateAssetAccruedYield(
   holding: InvestmentRecord | undefined,
-  financials: {
-    projectedApy: number;
-    targetUsdc?: number;
-    fundedUsdc?: number;
-    estDailyRevenueUsdc?: number;
-  },
-  now: number = Date.now(),
+  _financials?: unknown,
+  _now?: number,
 ): AccruedYieldResult {
-  if (!holding || holding.amountUsdc <= 0) {
-    const target = financials.targetUsdc || 10000;
-    const apyFraction = financials.projectedApy / 100;
-    const poolHourly = (target * apyFraction) / (365 * 24);
-    return {
-      hasActiveHolding: false,
-      amountUsdc: 0,
-      poolSharePercent: '0.00%',
-      hourlyRate: `+USDC ${poolHourly.toFixed(3)} / hr`,
-      hourlyRateNumber: poolHourly,
-      baseDividend: 0,
-      kaminoBonus: 0,
-      totalAccrued: 0,
-      formattedTotal: '+USDC 0.0000',
-      formattedBase: 'USDC 0.0000',
-      formattedKamino: 'USDC 0.0000',
-      elapsedSeconds: 0,
-      totalClaimedUsdc: 0,
-    };
-  }
-
-  const target = financials.targetUsdc || 10000;
-  const poolShareFraction = holding.amountUsdc / target;
-  const poolSharePercent = (poolShareFraction * 100).toFixed(2);
-  const apyFraction = financials.projectedApy / 100;
-  const annualDividend = holding.amountUsdc * apyFraction;
-  const hourlyRateNumber = annualDividend / (365 * 24);
-  const hourlyRate = `+USDC ${hourlyRateNumber.toFixed(hourlyRateNumber >= 0.01 ? 3 : 4)} / hr`;
-
-  // Determine effective lastClaimedAt:
-  // If the user has never claimed yield on this holding (totalClaimedUsdc is 0 or undefined),
-  // we ensure they have pre-existing operational telemetry (~36 hours) accrued from the Cerbo GX SCADA gateway.
-  let effectiveLastClaimedAt = holding.lastClaimedAt;
-  const hasClaimedBefore = (holding.totalClaimedUsdc ?? 0) > 0;
-
-  if (!hasClaimedBefore) {
-    const elapsedSinceClaim = now - holding.lastClaimedAt;
-    if (elapsedSinceClaim < INITIAL_TELEMETRY_HOURS * 3600 * 1000) {
-      effectiveLastClaimedAt =
-        holding.lastClaimedAt - INITIAL_TELEMETRY_HOURS * 3600 * 1000;
-    }
-  }
-
-  const elapsedSeconds = Math.max(
-    0,
-    Math.floor((now - effectiveLastClaimedAt) / 1000),
-  );
-
-  const ratePerSecond = annualDividend / SECONDS_PER_YEAR;
-  const baseDividend = ratePerSecond * elapsedSeconds;
-
-  const { kaminoBonus } = calculateKaminoAccruedYield(
-    baseDividend,
-    elapsedSeconds,
-    KAMINO_TOTAL_APY,
-  );
-
-  const totalAccrued = baseDividend + kaminoBonus;
-
+  const amount = holding?.claimableUsdc ?? 0,
+    rate = holding?.hourlyRateUsdc ?? 0;
   return {
-    hasActiveHolding: true,
-    amountUsdc: holding.amountUsdc,
-    poolSharePercent: `${poolSharePercent}%`,
-    hourlyRate,
-    hourlyRateNumber,
-    baseDividend,
-    kaminoBonus,
-    totalAccrued,
-    formattedTotal: `+USDC ${totalAccrued.toFixed(4)}`,
-    formattedBase: `USDC ${baseDividend.toFixed(4)}`,
-    formattedKamino: `USDC ${kaminoBonus.toFixed(4)}`,
-    elapsedSeconds,
-    totalClaimedUsdc: holding.totalClaimedUsdc || 0,
+    hasActiveHolding: (holding?.amountUsdc ?? 0) > 0 || amount > 0,
+    amountUsdc: holding?.amountUsdc ?? 0,
+    poolSharePercent: `${holding?.poolSharePercent ?? '0.00'}%`,
+    hourlyRate: `USDC ${rate.toFixed(4)} / hr realized`,
+    hourlyRateNumber: rate,
+    baseDividend: amount,
+    kaminoBonus: 0,
+    totalAccrued: amount,
+    formattedTotal: `+USDC ${amount.toFixed(6)}`,
+    formattedBase: `USDC ${amount.toFixed(6)}`,
+    formattedKamino: 'USDC 0.000000',
+    elapsedSeconds: 0,
+    totalClaimedUsdc: holding?.totalClaimedUsdc ?? 0,
   };
 }
-
-/**
- * React hook that streams live yield, re-rendering at 1Hz (every second).
- */
 export function useLiveYieldStream(
   holding: InvestmentRecord | undefined,
-  financials: {
-    projectedApy: number;
-    targetUsdc?: number;
-    fundedUsdc?: number;
-    estDailyRevenueUsdc?: number;
-  },
-): AccruedYieldResult {
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return calculateAssetAccruedYield(holding, financials, now);
+  financials?: unknown,
+) {
+  return calculateAssetAccruedYield(holding, financials);
 }

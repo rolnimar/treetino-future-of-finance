@@ -1,31 +1,57 @@
 # Treetino
 
-The backing dialog offers **Card** and **Direct USDC**. Direct USDC submits
-`buy_shares` to the selected project's dedicated devnet funding pool. The wallet
-spends test USDC, pays network fees in devnet SOL, and receives project shares.
-The portfolio reads confirmed program positions and combines them with verified
-card allocations without storing duplicate principal in the browser.
+The demo uses a **backend-owned device and payment ledger**. Devices, investments,
+wallet balances, charging sessions, revenue allocations, and claims are persisted
+in PostgreSQL. The frontend loads the catalog and portfolio from the API; browser
+storage and projected APY do not create holdings or earned yield.
 
-Featured pool bindings live in `packages/contracts/src/flagship-funding.ts`.
-To check initialization, run `bun scripts/setup-funding-pools.ts` from `frontend`.
-The script simulates missing pools; `--execute` initializes them on devnet using
-the configured creator's local Solana keypair. Existing pools are validated and
-left intact.
+- Invest with **Card** through MoonPay sandbox, or **Direct USDC** using demo credits.
+- Direct investments and claims may request a wallet memo for the demo. The backend
+  authenticates the wallet, saves the action, and calculates the resulting balances.
+- Every new demo wallet starts with 10,000 demo USDC. **Add test funds** persists a
+  deposit in the backend. These credits do not represent SPL transfers.
+- Open `/#charge/374891` for the EV station payment screen. Start a session, stop
+  and review its bill, then pay with demo USDC. The server simulates the meter at
+  120x speed and fixes the tariff when the session starts (initially 0.42 USDC/kWh
+  plus a 2.50 USDC connection fee).
+- A paid session distributes 100% of its revenue among the contributors recorded
+  at session start, in proportion to their saved investments. Allocations use exact
+  integer micro-USDC and conserve rounding dust. No contributors means revenue
+  stays unallocated; later investors cannot receive earlier payments.
+- **Claim Yield** transfers available ledger earnings into the contributor's demo
+  wallet balance. The backend determines the amount and prevents duplicate claims.
+  Refreshing, clearing browser storage, or using another browser preserves it.
 
-Card checkout uses MoonPay sandbox: USD card payments deliver devnet SOL to the
-connected wallet. The backend signs fixed checkout details, verifies payment
-status directly with MoonPay, and retries pending orders every 30 seconds.
-Verified net USD principal is shown as a test allocation in USDC; this does not
-mint USDC or execute an on-chain share purchase. Checkout and portfolio receipts
-remain marked as test mode. Set `MOONPAY_PUBLIC_KEY` and `MOONPAY_SECRET_KEY` on
-the backend using sandbox keys only. Live keys are rejected.
+The four featured device catalogs and hardware inventories are seeded once into
+`devices`. Existing records survive restarts without overwriting operator changes.
+Custom campaigns registered through the existing admin API are also added to this
+catalog. Card receipts and prior purchases already recorded by the backend indexer
+are imported idempotently into `device_investments`. Browser-only demo balances and
+holdings are intentionally not imported as trusted investments.
 
-After closing MoonPay, use **Cancel card checkout** to release an unpaid order
-and change the amount, or choose **Direct USDC** to cancel it and switch methods.
-Cancellation checks MoonPay first: processing payments stay visible, and completed
-payments keep their receipt. Closing a checkout does not reverse a submitted
-MoonPay payment. Cancelled local orders remain eligible for background settlement
-checks so a late provider confirmation is credited once rather than lost.
+The ledger uses `devices`, `device_investments`, `usage_sessions`,
+`device_distributions`, `device_claims`, `demo_wallets`, and `demo_deposits`.
+Concurrent payments and claims are serialized in database transactions. Retrying
+an action with its request ID cannot debit or credit the wallet twice. Charging
+continues across browser reloads; a backend worker finishes sessions at their target.
+
+API entry points (documented at `/api/docs`):
+
+- `GET /api/devices`, `GET /api/devices/portfolio/:wallet`
+- `GET /api/demo-wallet/:wallet`, `POST /api/demo-wallet/deposits`
+- `POST /api/devices/:siteId/investments`, `POST /api/devices/:siteId/claims`
+- `POST /api/devices/:siteId/sessions`, `GET /api/devices/:siteId/sessions?wallet=...`
+- `GET /api/device-sessions/:id`, `POST /api/device-sessions/:id/stop|pay|cancel`
+
+Mutations require a wallet-authenticated bearer session from the existing client
+challenge/login endpoints. The authenticated wallet owns the action; request-body
+wallets, yield totals, meter readings, and payment amounts cannot override it.
+
+MoonPay remains sandbox-only. Its verified net USD principal becomes a saved demo
+investment; closing an unpaid checkout allows cancellation or switching to USDC.
+Processing payments remain tracked. Set backend `MOONPAY_PUBLIC_KEY` and
+`MOONPAY_SECRET_KEY` with sandbox keys only. The program and chain tooling below
+remain available separately from the backend demo flow.
 
 Bun workspace monorepo for the Treetino Solana hackathon prototype.
 

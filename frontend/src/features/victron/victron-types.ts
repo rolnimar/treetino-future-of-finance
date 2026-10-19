@@ -38,6 +38,20 @@ export type VictronCashFlowItem = z.infer<typeof victronCashFlowItemSchema>;
 export type VictronWaterfallStep = VictronCashFlowItem;
 
 export const victronDemoItemSchema = z.object({
+  usage: z
+    .object({
+      tariffUsdcPerKwh: z.number(),
+      connectionFeeUsdc: z.number(),
+      powerKw: z.number(),
+    })
+    .optional(),
+  revenue: z
+    .object({
+      receivedUsdc: z.number(),
+      paidSessions: z.number(),
+      energyKwh: z.number(),
+    })
+    .optional(),
   siteId: z.number(),
   key: z.enum(['offgrid', 'ess', 'ev', 'treetino-v1']),
   title: z.string(),

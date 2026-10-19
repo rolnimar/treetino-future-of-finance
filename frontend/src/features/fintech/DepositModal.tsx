@@ -81,9 +81,9 @@ export function DepositModal({
           <CurrencyDollarIcon className="h-8 w-8" />
         </div>
       }
-      tag="SOLANA DEVNET FAUCET"
+      tag="DEMO WALLET"
       title="Deposit Funds (USDC)"
-      description="Get test USDC on Solana devnet to fund clean energy infrastructure pools."
+      description="Add demo USDC to your demo wallet to invest in devices or pay for EV charging."
       mainPoint={
         <div className="space-y-3">
           {/* Amount Input Row */}
@@ -151,7 +151,7 @@ export function DepositModal({
           {/* Feedback status */}
           {publicTx.isPending && (
             <div className="rounded-xl bg-blue-50 border border-blue-100 p-2.5 text-xs text-[#183d89] font-medium text-center">
-              Submitting transaction to Solana Devnet…
+              Adding demo funds…
             </div>
           )}
 
@@ -186,8 +186,8 @@ export function DepositModal({
         label: !wallet
           ? 'Connect Wallet to Deposit'
           : publicTx.isPending
-            ? 'Confirming on Solana…'
-            : `Mint +${amountNum.toLocaleString()} USDC →`,
+            ? 'Saving demo balance…'
+            : `Add +${amountNum.toLocaleString()} demo USDC →`,
         onClick: !wallet ? () => openWalletModal(true) : handleDeposit,
         isLoading: publicTx.isPending,
         disabled: publicTx.isPending || amountNum <= 0,
@@ -196,7 +196,7 @@ export function DepositModal({
         label: 'Cancel',
         onClick: onClose,
       }}
-      footerNote="Non-Custodial · Instant Devnet Settlement · Zero Slippage"
+      footerNote="Demo credits · Balance saved to your account"
     />
   );
 }

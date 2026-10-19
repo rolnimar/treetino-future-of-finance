@@ -18,6 +18,7 @@ import { TreetinoBlueprintBanner } from './components/TreetinoBlueprintBanner';
 import { DepositModal } from './features/fintech/DepositModal';
 import { BackProjectModal } from './features/fintech/BackProjectModal';
 import { PitchDeck } from './features/pitch/pitch-deck';
+import { ChargingPage } from './features/devices/charging-page';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import type { VictronDemoItem } from './features/victron/victron-types';
 
@@ -33,6 +34,10 @@ const ClientAccess = lazy(() =>
 );
 
 export function App() {
+  const [chargingSiteId, setChargingSiteId] = useState<number | null>(() => {
+    const match = window.location.hash.match(/^#charge\/(\d+)$/);
+    return match ? Number(match[1]) : null;
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSiteId, setSelectedSiteId] = useState<number | null>(() => {
     if (typeof window === 'undefined') return null;
@@ -85,6 +90,12 @@ export function App() {
     const handleRouteSync = () => {
       const hash = window.location.hash;
       const pathname = window.location.pathname;
+      const charging = hash.match(/^#charge\/(\d+)$/);
+      setChargingSiteId(charging ? Number(charging[1]) : null);
+      if (charging) {
+        setSelectedSiteId(null);
+        return;
+      }
 
       if (pathname === '/pitch' || hash === '#pitch') {
         setSelectedSiteId(null);
@@ -134,6 +145,9 @@ export function App() {
   };
 
   const selectedDemo = demos.find((d) => d.siteId === selectedSiteId);
+
+  if (chargingSiteId !== null)
+    return <ChargingPage key={chargingSiteId} siteId={chargingSiteId} />;
 
   if (currentView === 'pitch') {
     return (
