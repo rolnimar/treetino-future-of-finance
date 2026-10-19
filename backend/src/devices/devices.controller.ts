@@ -6,6 +6,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
   BadRequestException,
 } from '@nestjs/common';
@@ -76,8 +77,14 @@ export class DevicesController {
     return this.ledger.claim(req.client.wallet, site(id), body);
   }
   @Get('devices/:siteId/sessions')
-  latest(@Param('siteId') id: string, @Query('wallet') wallet: string) {
-    return this.ledger.latestSession(wallet, site(id));
+  async latest(
+    @Param('siteId') id: string,
+    @Query('wallet') wallet: string,
+    @Res() response: { json: (value: unknown) => unknown },
+  ) {
+    // Nest's automatic handling ends a null response without a JSON body.
+    // A first-time customer must receive the explicit JSON value `null`.
+    response.json(await this.ledger.latestSession(wallet, site(id)));
   }
   @Post('devices/:siteId/sessions')
   @ApiBearerAuth()

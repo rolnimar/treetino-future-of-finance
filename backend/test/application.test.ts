@@ -12,6 +12,7 @@ import { createApplication } from '../dist/application.js';
 import { Keypair } from '@solana/web3.js';
 import { IndexerService } from '../dist/indexer/indexer.service.js';
 import { IndexerConfig } from '../dist/indexer/indexer.config.js';
+import { DeviceLedgerService } from '../dist/devices/device-ledger.service.js';
 
 describe('compiled NestJS application running on Bun', () => {
   let app: Awaited<ReturnType<typeof createApplication>>;
@@ -545,6 +546,33 @@ describe('compiled NestJS application running on Bun', () => {
       amount: '1',
     });
     expect(unknown.status).toBe(404);
+  });
+
+  test('first-time charging wallets receive explicit JSON null instead of an empty success response', async () => {
+    const wallet = Keypair.generate().publicKey.toBase58();
+    const response = await fetch(
+      baseUrl + `/api/devices/374891/sessions?wallet=${wallet}`,
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/json');
+    expect(await response.text()).toBe('null');
+    const invalid = await fetch(
+      baseUrl + '/api/devices/374891/sessions?wallet=invalid',
+    );
+    expect(invalid.status).toBe(400);
+    expect((await invalid.json()).message).toContain('valid Solana');
+    const session = await app
+      .get(DeviceLedgerService)
+      .start(wallet, 374891, { id: crypto.randomUUID(), kwh: '1' });
+    const resumed = await fetch(
+      baseUrl + `/api/devices/374891/sessions?wallet=${wallet}`,
+    );
+    expect(resumed.status).toBe(200);
+    expect(await resumed.json()).toMatchObject({
+      id: session.id,
+      wallet,
+      siteId: 374891,
+    });
   });
 
   test('serves public clean energy campaigns and detail dossiers', async () => {
