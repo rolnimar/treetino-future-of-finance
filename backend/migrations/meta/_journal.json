@@ -43,6 +43,13 @@
       "when": 1792419600000,
       "tag": "0005_moonpay_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792428000000,
+      "tag": "0006_cancel_card_checkout",
+      "breakpoints": true
     }
   ]
 }

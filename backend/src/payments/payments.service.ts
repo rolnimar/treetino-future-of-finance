@@ -38,7 +38,10 @@ export function paymentReceipt(order: Order) {
       : null,
     currency: order.fiatCurrency,
     usdcAllocation: order.usdcAllocation,
-    status: order.status,
+    status:
+      order.status === 'pending' && order.cancelledAt
+        ? 'cancelled'
+        : order.status,
     transactionId: order.transactionId,
     completedAt: order.completedAt,
     simulated: true as const,
@@ -116,12 +119,36 @@ export class PaymentsService {
   }
 
   async checkout(id: string, ip: string) {
-    await this.order(id);
+    this.assertOpen(await this.order(id));
     return { allowedIpAddress: await this.moonpay.ipHash(ip) };
+  }
+
+  private assertOpen(order: Order) {
+    if (order.status !== 'pending' || order.cancelledAt)
+      throw new ConflictException(
+        'This checkout is closed. Start a new payment.',
+      );
+  }
+
+  async cancel(id: string) {
+    // Never discard a paid or processing provider transaction when leaving checkout.
+    const receipt = await this.verify(id);
+    if (receipt.status === 'completed') return receipt;
+    if (receipt.transactionId)
+      throw new ConflictException(
+        'MoonPay is already processing this payment. Check its status before making another investment. Closing checkout does not cancel a submitted payment.',
+      );
+    const [cancelled] = await this.database.db
+      .update(demoPayments)
+      .set({ cancelledAt: Date.now() })
+      .where(and(eq(demoPayments.id, id), eq(demoPayments.status, 'pending')))
+      .returning();
+    return paymentReceipt(cancelled ?? (await this.order(id)));
   }
 
   async sign(id: string, rawUrl: unknown, ip: string) {
     const order = await this.order(id);
+    this.assertOpen(order);
     if (typeof rawUrl !== 'string' || rawUrl.length > 4096)
       throw new BadRequestException('Invalid checkout URL.');
     let url: URL;
@@ -230,7 +257,11 @@ export class PaymentsService {
         status:
           !processing && matches.some((tx) => tx.status === 'failed')
             ? 'failed'
-            : 'pending',
+            : processing
+              ? 'pending'
+              : order.cancelledAt
+                ? 'cancelled'
+                : 'pending',
       };
     }
     const [completed] = await this.database.db

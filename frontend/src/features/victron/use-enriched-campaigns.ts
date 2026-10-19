@@ -48,6 +48,7 @@ function campaignToDemoItem(
 
     return {
       ...baseDemo,
+      identifier: c.treeAddress,
       title: c.title,
       category: c.category,
       categoryBadge: c.categoryBadge,

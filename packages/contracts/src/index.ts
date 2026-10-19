@@ -174,3 +174,4 @@ export interface CreateCampaignDto {
   supplierName?: string;
   targetUsdc: string;
 }
+export { FLAGSHIP_CREATOR, FLAGSHIP_FUNDING } from './flagship-funding';

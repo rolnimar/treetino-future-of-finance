@@ -11,8 +11,11 @@ import type { VictronDemoItem } from '../victron/victron-types';
 import { getCampaignCoverImage } from '../victron/campaign-helpers';
 import { CheckIcon } from '../victron/victron-icons';
 import { UniversalPopup } from './UniversalPopup';
+import { PaymentMethodSwitch } from './PaymentMethodSwitch';
+import { UsdcBacking } from './UsdcBacking';
 import {
   clearPendingPayment,
+  cancelPayment,
   createPayment,
   readPendingPayment,
   savePendingPayment,
@@ -38,11 +41,33 @@ export function BackProjectModal(props: BackProjectModalProps) {
   const wallet = useConnectedWallet();
   if (!props.isOpen || !props.demo) return null;
   return (
-    <FiatBacking
-      key={`${props.demo.siteId}:${wallet?.address ?? 'guest'}`}
+    <Backing
+      key={props.demo.siteId}
       {...props}
       demo={props.demo}
       walletAddress={wallet?.address}
+    />
+  );
+}
+
+function Backing(
+  props: BackProjectModalProps & {
+    demo: VictronDemoItem;
+    walletAddress?: string;
+  },
+) {
+  const [method, setMethod] = useState<'card' | 'usdc'>('card');
+  return method === 'card' ? (
+    <FiatBacking
+      key={props.walletAddress ?? 'guest'}
+      {...props}
+      onUseUsdc={() => setMethod('usdc')}
+    />
+  ) : (
+    <UsdcBacking
+      key={props.walletAddress ?? 'guest'}
+      {...props}
+      onUseCard={() => setMethod('card')}
     />
   );
 }
@@ -52,7 +77,12 @@ function FiatBacking({
   onClose,
   onNavigatePortfolio,
   walletAddress,
-}: BackProjectModalProps & { demo: VictronDemoItem; walletAddress?: string }) {
+  onUseUsdc,
+}: BackProjectModalProps & {
+  demo: VictronDemoItem;
+  walletAddress?: string;
+  onUseUsdc: () => void;
+}) {
   const { setVisible: openWalletModal } = useWalletModal();
   const queryClient = useQueryClient();
   const [order, setOrder] = useState<PaymentOrder | null>(() =>
@@ -74,6 +104,8 @@ function FiatBacking({
   );
   const [quoteAmount, setQuoteAmount] = useState<number | null>(null);
   const checking = useRef(false);
+  const activeOrderId = useRef(order?.id);
+  activeOrderId.current = order?.id;
   const closeCheckout = useCallback(() => setCheckoutVisible(false), []);
   const amountNum = Number(amount);
   const validAmount =
@@ -114,8 +146,17 @@ function FiatBacking({
     checking.current = true;
     try {
       const result = await verifyPayment(order.id);
+      if (activeOrderId.current !== order.id) return;
       if (result.status === 'completed') {
         await complete(result, order);
+      } else if (result.status === 'cancelled') {
+        clearPendingPayment(order);
+        activeOrderId.current = undefined;
+        setOrder(null);
+        setTrackingId(null);
+        setMessage(
+          'Card checkout cancelled. Choose a payment method or enter a new amount.',
+        );
       } else if (result.status === 'failed') {
         setMessage(
           'Your payment was unsuccessful. No allocation was recorded. Please try again.',
@@ -140,6 +181,38 @@ function FiatBacking({
       checking.current = false;
     }
   }, [order, complete]);
+
+  const cancelCurrentOrder = async () => {
+    if (busy) return false;
+    if (!order) return true;
+    setBusy(true);
+    try {
+      const result = await cancelPayment(order.id);
+      if (result.status === 'completed') {
+        await complete(result, order);
+        return false;
+      }
+      clearPendingPayment(order);
+      activeOrderId.current = undefined;
+      setOrder(null);
+      setTrackingId(null);
+      setCheckoutTrackingId(null);
+      setCheckoutVisible(false);
+      setMessage(
+        'Card checkout cancelled. Choose a payment method or enter a new amount.',
+      );
+      return true;
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'Could not cancel checkout. Check payment status before trying again.',
+      );
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (!order || receipt) return;
@@ -264,6 +337,16 @@ function FiatBacking({
             </div>
           ) : (
             <div className="space-y-4">
+              <PaymentMethodSwitch
+                method="card"
+                disabled={busy}
+                onChange={(method) => {
+                  if (method === 'usdc')
+                    void (async () => {
+                      if (await cancelCurrentOrder()) onUseUsdc();
+                    })();
+                }}
+              />
               <label
                 htmlFor="back-amount-input"
                 className="block text-xs text-zinc-600"
@@ -362,8 +445,14 @@ function FiatBacking({
           disabled: !receipt && !validAmount,
         }}
         secondaryButton={{
-          label: receipt ? 'Done' : 'Cancel',
-          onClick: onClose,
+          label: receipt ? 'Done' : order ? 'Cancel card checkout' : 'Close',
+          onClick:
+            order && !receipt
+              ? () => {
+                  void cancelCurrentOrder();
+                }
+              : onClose,
+          disabled: busy,
         }}
         footerNote="Test mode · Payments and allocations are simulated"
       />
@@ -415,6 +504,13 @@ const MoonPayCheckout = memo(function MoonPayCheckout({
     onClose();
     await onVerify();
   }, [onClose, onVerify]);
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') void close();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [close]);
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 p-3"

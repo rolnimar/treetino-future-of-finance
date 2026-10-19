@@ -378,6 +378,7 @@ describe('compiled NestJS application running on Bun', () => {
       '/api/events/status',
       '/api/health',
       '/api/payments/moonpay/orders',
+      '/api/payments/moonpay/orders/{id}/cancel',
       '/api/payments/moonpay/orders/{id}/checkout',
       '/api/payments/moonpay/orders/{id}/sign',
       '/api/payments/moonpay/orders/{id}/verify',
@@ -467,6 +468,10 @@ describe('compiled NestJS application running on Bun', () => {
       projectedApy: '14.2%',
       city: 'Kryry',
       country: 'Czech Republic',
+      treeAddress: 'C22QhgXS4SkTw8awMSZVbiNTeBb75q3SbX158P287tjV',
+      treeId: '202610190209689',
+      raisedUsdc: '0',
+      canBuy: false,
     });
 
     const detailRes = await fetch(baseUrl + '/api/campaigns/209689');

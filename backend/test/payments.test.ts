@@ -258,6 +258,59 @@ test('provider failures cannot fabricate a receipt', async () => {
   expect(await service.list(wallet)).toEqual([]);
 });
 
+test('unpaid checkout can be cancelled and cannot be reopened, while a late provider payment is still recovered', async () => {
+  const { service, moonpay, order, db } = await fixture();
+  const fetch = spyOn(moonpay, 'transactions').mockResolvedValue([]);
+  cleanup.push(() => fetch.mockRestore());
+  expect((await service.cancel(order.id)).status).toBe('cancelled');
+  expect((await service.verify(order.id)).status).toBe('cancelled');
+  await expect(service.checkout(order.id, '203.0.113.42')).rejects.toThrow(
+    'checkout is closed',
+  );
+  await expect(
+    service.sign(order.id, 'https://buy.moonpay.com/v2/buy', '203.0.113.42'),
+  ).rejects.toThrow('checkout is closed');
+  expect(await service.list(wallet)).toEqual([]);
+  const replacement = await service.create({
+    wallet,
+    siteId: 219742,
+    amount: 100,
+  });
+  expect(replacement.id).not.toBe(order.id);
+  expect(replacement.amount).toBe(100);
+  const tx = transaction(order);
+  fetch.mockImplementation(async (id) => (id === order.id ? [tx] : []));
+  // A previously signed MoonPay URL could settle after cancellation. Keep checking it.
+  await new PaymentsReconciler(db, service, moonpay).reconcile();
+  const receipts = await service.list(wallet);
+  expect(receipts).toHaveLength(1);
+  expect(receipts[0]).toMatchObject({
+    id: order.id,
+    status: 'completed',
+    transactionId: tx.id,
+  });
+  expect((await service.cancel(order.id)).status).toBe('completed');
+});
+
+test('processing, paid and unverifiable provider payments cannot be silently discarded', async () => {
+  const { service, moonpay, order } = await fixture();
+  const tx = transaction(order);
+  const fetch = spyOn(moonpay, 'transactions').mockResolvedValue([
+    { ...tx, status: 'pending' },
+  ]);
+  cleanup.push(() => fetch.mockRestore());
+  await expect(service.cancel(order.id)).rejects.toThrow('already processing');
+  expect((await service.verify(order.id)).status).toBe('pending');
+  await expect(
+    service.checkout(order.id, '203.0.113.42'),
+  ).resolves.toBeDefined();
+  fetch.mockRejectedValue(new Error('Provider timeout'));
+  await expect(service.cancel(order.id)).rejects.toThrow('Provider timeout');
+  fetch.mockResolvedValue([tx]);
+  expect((await service.cancel(order.id)).status).toBe('completed');
+  expect(await service.list(wallet)).toHaveLength(1);
+});
+
 test('fee quotes validate amounts and preserve the provider fee breakdown', async () => {
   const { service } = await fixture();
   const fetch = spyOn(globalThis, 'fetch').mockResolvedValue(

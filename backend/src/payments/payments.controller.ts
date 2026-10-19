@@ -63,6 +63,11 @@ export class PaymentsController {
     return this.payments.verify(id);
   }
 
+  @Post('orders/:id/cancel')
+  cancel(@Param('id') id: string) {
+    return this.payments.cancel(id);
+  }
+
   @Get('receipts')
   list(@Query('wallet') wallet: string) {
     return this.payments.list(wallet);

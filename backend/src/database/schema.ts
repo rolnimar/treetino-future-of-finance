@@ -293,6 +293,7 @@ export const demoPayments = pgTable('demo_payments', {
   transactionId: text('transaction_id').unique(),
   createdAt: bigint('created_at', { mode: 'number' }).notNull(),
   completedAt: bigint('completed_at', { mode: 'number' }),
+  cancelledAt: bigint('cancelled_at', { mode: 'number' }),
   paymentAmounts: jsonb('payment_amounts').$type<DemoPaymentAmounts>(),
   fiatCurrency: text('fiat_currency').$type<'USD'>().notNull().default('USD'),
   usdcAllocation: jsonb('usdc_allocation').$type<{

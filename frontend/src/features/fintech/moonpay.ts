@@ -28,7 +28,7 @@ export const paymentReceiptSchema = z.object({
     })
     .nullable()
     .optional(),
-  status: z.enum(['pending', 'completed', 'failed']),
+  status: z.enum(['pending', 'completed', 'failed', 'cancelled']),
   transactionId: z.string().nullable(),
   completedAt: z.number().nullable(),
   simulated: z.literal(true),
@@ -51,6 +51,12 @@ export const createPayment = (wallet: string, siteId: number, amount: number) =>
 export const verifyPayment = (id: string) =>
   api(
     `payments/moonpay/orders/${id}/verify`,
+    paymentReceiptSchema,
+    jsonBody({}),
+  );
+export const cancelPayment = (id: string) =>
+  api(
+    `payments/moonpay/orders/${id}/cancel`,
     paymentReceiptSchema,
     jsonBody({}),
   );
@@ -86,7 +92,8 @@ export function readPendingPayment(
     );
     return parsed.success &&
       parsed.data.wallet === wallet &&
-      parsed.data.siteId === siteId
+      parsed.data.siteId === siteId &&
+      parsed.data.status === 'pending'
       ? parsed.data
       : null;
   } catch {

@@ -1,9 +1,15 @@
 import { useSyncExternalStore, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useConnection } from '@solana/wallet-adapter-react';
 import { fetchPaymentReceipts } from '../fintech/moonpay';
 import { mergeDemoPayments } from './demo-payment-investments';
+import {
+  fetchFundingPositions,
+  mergeFundingPositions,
+} from './funding-investments';
 
 export interface InvestmentRecord {
+  onchainAmountUsdc?: number;
   amountUsdc: number;
   investedAt: number;
   lastClaimedAt: number;
@@ -35,6 +41,7 @@ function safeParse(json: string | null): InvestmentsMap {
 }
 
 export function useVictronInvestments(walletAddress: string | undefined) {
+  const { connection } = useConnection();
   const storageKey = walletAddress
     ? `treetino_victron_investments_${walletAddress}`
     : 'treetino_victron_investments_guest';
@@ -66,7 +73,23 @@ export function useVictronInvestments(walletAddress: string | undefined) {
     staleTime: 30_000,
     refetchInterval: 30_000,
   });
-  const investments = mergeDemoPayments(safeParse(rawJson), fiatReceipts);
+  const { data: fundingPositions = [] } = useQuery({
+    queryKey: [
+      'wallet',
+      'funding-positions',
+      connection.rpcEndpoint,
+      walletAddress,
+    ],
+    queryFn: ({ signal }) =>
+      fetchFundingPositions(connection, walletAddress!, signal),
+    enabled: !!walletAddress,
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+  });
+  const investments = mergeDemoPayments(
+    mergeFundingPositions(safeParse(rawJson), fundingPositions),
+    fiatReceipts,
+  );
 
   const invest = useCallback(
     (siteId: number, amountUsdc: number) => {
@@ -105,7 +128,10 @@ export function useVictronInvestments(walletAddress: string | undefined) {
     (siteId: number, amountUsdc: number, kaminoBonusUsdc: number = 0) => {
       if (amountUsdc <= 0 && kaminoBonusUsdc <= 0) return;
       const current = safeParse(localStorage.getItem(storageKey));
-      const holding = mergeDemoPayments(current, fiatReceipts)[siteId];
+      const holding = mergeDemoPayments(
+        mergeFundingPositions(current, fundingPositions),
+        fiatReceipts,
+      )[siteId];
       if (!holding) return;
       const existing = current[siteId] ?? {
         amountUsdc: 0,
@@ -133,7 +159,7 @@ export function useVictronInvestments(walletAddress: string | undefined) {
       }
       notify();
     },
-    [storageKey, fiatReceipts],
+    [storageKey, fiatReceipts, fundingPositions],
   );
 
   return {

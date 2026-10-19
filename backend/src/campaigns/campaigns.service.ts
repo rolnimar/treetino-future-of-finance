@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CampaignsRepository } from './campaigns.repository';
 import { IndexerService } from '../indexer/indexer.service';
+import { FLAGSHIP_FUNDING } from '@treetino/contracts';
 import type {
   CampaignDossier,
   CampaignsResponse,
@@ -149,10 +150,16 @@ export class CampaignsService {
 
     // Start with default flagship campaigns
     const result: CampaignDossier[] = DEFAULT_FLAGSHIP_CAMPAIGNS.map((def) => {
-      const matched = treeMap.get(def.treeAddress);
+      const funding = FLAGSHIP_FUNDING[def.victronSiteId!];
+      const bound = {
+        ...def,
+        treeAddress: funding.address,
+        treeId: funding.treeId,
+      };
+      const matched = treeMap.get(funding.address);
       if (matched) {
         return {
-          ...def,
+          ...bound,
           targetUsdc: (Number(BigInt(matched.target)) / 1e6).toString(),
           raisedUsdc: (Number(BigInt(matched.raised)) / 1e6).toString(),
           phase: matched.phase,
@@ -160,7 +167,7 @@ export class CampaignsService {
           treeId: matched.treeId,
         };
       }
-      return def;
+      return { ...bound, raisedUsdc: '0', canBuy: false };
     });
 
     const defaultIds = new Set(DEFAULT_FLAGSHIP_CAMPAIGNS.map((d) => d.id));

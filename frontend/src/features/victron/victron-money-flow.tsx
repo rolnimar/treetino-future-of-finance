@@ -12,6 +12,7 @@ interface VictronMoneyFlowProps {
   walletAddress?: string;
   walletBalance?: string;
   onOpenDeposit?: () => void;
+  onBackProject?: (demo: VictronDemoItem) => void;
 }
 
 export function VictronMoneyFlow({
@@ -19,13 +20,12 @@ export function VictronMoneyFlow({
   walletAddress,
   walletBalance,
   onOpenDeposit,
+  onBackProject,
 }: VictronMoneyFlowProps) {
   const wallet = useConnectedWallet();
   const publicTx = usePublicTransactions(wallet);
   const [investAmount, setInvestAmount] = useState<number>(500);
-  const [justInvested, setJustInvested] = useState<boolean>(false);
-
-  const { investments, invest } = useVictronInvestments(walletAddress);
+  const { investments } = useVictronInvestments(walletAddress);
   const currentHolding = investments[demo.siteId];
 
   // Proportional calculations
@@ -39,13 +39,6 @@ export function VictronMoneyFlow({
   // Synchronized live accrued yield
   const liveResult = useLiveYieldStream(currentHolding, demo.financials);
   const accruedUsdc = liveResult.totalAccrued;
-
-  const handleInvest = () => {
-    if (investAmount <= 0) return;
-    invest(demo.siteId, investAmount);
-    setJustInvested(true);
-    setTimeout(() => setJustInvested(false), 3500);
-  };
 
   return (
     <div className="space-y-6">
@@ -322,19 +315,12 @@ export function VictronMoneyFlow({
 
             <button
               type="button"
-              onClick={handleInvest}
-              disabled={investAmount <= 0}
+              onClick={() => onBackProject?.(demo)}
+              disabled={!onBackProject}
               className="w-full rounded-xl bg-t-blue hover:bg-t-blue/90 py-3.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-50 cursor-pointer"
             >
-              Fund {investAmount.toLocaleString()} USDC in this Asset →
+              Invest with Card or USDC →
             </button>
-
-            {justInvested && (
-              <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-700">
-                <CheckIcon className="h-4 w-4" />
-                Successfully allocated {investAmount.toLocaleString()} USDC!
-              </div>
-            )}
           </div>
 
           {/* Right: Proportional Distribution Table */}

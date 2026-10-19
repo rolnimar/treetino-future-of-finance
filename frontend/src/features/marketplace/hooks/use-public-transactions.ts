@@ -48,6 +48,10 @@ export function usePublicTransactions(wallet: ConnectedWallet | null) {
           ],
         }),
         queryClient.invalidateQueries({ queryKey: ['trees'] }),
+        queryClient.invalidateQueries({ queryKey: ['campaigns-list'] }),
+        queryClient.invalidateQueries({
+          queryKey: ['wallet', 'funding-positions'],
+        }),
         queryClient.invalidateQueries({ queryKey: ['tree-reports'] }),
         queryClient.invalidateQueries({ queryKey: ['client'] }),
         queryClient.invalidateQueries({ queryKey: ['wallet', 'treeRewards'] }),

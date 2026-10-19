@@ -1,5 +1,17 @@
 # Treetino
 
+The backing dialog offers **Card** and **Direct USDC**. Direct USDC submits
+`buy_shares` to the selected project's dedicated devnet funding pool. The wallet
+spends test USDC, pays network fees in devnet SOL, and receives project shares.
+The portfolio reads confirmed program positions and combines them with verified
+card allocations without storing duplicate principal in the browser.
+
+Featured pool bindings live in `packages/contracts/src/flagship-funding.ts`.
+To check initialization, run `bun scripts/setup-funding-pools.ts` from `frontend`.
+The script simulates missing pools; `--execute` initializes them on devnet using
+the configured creator's local Solana keypair. Existing pools are validated and
+left intact.
+
 Card checkout uses MoonPay sandbox: USD card payments deliver devnet SOL to the
 connected wallet. The backend signs fixed checkout details, verifies payment
 status directly with MoonPay, and retries pending orders every 30 seconds.
@@ -7,6 +19,13 @@ Verified net USD principal is shown as a test allocation in USDC; this does not
 mint USDC or execute an on-chain share purchase. Checkout and portfolio receipts
 remain marked as test mode. Set `MOONPAY_PUBLIC_KEY` and `MOONPAY_SECRET_KEY` on
 the backend using sandbox keys only. Live keys are rejected.
+
+After closing MoonPay, use **Cancel card checkout** to release an unpaid order
+and change the amount, or choose **Direct USDC** to cancel it and switch methods.
+Cancellation checks MoonPay first: processing payments stay visible, and completed
+payments keep their receipt. Closing a checkout does not reverse a submitted
+MoonPay payment. Cancelled local orders remain eligible for background settlement
+checks so a late provider confirmation is credited once rather than lost.
 
 Bun workspace monorepo for the Treetino Solana hackathon prototype.
 

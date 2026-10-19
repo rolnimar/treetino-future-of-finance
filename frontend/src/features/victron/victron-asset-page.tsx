@@ -527,6 +527,7 @@ export function VictronAssetPage({
           walletAddress={walletAddress}
           walletBalance={walletBalance}
           onOpenDeposit={onOpenDeposit}
+          onBackProject={onBackProject}
         />
       )}
 
