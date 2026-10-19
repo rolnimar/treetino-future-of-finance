@@ -283,6 +283,39 @@ export function InvestorPortfolio({
       aria-label="Investor Portfolio"
       className="py-3 md:py-6 space-y-4 md:space-y-10 animate-fade-in"
     >
+      {Object.values(investments).some(
+        (holding) => (holding.demoFiatAmountUsdc ?? 0) > 0,
+      ) && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-[#183d89]">
+          <p className="font-semibold">Card payment summary</p>
+          <p className="mt-1 font-semibold">
+            Card payments (USDC equivalent): USDC
+            {Object.values(investments)
+              .reduce(
+                (sum, holding) => sum + (holding.demoFiatPaidUsdc ?? 0),
+                0,
+              )
+              .toFixed(2)}
+            {' · '}MoonPay & network fees: USDC
+            {Object.values(investments)
+              .reduce(
+                (sum, holding) => sum + (holding.demoFiatFeesUsdc ?? 0),
+                0,
+              )
+              .toFixed(2)}
+            {' · '}Net allocated: USDC
+            {Object.values(investments)
+              .reduce(
+                (sum, holding) => sum + (holding.demoFiatAmountUsdc ?? 0),
+                0,
+              )
+              .toFixed(2)}
+          </p>
+          <p className="mt-2 text-[10px] text-zinc-500">
+            Test mode · Portfolio allocations are simulated
+          </p>
+        </div>
+      )}
       {/* MOBILE NATIVE WALLET (Institutional Clean Design) */}
       <div className="md:hidden flex flex-col space-y-4 rounded-3xl bg-white border border-zinc-200/80 p-5 text-zinc-950 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
         {/* 1. Header Bar: Treetino Wallet + Solana Badge */}

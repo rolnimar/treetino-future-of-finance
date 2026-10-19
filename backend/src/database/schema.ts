@@ -273,3 +273,32 @@ export const campaigns = pgTable(
 
 export type Campaign = typeof campaigns.$inferSelect;
 export type CampaignInput = typeof campaigns.$inferInsert;
+
+// Sandbox payment receipts only. These are demo allocations, not SPL shares.
+export interface DemoPaymentAmounts {
+  principalCents: number;
+  moonpayFeeCents: number;
+  networkFeeCents: number;
+  extraFeeCents: number;
+  totalPaidCents: number;
+  checkoutCents: number;
+}
+
+export const demoPayments = pgTable('demo_payments', {
+  id: uuidPrimaryKey(),
+  wallet: text('wallet').notNull(),
+  siteId: integer('site_id').notNull(),
+  amountCents: integer('amount_cents').notNull(),
+  status: text('status').notNull().default('pending'),
+  transactionId: text('transaction_id').unique(),
+  createdAt: bigint('created_at', { mode: 'number' }).notNull(),
+  completedAt: bigint('completed_at', { mode: 'number' }),
+  paymentAmounts: jsonb('payment_amounts').$type<DemoPaymentAmounts>(),
+  fiatCurrency: text('fiat_currency').$type<'USD'>().notNull().default('USD'),
+  usdcAllocation: jsonb('usdc_allocation').$type<{
+    amountUsdc: number;
+    rate: number;
+    rateDate: string;
+    source: 'USD';
+  }>(),
+});

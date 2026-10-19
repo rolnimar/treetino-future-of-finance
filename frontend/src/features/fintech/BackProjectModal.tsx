@@ -1,20 +1,29 @@
-import { useState, useEffect } from 'react';
-import { useConnection } from '@solana/wallet-adapter-react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  MoonPayBuyWidget,
+  MoonPayProvider,
+  MoonPayTransactionTrackerWidget,
+} from '@moonpay/moonpay-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnectedWallet } from '../wallet/use-connected-wallet';
-import { useVictronInvestments } from '../victron/use-victron-investments';
-import { usePublicTransactions } from '../marketplace/hooks/use-public-transactions';
-import { useTrees } from '../trees/use-trees';
-import { parseTokenAmount } from '../../chain/amounts';
-import { requestWalletApproval } from '../../chain/wallet-action';
 import type { VictronDemoItem } from '../victron/victron-types';
 import { getCampaignCoverImage } from '../victron/campaign-helpers';
-import {
-  CheckIcon,
-  CurrencyDollarIcon,
-  ExternalLinkIcon,
-} from '../victron/victron-icons';
+import { CheckIcon } from '../victron/victron-icons';
 import { UniversalPopup } from './UniversalPopup';
+import {
+  clearPendingPayment,
+  createPayment,
+  readPendingPayment,
+  savePendingPayment,
+  signCheckout,
+  prepareCheckout,
+  fetchPaymentQuote,
+  verifyPayment,
+  type PaymentOrder,
+  type PaymentReceipt,
+  type PaymentAmounts,
+} from './moonpay';
 
 interface BackProjectModalProps {
   isOpen: boolean;
@@ -25,372 +34,503 @@ interface BackProjectModalProps {
   onNavigatePortfolio?: () => void;
 }
 
-export function BackProjectModal({
-  isOpen,
-  onClose,
-  demo,
-  walletBalance,
-  onNavigatePortfolio,
-}: BackProjectModalProps) {
-  const { connection } = useConnection();
+export function BackProjectModal(props: BackProjectModalProps) {
   const wallet = useConnectedWallet();
+  if (!props.isOpen || !props.demo) return null;
+  return (
+    <FiatBacking
+      key={`${props.demo.siteId}:${wallet?.address ?? 'guest'}`}
+      {...props}
+      demo={props.demo}
+      walletAddress={wallet?.address}
+    />
+  );
+}
+
+function FiatBacking({
+  demo,
+  onClose,
+  onNavigatePortfolio,
+  walletAddress,
+}: BackProjectModalProps & { demo: VictronDemoItem; walletAddress?: string }) {
   const { setVisible: openWalletModal } = useWalletModal();
-  const { invest } = useVictronInvestments(wallet?.address);
-  const publicTx = usePublicTransactions(wallet);
-  const { data: treesData } = useTrees('all', 0);
+  const queryClient = useQueryClient();
+  const [order, setOrder] = useState<PaymentOrder | null>(() =>
+    walletAddress ? readPendingPayment(walletAddress, demo.siteId) : null,
+  );
+  const [amount, setAmount] = useState(() =>
+    String(order?.checkoutAmount ?? order?.amount ?? 500),
+  );
+  const [checkoutVisible, setCheckoutVisible] = useState(false);
+  const [allowedIpAddress, setAllowedIpAddress] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<PaymentReceipt | null>(null);
+  const [trackingId, setTrackingId] = useState<string | null>(
+    order?.transactionId ?? null,
+  );
+  const [checkoutTrackingId, setCheckoutTrackingId] = useState<string | null>(
+    null,
+  );
+  const [quoteAmount, setQuoteAmount] = useState<number | null>(null);
+  const checking = useRef(false);
+  const closeCheckout = useCallback(() => setCheckoutVisible(false), []);
+  const amountNum = Number(amount);
+  const validAmount =
+    Number.isFinite(amountNum) &&
+    amountNum >= 20 &&
+    amountNum <= 5000 &&
+    Math.abs(amountNum * 100 - Math.round(amountNum * 100)) < 0.000001;
 
-  const [amountStr, setAmountStr] = useState('500');
-  const [step, setStep] = useState<'input' | 'confirming' | 'success'>('input');
-  const [isInstantConfirmed, setIsInstantConfirmed] = useState(false);
-  const [liveYieldTicks, setLiveYieldTicks] = useState(0);
-  const [prevDemoSiteId, setPrevDemoSiteId] = useState<number | null>(null);
-  const [confirmedTxSig, setConfirmedTxSig] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  if (demo && demo.siteId !== prevDemoSiteId) {
-    setPrevDemoSiteId(demo.siteId);
-    setStep('input');
-    setIsInstantConfirmed(false);
-    setLiveYieldTicks(0);
-    setConfirmedTxSig(null);
-    setErrorMessage(null);
-  }
-
-  const amountNum = parseFloat(amountStr) || 0;
-  const balanceNum = walletBalance ? parseFloat(walletBalance) : 0;
-  const isInsufficient = wallet && balanceNum > 0 && amountNum > balanceNum;
-
-  const handleQuickMint = () => {
-    if (!wallet) {
-      openWalletModal(true);
-      return;
-    }
-    try {
-      const baseUnits = parseTokenAmount('1000');
-      publicTx.mutate({ action: 'giveMeMoney', amount: baseUnits });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  // Live yield streaming ticker simulation
   useEffect(() => {
-    if (step !== 'success') return;
-    const interval = setInterval(() => {
-      setLiveYieldTicks((t) => t + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [step]);
+    const timer = window.setTimeout(
+      () => setQuoteAmount(validAmount ? amountNum : null),
+      400,
+    );
+    return () => window.clearTimeout(timer);
+  }, [amountNum, validAmount]);
+  const quote = useQuery({
+    queryKey: ['moonpay-quote', quoteAmount],
+    queryFn: () => fetchPaymentQuote(quoteAmount!),
+    enabled:
+      quoteAmount !== null && !receipt && (!order || order.currency === 'USD'),
+    staleTime: 30_000,
+  });
 
-  if (!isOpen || !demo) return null;
+  const complete = useCallback(
+    async (result: PaymentReceipt, currentOrder: PaymentOrder) => {
+      setReceipt(result);
+      setCheckoutVisible(false);
+      clearPendingPayment(currentOrder);
+      await queryClient.invalidateQueries({
+        queryKey: ['moonpay-receipts', currentOrder.wallet],
+      });
+    },
+    [queryClient],
+  );
 
-  const target = demo.financials.targetUsdc || 10000;
-  const apyFraction = demo.financials.projectedApy / 100;
-  const poolStakePercent = ((amountNum / target) * 100).toFixed(2);
-  const annualDividend = (amountNum * apyFraction).toFixed(2);
-  const dailyDividend = ((amountNum * apyFraction) / 365).toFixed(2);
+  const verify = useCallback(async () => {
+    if (!order || checking.current) return;
+    checking.current = true;
+    try {
+      const result = await verifyPayment(order.id);
+      if (result.status === 'completed') {
+        await complete(result, order);
+      } else if (result.status === 'failed') {
+        setMessage(
+          'Your payment was unsuccessful. No allocation was recorded. Please try again.',
+        );
+      } else {
+        setTrackingId(result.transactionId);
+        if (result.transactionId)
+          savePendingPayment({ ...order, transactionId: result.transactionId });
+        setMessage(
+          result.transactionId
+            ? 'MoonPay is processing your existing payment. You do not need to pay again. View its status or check again shortly.'
+            : 'No completed payment has been found yet. If you already paid, check its status again before retrying checkout.',
+        );
+      }
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'Could not verify payment. Please retry.',
+      );
+    } finally {
+      checking.current = false;
+    }
+  }, [order, complete]);
 
-  const streamingCents = (
-    (parseFloat(annualDividend) / (365 * 24 * 3600)) *
-    (liveYieldTicks + 1)
-  ).toFixed(6);
+  useEffect(() => {
+    if (!order || receipt) return;
+    void verify();
+    const timer = window.setInterval(() => {
+      void verify();
+    }, 10_000);
+    return () => window.clearInterval(timer);
+  }, [order, receipt, verify]);
 
-  const handleConfirmBacking = async () => {
-    if (amountNum <= 0) return;
-
-    if (
-      !wallet &&
-      typeof window !== 'undefined' &&
-      !(window as unknown as { solana?: unknown }).solana
-    ) {
+  const beginCheckout = async () => {
+    if (!walletAddress) {
       openWalletModal(true);
       return;
     }
-
-    setErrorMessage(null);
-    setStep('confirming');
-
+    if (busy || !validAmount) return;
+    setBusy(true);
+    setMessage(null);
     try {
-      const approval = await requestWalletApproval({
-        connection,
-        wallet,
-        actionName: 'back_clean_energy_infrastructure',
-        memoPayload: {
-          site_id: demo.siteId,
-          asset_title: demo.title,
-          amount_usdc: amountNum,
-          projected_apy: demo.financials.projectedApy,
-          hardware_escrow: 'solana_devnet_v1',
-        },
-      });
-
-      invest(demo.siteId, amountNum);
-      setIsInstantConfirmed(true);
-      setConfirmedTxSig(approval.signature);
-
-      const matchingTree =
-        treesData?.trees?.find((t) => t.id === String(demo.siteId)) ??
-        treesData?.trees?.[0];
-
-      if (matchingTree && matchingTree.phase === 'funding') {
-        try {
-          const baseUnits = parseTokenAmount(amountStr);
-          publicTx.mutate({
-            action: 'buyShares',
-            tree: matchingTree,
-            amount: baseUnits,
-          });
-        } catch {
-          // ignore
+      let currentOrder = order;
+      // Recover a paid order before opening any screen that could take another payment.
+      if (currentOrder) {
+        const result = await verifyPayment(currentOrder.id);
+        if (result.status === 'completed') {
+          await complete(result, currentOrder);
+          return;
         }
+        if (result.status === 'pending' && result.transactionId) {
+          setTrackingId(result.transactionId);
+          setCheckoutTrackingId(result.transactionId);
+          savePendingPayment({
+            ...currentOrder,
+            transactionId: result.transactionId,
+          });
+          setCheckoutVisible(true);
+          return;
+        }
+        setTrackingId(null);
+        setCheckoutTrackingId(null);
       }
-
-      setTimeout(() => setStep('success'), 400);
-    } catch (err: unknown) {
-      console.warn('Backing rejected or failed:', err);
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes('cancelled') || msg.includes('rejected')) {
-        setErrorMessage('Transaction was cancelled in wallet.');
-      } else {
-        setErrorMessage(`Transaction failed: ${msg}`);
+      if (!currentOrder) {
+        const created = await createPayment(
+          walletAddress,
+          demo.siteId,
+          amountNum,
+        );
+        // Save before opening so reloads can resume payment verification.
+        savePendingPayment(created);
+        setOrder(created);
+        currentOrder = created;
       }
-      setStep('input');
+      const checkout = await prepareCheckout(currentOrder.id);
+      setAllowedIpAddress(checkout.allowedIpAddress);
+      setCheckoutVisible(true);
+    } catch (error) {
+      setMessage(
+        error instanceof Error ? error.message : 'Could not open checkout.',
+      );
+    } finally {
+      setBusy(false);
     }
   };
 
-  // STEP 2: CONFIRMING
-  if (step === 'confirming') {
-    return (
+  return (
+    <>
       <UniversalPopup
-        isOpen={isOpen}
+        isOpen={!checkoutVisible}
         onClose={onClose}
         dark={false}
         icon={
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 border border-blue-200 shadow-xs">
-            <div className="h-8 w-8 animate-spin rounded-full border-3 border-[#183d89] border-t-transparent" />
-          </div>
-        }
-        tag="SOLANA DEVNET ESCROW"
-        title="Confirming Allocation…"
-        description="Interacting with Anchor contract escrow. Please approve the transaction in your wallet."
-        mainPoint={
-          <div className="py-4 text-center text-xs text-zinc-600 font-mono">
-            Submitting transaction to Solana Devnet…
-          </div>
-        }
-        primaryButton={{
-          label: 'Confirming…',
-          onClick: () => {},
-          isLoading: true,
-          disabled: true,
-        }}
-      />
-    );
-  }
-
-  // STEP 3: SUCCESS (Confirmation state matching layout 100%)
-  if (step === 'success') {
-    return (
-      <UniversalPopup
-        isOpen={isOpen}
-        onClose={onClose}
-        dark={false}
-        icon={
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-white shadow-md">
-            <CheckIcon className="h-8 w-8" />
-          </div>
-        }
-        tag="ALLOCATION CONFIRMED"
-        title={`You Backed ${demo.title}!`}
-        description={`${amountNum.toLocaleString()} USDC allocated into hardware escrow. You now own ${poolStakePercent}% of this installation.`}
-        mainPoint={
-          <div className="space-y-1.5 text-center py-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[10px] font-bold text-emerald-700 border border-emerald-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>LIVE YIELD STREAM ACTIVE</span>
+          receipt ? (
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-white">
+              <CheckIcon className="h-8 w-8" />
             </div>
-            <div className="font-mono text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight pt-1">
-              +{streamingCents}{' '}
-              <span className="text-xs text-zinc-500 font-normal font-sans">
-                USDC
-              </span>
-            </div>
-            <p className="text-[11px] text-zinc-600 font-normal">
-              Continuous kilowatt-hour revenue accruing every second based on
-              Victron Cerbo GX telemetry.
-            </p>
-            {confirmedTxSig && (
-              <div className="pt-2">
-                <a
-                  href={`https://solscan.io/tx/${confirmedTxSig}?cluster=devnet`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-[#183d89] hover:underline"
-                >
-                  <span>
-                    Solscan: {confirmedTxSig.slice(0, 8)}…
-                    {confirmedTxSig.slice(-6)}
-                  </span>
-                  <ExternalLinkIcon className="h-3 w-3" />
-                </a>
+          ) : (
+            <img
+              src={getCampaignCoverImage(demo.key)}
+              alt=""
+              className="h-16 w-16 rounded-full object-cover"
+            />
+          )
+        }
+        tag={receipt ? 'PAYMENT CONFIRMED' : 'BACK CLEAN ENERGY'}
+        title={
+          receipt ? 'Your test allocation is recorded' : `Back ${demo.title}`
+        }
+        description={
+          receipt
+            ? `Your sandbox payment for ${demo.title} is confirmed. Your test allocation is available in your portfolio.`
+            : 'Pay by card through MoonPay. Checkout delivers devnet SOL to your wallet and records a test allocation in USDC.'
+        }
+        mainPoint={
+          receipt ? (
+            <div className="space-y-3 text-sm">
+              <p className="text-center text-3xl font-bold">
+                {receipt.usdcAllocation?.amountUsdc.toLocaleString()} USDC
+              </p>
+              <p className="text-center text-xs text-zinc-500">
+                Allocated to {demo.title}
+              </p>
+              {receipt.paymentAmounts && (
+                <PaymentBreakdown
+                  amounts={receipt.paymentAmounts}
+                  currency={receipt.currency}
+                  allocation={receipt.usdcAllocation?.amountUsdc}
+                />
+              )}
+              <div className="space-y-2 text-xs text-zinc-600">
+                <p>✓ Sandbox payment verified</p>
+                <p>✓ Test allocation recorded</p>
+                <p>✓ Available in your portfolio</p>
               </div>
-            )}
-          </div>
+              <details className="text-xs text-zinc-500">
+                <summary className="cursor-pointer">Receipt details</summary>
+                <p className="mt-2 break-all">
+                  Payment reference: {receipt.transactionId}
+                </p>
+                <p className="mt-1 break-all">
+                  Allocation reference: {receipt.id}
+                </p>
+              </details>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <label
+                htmlFor="back-amount-input"
+                className="block text-xs text-zinc-600"
+              >
+                Total card payment (USD)
+              </label>
+              <div className="flex items-center gap-2 border-b border-zinc-200 pb-3">
+                <span className="text-xl text-zinc-400">
+                  {order?.currency ?? 'USD'}
+                </span>
+                <input
+                  id="back-amount-input"
+                  type="number"
+                  min="20"
+                  max="5000"
+                  step="0.01"
+                  value={amount}
+                  disabled={!!order || busy}
+                  onChange={(event) => setAmount(event.target.value)}
+                  className="w-full bg-transparent text-3xl font-bold outline-none"
+                />
+              </div>
+              {!order && (
+                <div className="flex gap-2">
+                  {[100, 500, 1000].map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setAmount(String(value))}
+                      className="flex-1 rounded-lg border border-zinc-200 p-2 text-xs"
+                    >
+                      USD {value}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {(!order || order.currency === 'USD') &&
+              quoteAmount === amountNum &&
+              quote.data ? (
+                <PaymentBreakdown amounts={quote.data} estimated />
+              ) : (
+                <p className="text-xs text-zinc-500">
+                  {quote.isError
+                    ? 'Fee estimate unavailable. MoonPay will show final fees before payment.'
+                    : validAmount
+                      ? 'Loading MoonPay fee estimate…'
+                      : 'Enter between USD 20 and USD 5,000.'}
+                </p>
+              )}
+              <div className="space-y-2 text-xs text-zinc-600">
+                <p>1. Choose your contribution</p>
+                <p>2. Complete secure checkout</p>
+                <p>3. View your allocation in your portfolio</p>
+              </div>
+              {order && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void verify();
+                  }}
+                  className="text-xs font-semibold text-[#183d89] underline"
+                >
+                  Check payment status
+                </button>
+              )}
+              {message && (
+                <p
+                  role="status"
+                  className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900"
+                >
+                  {message}
+                </p>
+              )}
+            </div>
+          )
         }
         primaryButton={{
-          label: 'Go to My Portfolio →',
-          onClick: () => {
-            onClose();
-            onNavigatePortfolio?.();
-          },
+          label: receipt
+            ? 'Go to My Portfolio →'
+            : !walletAddress
+              ? 'Connect Wallet to Continue'
+              : order
+                ? trackingId
+                  ? 'View Payment Status'
+                  : 'Resume MoonPay Checkout'
+                : `Pay USD ${validAmount ? amountNum.toLocaleString() : '—'} with Card`,
+          onClick: receipt
+            ? () => {
+                onClose();
+                onNavigatePortfolio?.();
+              }
+            : () => {
+                void beginCheckout();
+              },
+          isLoading: busy,
+          disabled: !receipt && !validAmount,
         }}
         secondaryButton={{
-          label: 'Done',
+          label: receipt ? 'Done' : 'Cancel',
           onClick: onClose,
         }}
+        footerNote="Test mode · Payments and allocations are simulated"
       />
-    );
-  }
+      {order && checkoutVisible && !receipt && (
+        <MoonPayCheckout
+          order={order}
+          trackingId={checkoutTrackingId}
+          allowedIpAddress={allowedIpAddress}
+          onVerify={verify}
+          onClose={closeCheckout}
+          onError={setMessage}
+        />
+      )}
+    </>
+  );
+}
 
-  // STEP 1: INVESTMENT INPUT STATE (Exact same 6-step layout)
+// Keep SDK props stable while the backing dialog polls for settlement.
+const MoonPayCheckout = memo(function MoonPayCheckout({
+  order,
+  trackingId,
+  allowedIpAddress,
+  onVerify,
+  onClose,
+  onError,
+}: {
+  order: PaymentOrder;
+  trackingId: string | null;
+  allowedIpAddress: string;
+  onVerify: () => Promise<void>;
+  onClose: () => void;
+  onError: (message: string) => void;
+}) {
+  const sign = useCallback(
+    async (url: string) => {
+      try {
+        return await signCheckout(order.id, url);
+      } catch (error) {
+        onError(
+          error instanceof Error ? error.message : 'Checkout signing failed.',
+        );
+        onClose();
+        throw error;
+      }
+    },
+    [order.id, onError, onClose],
+  );
+  const close = useCallback(async () => {
+    onClose();
+    await onVerify();
+  }, [onClose, onVerify]);
   return (
-    <UniversalPopup
-      isOpen={isOpen}
-      onClose={onClose}
-      dark={false}
-      icon={
-        <div className="relative h-16 w-16 overflow-hidden rounded-full ring-4 ring-blue-500/20 shadow-md">
-          <img
-            src={getCampaignCoverImage(demo.key)}
-            alt={demo.title}
-            className="h-full w-full object-cover"
-          />
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 p-3"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Secure payment checkout"
+    >
+      <div className="w-full max-w-[440px] overflow-hidden rounded-2xl bg-white shadow-xl">
+        <div className="flex items-center justify-between border-b border-zinc-200 p-3 text-xs">
+          <span>Secure checkout · MoonPay</span>
+          <button
+            type="button"
+            onClick={() => {
+              void close();
+            }}
+            className="rounded-lg border border-zinc-200 px-3 py-1.5"
+          >
+            Close checkout
+          </button>
         </div>
-      }
-      tag={`${demo.financials.projectedApy}% APY · REAL ASSET ESCROW`}
-      title={`Back ${demo.title}`}
-      description={`${
-        demo.location?.city ?? 'Dolni Lukavice'
-      }, Czech Republic · 20-Yr ČEZ Concession Agreement`}
-      mainPoint={
-        <div className="space-y-3">
-          {/* Amount Input Row */}
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-200/80">
-            <div className="flex items-baseline gap-1">
-              <span className="text-sm font-medium text-zinc-400 select-none">
-                <CurrencyDollarIcon className="h-4 w-4" />
-              </span>
-              <input
-                id="back-amount-input"
-                type="number"
-                min="10"
-                step="50"
-                value={amountStr}
-                onChange={(e) => setAmountStr(e.target.value)}
-                className="w-28 text-3xl font-bold tracking-tight text-zinc-950 bg-transparent focus:outline-none"
-                placeholder="500"
-              />
-            </div>
-            <div className="flex items-center gap-1.5 rounded-xl bg-blue-50 border border-blue-200 px-2.5 py-1 shadow-2xs font-mono text-xs font-bold text-[#183d89]">
-              <div className="h-4 w-4 rounded-full bg-[#10b981] flex items-center justify-center text-white text-[10px] font-bold">
-                <CurrencyDollarIcon className="h-4 w-4" />
-              </div>
-              <span>USDC</span>
-            </div>
-          </div>
-
-          {/* Preset Chips */}
-          <div className="flex items-center gap-1.5 font-mono">
-            {['100', '500', '1000'].map((val) => (
-              <button
-                key={val}
-                type="button"
-                onClick={() => setAmountStr(val)}
-                className={`flex-1 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  amountStr === val
-                    ? 'bg-[#183d89] text-white shadow-xs'
-                    : 'bg-white border border-zinc-200/80 text-zinc-700 hover:bg-zinc-100'
-                }`}
-              >
-                USDC {val}
-              </button>
-            ))}
-            {wallet && balanceNum > 0 && (
-              <button
-                type="button"
-                onClick={() => setAmountStr(String(Math.floor(balanceNum)))}
-                className="px-2 py-1 rounded-lg text-xs font-semibold bg-white border border-zinc-200/80 text-zinc-700 hover:bg-zinc-100"
-              >
-                Max
-              </button>
-            )}
-          </div>
-
-          {/* Yield & Stake Breakdown */}
-          <div className="pt-2 border-t border-zinc-200/80 space-y-1.5 text-[11px] text-zinc-500 text-left">
-            <div className="flex justify-between items-center">
-              <span>Projected Yield:</span>
-              <span className="font-mono font-bold text-emerald-600">
-                +USDC {annualDividend}/yr (+USDC {dailyDividend}/d)
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>Hardware Share:</span>
-              <span className="font-mono font-semibold text-zinc-950">
-                {poolStakePercent}% of Installation
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span>Revenue Model:</span>
-              <span className="font-medium text-zinc-800">
-                Spot Arb + Grid Standby
-              </span>
-            </div>
-          </div>
-
-          {isInsufficient && (
-            <div className="rounded-xl bg-amber-50 border border-amber-200 p-2 text-xs text-amber-900 flex items-center justify-between">
-              <span>Amount exceeds balance</span>
-              <button
-                type="button"
-                disabled={publicTx.isPending}
-                onClick={handleQuickMint}
-                className="font-bold text-amber-800 underline cursor-pointer"
-              >
-                Mint USDC 1k
-              </button>
-            </div>
+        <MoonPayProvider apiKey={order.publicKey}>
+          {trackingId ? (
+            <MoonPayTransactionTrackerWidget
+              variant="embedded"
+              visible
+              transactionId={trackingId}
+              style={{
+                width: '100%',
+                height: 'min(720px, 80vh)',
+                margin: 0,
+                border: 0,
+                borderRadius: 0,
+              }}
+              onTransactionCompleted={onVerify}
+              onClose={close}
+            />
+          ) : (
+            <MoonPayBuyWidget
+              variant="embedded"
+              visible
+              style={{
+                width: '100%',
+                height: 'min(720px, 80vh)',
+                margin: 0,
+                border: 0,
+                borderRadius: 0,
+              }}
+              currencyCode="sol"
+              baseCurrencyCode={order.currency.toLowerCase()}
+              baseCurrencyAmount={String(order.checkoutAmount ?? order.amount)}
+              walletAddress={order.wallet}
+              externalTransactionId={order.id}
+              lockAmount="true"
+              allowedIpAddress={allowedIpAddress}
+              onUrlSignatureRequested={sign}
+              onTransactionCreated={onVerify}
+              onTransactionCompleted={onVerify}
+              onClose={close}
+            />
           )}
+        </MoonPayProvider>
+      </div>
+    </div>
+  );
+});
 
-          {errorMessage && (
-            <div className="rounded-xl bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-900 font-medium text-center">
-              {errorMessage}
-            </div>
-          )}
-        </div>
+function PaymentBreakdown({
+  amounts,
+  estimated = false,
+  currency = 'USD',
+  allocation,
+}: {
+  amounts: PaymentAmounts;
+  estimated?: boolean;
+  currency?: 'USD';
+  allocation?: number;
+}) {
+  const money = (amount: number) => `${amount.toFixed(2)} ${currency}`;
+  return (
+    <div
+      className="space-y-2 border-y border-zinc-200 py-3 text-xs"
+      aria-label={
+        estimated
+          ? 'Estimated payment breakdown'
+          : 'Confirmed payment breakdown'
       }
-      primaryButton={{
-        label: isInstantConfirmed ? (
-          <span className="inline-flex items-center gap-2 animate-scale-up font-bold">
-            <CheckIcon className="h-5 w-5" />
-            <span>✓ Confirmed in 0.4 s</span>
-          </span>
-        ) : !wallet ? (
-          'Connect Wallet to Invest'
-        ) : (
-          `Confirm on Solana (USDC ${amountNum.toLocaleString()})`
-        ),
-        onClick: !wallet ? () => openWalletModal(true) : handleConfirmBacking,
-        disabled: amountNum <= 0,
-        colorClass: isInstantConfirmed
-          ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 shadow-emerald-500/40 ring-2 ring-emerald-400/50'
-          : undefined,
-      }}
-      secondaryButton={{
-        label: 'Test Demo Simulation',
-        onClick: handleConfirmBacking,
-      }}
-      footerNote="1:1 Stable Settlement · Zero Volatility · Solana PDA Escrow"
-    />
+    >
+      <div className="flex justify-between">
+        <span>Total paid{estimated ? ' (estimated)' : ''}</span>
+        <strong>{money(amounts.amountPaid)}</strong>
+      </div>
+      <div className="flex justify-between">
+        <span>MoonPay & network fees</span>
+        <strong>{money(amounts.totalFees)}</strong>
+      </div>
+      <p className="text-[10px] text-zinc-500">
+        MoonPay {money(amounts.moonpayFee)} · Network{' '}
+        {money(amounts.networkFee)}
+        {amounts.extraFee > 0
+          ? ` · Additional fee ${money(amounts.extraFee)}`
+          : ''}
+      </p>
+      <div className="flex justify-between font-semibold text-emerald-700">
+        <span>{estimated ? 'Estimated allocation' : 'Net allocated'}</span>
+        <strong>
+          {allocation !== undefined
+            ? `${allocation.toFixed(2)} USDC`
+            : `${amounts.netInvested.toFixed(2)} USDC`}
+        </strong>
+      </div>
+      {estimated && (
+        <p className="text-[10px] text-zinc-500">
+          Card-payment estimate. Final fees are confirmed in MoonPay checkout
+          and may vary by payment method.
+        </p>
+      )}
+    </div>
   );
 }

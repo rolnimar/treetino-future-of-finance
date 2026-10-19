@@ -1,4 +1,7 @@
 import { useSyncExternalStore, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPaymentReceipts } from '../fintech/moonpay';
+import { mergeDemoPayments } from './demo-payment-investments';
 
 export interface InvestmentRecord {
   amountUsdc: number;
@@ -7,6 +10,9 @@ export interface InvestmentRecord {
   totalClaimedUsdc: number;
   totalKaminoBonusClaimed?: number;
   kaminoAutoCompound?: boolean;
+  demoFiatAmountUsdc?: number;
+  demoFiatFeesUsdc?: number;
+  demoFiatPaidUsdc?: number;
 }
 
 export type InvestmentsMap = Record<number, InvestmentRecord>;
@@ -53,7 +59,14 @@ export function useVictronInvestments(walletAddress: string | undefined) {
   }, [storageKey]);
 
   const rawJson = useSyncExternalStore(subscribe, getSnapshot, () => '{}');
-  const investments = safeParse(rawJson);
+  const { data: fiatReceipts = [] } = useQuery({
+    queryKey: ['moonpay-receipts', walletAddress],
+    queryFn: () => fetchPaymentReceipts(walletAddress!),
+    enabled: !!walletAddress,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+  });
+  const investments = mergeDemoPayments(safeParse(rawJson), fiatReceipts);
 
   const invest = useCallback(
     (siteId: number, amountUsdc: number) => {
@@ -92,8 +105,14 @@ export function useVictronInvestments(walletAddress: string | undefined) {
     (siteId: number, amountUsdc: number, kaminoBonusUsdc: number = 0) => {
       if (amountUsdc <= 0 && kaminoBonusUsdc <= 0) return;
       const current = safeParse(localStorage.getItem(storageKey));
-      const existing = current[siteId];
-      if (!existing) return;
+      const holding = mergeDemoPayments(current, fiatReceipts)[siteId];
+      if (!holding) return;
+      const existing = current[siteId] ?? {
+        amountUsdc: 0,
+        investedAt: holding.investedAt,
+        lastClaimedAt: holding.lastClaimedAt,
+        totalClaimedUsdc: 0,
+      };
 
       const totalPayout = amountUsdc + kaminoBonusUsdc;
       const updated: InvestmentsMap = {
@@ -114,7 +133,7 @@ export function useVictronInvestments(walletAddress: string | undefined) {
       }
       notify();
     },
-    [storageKey],
+    [storageKey, fiatReceipts],
   );
 
   return {

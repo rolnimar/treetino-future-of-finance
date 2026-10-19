@@ -1,5 +1,13 @@
 # Treetino
 
+Card checkout uses MoonPay sandbox: USD card payments deliver devnet SOL to the
+connected wallet. The backend signs fixed checkout details, verifies payment
+status directly with MoonPay, and retries pending orders every 30 seconds.
+Verified net USD principal is shown as a test allocation in USDC; this does not
+mint USDC or execute an on-chain share purchase. Checkout and portfolio receipts
+remain marked as test mode. Set `MOONPAY_PUBLIC_KEY` and `MOONPAY_SECRET_KEY` on
+the backend using sandbox keys only. Live keys are rejected.
+
 Bun workspace monorepo for the Treetino Solana hackathon prototype.
 
 ```text

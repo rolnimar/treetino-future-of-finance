@@ -43,6 +43,7 @@
         "@anchor-lang/core": "^1.2.0",
         "@hookform/resolvers": "^5.9.1",
         "@marinade.finance/marinade-ts-sdk": "^6.1.0",
+        "@moonpay/moonpay-react": "^1.10.8",
         "@solana/spl-token": "^0.4.15",
         "@solana/wallet-adapter-base": "^0.9.28",
         "@solana/wallet-adapter-phantom": "^0.9.30",
@@ -248,6 +249,8 @@
     "@marinade.finance/native-staking-sdk": ["@marinade.finance/native-staking-sdk@1.3.4", "", { "dependencies": { "@solana/spl-memo": "^0.2.5", "@solana/web3.js": "^1.98.0", "bn.js": "^5.2.1" } }, "sha512-//7kjIJFXmCIOauxzQl3B+Y/Av66Sf2pjJsmu+e8/Nk74rUBO4aL0rPSEiGhMvatZV1NXOQXdEZ3Ue34FN6Aaw=="],
 
     "@microsoft/tsdoc": ["@microsoft/tsdoc@0.17.0", "", {}, "sha512-p68VexhnH7ojf3U27RdryUDqnKJgKaWUbCL96vJR7N0mqDuhKG5OIECk3sCPPdynxjk+yoVhRkScqtv5KQjzsw=="],
+
+    "@moonpay/moonpay-react": ["@moonpay/moonpay-react@1.10.8", "", { "peerDependencies": { "react": ">=16" } }, "sha512-QAK7uCfG66H2G4SbyGtSpS9RzP0Ah0hNUGA8i3FUDWpXsRocW5UlPXWV8jkp7O8rCzHWtgKQvgCoMgpJUJozTg=="],
 
     "@nestjs/common": ["@nestjs/common@12.1.2", "", { "dependencies": { "@standard-schema/spec": "1.1.0", "file-type": "22.1.1", "iterare": "1.2.1", "load-esm": "1.0.3", "tslib": "2.8.1", "uid": "2.0.2" }, "peerDependencies": { "class-transformer": ">=0.4.1", "class-validator": ">=0.13.2", "reflect-metadata": "^0.1.12 || ^0.2.0", "rxjs": "^7.1.0" }, "optionalPeers": ["class-transformer", "class-validator"] }, "sha512-e2tvLcEaG18sJy5IXrdSLv0ZBpR5djWxypCLkLuMAEFCvVPYL1lEIhvAMBkarlg+ZA8tbZN40J0tFurUl9NpdA=="],
 

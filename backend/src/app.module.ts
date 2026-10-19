@@ -1,3 +1,4 @@
+import { PaymentsModule } from './payments/payments.module';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -16,6 +17,7 @@ import { CampaignsModule } from './campaigns/campaigns.module';
     IndexerModule,
     VictronModule,
     CampaignsModule,
+    PaymentsModule,
   ],
   controllers: [HealthController],
 })

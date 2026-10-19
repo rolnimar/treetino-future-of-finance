@@ -15,6 +15,7 @@
     "@anchor-lang/core": "^1.2.0",
     "@hookform/resolvers": "^5.9.1",
     "@marinade.finance/marinade-ts-sdk": "^6.1.0",
+    "@moonpay/moonpay-react": "^1.10.8",
     "@solana/spl-token": "^0.4.15",
     "@solana/wallet-adapter-base": "^0.9.28",
     "@solana/wallet-adapter-phantom": "^0.9.30",
