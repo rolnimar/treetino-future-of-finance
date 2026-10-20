@@ -63,24 +63,22 @@ test('catalog is persisted for every device and restart preserves operator data'
 test('custom devices get durable distinct catalog IDs without frontend templates', async () => {
   const { db, catalog } = await fixture();
   for (const category of ['EV charging', 'Battery storage'])
-    await db.db
-      .insert(campaigns)
-      .values({
-        treeAddress: wallet(),
-        treeId: '18446744073709551615',
-        title: category,
-        narrative: 'A custom registered device',
-        category,
-        categoryBadge: category,
-        city: 'Prague',
-        country: 'Czech Republic',
-        projectedApy: '12.5%',
-        tariffRate: 'USDC 0.42/kWh',
-        offTakerName: 'Demo operator',
-        targetUsdc: '1000',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      });
+    await db.db.insert(campaigns).values({
+      treeAddress: wallet(),
+      treeId: '18446744073709551615',
+      title: category,
+      narrative: 'A custom registered device',
+      category,
+      categoryBadge: category,
+      city: 'Prague',
+      country: 'Czech Republic',
+      projectedApy: '12.5%',
+      tariffRate: 'USDC 0.42/kWh',
+      offTakerName: 'Demo operator',
+      targetUsdc: '1000',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
   await catalog.seed();
   const rows = await catalog.list();
   expect(rows).toHaveLength(6);

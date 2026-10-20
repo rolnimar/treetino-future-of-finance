@@ -53,7 +53,9 @@ export function App() {
     if (typeof window === 'undefined') return 'explore';
     if (
       window.location.pathname === '/pitch' ||
-      window.location.hash === '#pitch'
+      window.location.pathname === '/pitch-hackathon' ||
+      window.location.hash === '#pitch' ||
+      window.location.hash === '#pitch-hackathon'
     )
       return 'pitch';
     if (window.location.hash === '#portfolio') return 'portfolio';
@@ -97,7 +99,12 @@ export function App() {
         return;
       }
 
-      if (pathname === '/pitch' || hash === '#pitch') {
+      if (
+        pathname === '/pitch' ||
+        pathname === '/pitch-hackathon' ||
+        hash === '#pitch' ||
+        hash === '#pitch-hackathon'
+      ) {
         setSelectedSiteId(null);
         setCurrentView('pitch');
         return;
@@ -133,7 +140,10 @@ export function App() {
     setSelectedSiteId(null);
     setCurrentView(view);
     if (view === 'explore') {
-      if (window.location.pathname === '/pitch') {
+      if (
+        window.location.pathname === '/pitch' ||
+        window.location.pathname === '/pitch-hackathon'
+      ) {
         window.history.pushState(null, '', '/');
       }
       window.location.hash = '';

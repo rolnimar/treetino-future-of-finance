@@ -1,5 +1,41 @@
 # Treetino
 
+> **The FinTechers Hackathon 2026** · **Team:** Treetino (Jakub Lustyk, Marian-Daniel Rolník)
+> **Track:** Track 2 — Stablecoins and new financial infrastructure · Track 4 — Gen AI onboarding, KYC and trust
+> **Pitch:** [https://treetino.eu/pitch-hackathon](https://treetino.eu/pitch-hackathon)
+> **Kickoff baseline tag:** [`hackathon-start`](https://github.com/rolnimar/treetino-future-of-finance/releases/tag/hackathon-start) (commit `988ff79`, pre-event state before Monday 19 Oct 2026 12:00 kickoff)
+
+## Built during the hackathon
+
+We built a **fiat layer** on top of our pre-existing RWA tokenization protocol for green energy projects. The demo showcases an RWA-funded EV charger backed by a liquidity pool, adding a **fiat on-ramp into the pool** and a **fiat-focused screen for drivers at an EV charging station (`/#charge/374891`)**. The driver's payment settles in fiat and **within seconds yield is distributed proportionally to all investors**.
+
+All work after the `hackathon-start` tag (`988ff79..HEAD`, 19–20 October 2026) was built during the 30-hour sprint at The FinTechers Hackathon 2026:
+
+1. **Fiat On-Ramp into the RWA Liquidity Pool & EV Charging Checkout (`0005_moonpay_payments.sql`, `0006_cancel_card_checkout.sql`, `0008_charging_card_payments.sql`, `backend/src/payments/`)**:
+   - End-to-end MoonPay sandbox card checkout widget (`MoonPayCheckout.tsx`, `charging-card-payment.tsx`) and instant Apple Pay-style card flow supporting both fractional device investments into the liquidity pool and fiat driver EV charging bill settlement.
+   - Background payment reconciler (`payments-reconciler.service.ts`) that verifies provider status, handles fee adjustments, credits net principal, auto-settles pending charging bills, and supports safe checkout cancellation without double-crediting.
+2. **Fiat-Focused Portrait EV Charging Station Kiosk & Sub-Second Yield Streaming (`frontend/src/features/devices/charging-page.tsx`, `backend/src/devices/device-ledger.service.ts`)**:
+   - Built the interactive `/#charge/:siteId` (e.g., `/#charge/374891`) fullscreen portrait EV charging kiosk in our pitch-deck aesthetic with one-tap fiat card charging (`start → stop at full target → card pay`), pre-warmed terminal authentication, and 120x server-side meter simulation.
+   - Sub-second live payout streaming (`0.8s` portfolio polling + `BroadcastChannel` cross-tab sync) showing instant investor yield arrival and one-click `Claim Yield` settlement the moment a driver pays at the kiosk.
+3. **Authoritative Device, Investment & Payment Ledger (`0007_device_ledger.sql`, `backend/src/devices/`)**:
+   - Replaced client-side/simulated state with an authoritative PostgreSQL ledger (`devices`, `device_investments`, `usage_sessions`, `device_distributions`, `device_claims`, `demo_wallets`, `demo_deposits`) using Drizzle ORM and serialized database transactions.
+   - Exact integer micro-USDC revenue waterfall (`device-math.ts`) that distributes 100% of paid usage session bills proportionally across recorded contributors at session start while conserving rounding dust.
+4. **Direct USDC Backing, Persona Switching & Unified Denomination (`frontend/src/features/fintech/UsdcBacking.tsx`, `PaymentMethodSwitch.tsx`, `demo-personas.ts`)**:
+   - Seamless switching between Fiat Card (MoonPay sandbox / instant card checkout) and Direct USDC investments (`setup-funding-pools.ts`), standardized 6-decimal accounting across the monorepo (`89bb1a9`), and live payout banners in the Investor Portfolio (`investor-portfolio.tsx`).
+
+### What existed before (`hackathon-start` / `988ff79`)
+
+Prior to the hackathon kickoff (built for our earlier Solana prototype and disclosed in advance), the repository contained:
+- The Anchor Solana program (`programs/treetino/`) for tree initialization, share minting, 15-minute Wh production reporting, and OTE/ČNB spot-price invoicing.
+- The NestJS Solana event indexer (`backend/src/indexer/`), mock production reporter worker (`backend/src/mock-reporters/`), and admin/client workspace UI.
+- The Victron Energy VRM SCADA schematic visualizers (`frontend/src/features/victron/`), initial campaign catalog views, and interactive slide deck framework (`frontend/src/features/pitch/`).
+
+### Open-Source & Partner Credits
+
+Built on open-source tooling and partner sandboxes: **Solana Web3.js & Anchor** (`@coral-xyz/anchor`, `@solana/web3.js`, Wallet Adapter), **NestJS**, **Drizzle ORM** + **PostgreSQL**, **React 19** + **Vite** + **Tailwind CSS** + **TanStack Query** + **Zod**, **MoonPay SDK** (`@moonpay/moonpay-react`), **Victron Energy VRM API**, **Open-Meteo API**, and **OTE / ČNB** public market data feeds.
+
+---
+
 The demo uses a **backend-owned device and payment ledger**. Devices, investments,
 wallet balances, charging sessions, revenue allocations, and claims are persisted
 in PostgreSQL. The frontend loads the catalog and portfolio from the API; browser
