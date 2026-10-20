@@ -581,12 +581,14 @@ export class DeviceLedgerService {
     )
       await this.stop(session.wallet, id);
   }
-  async stop(wallet: string, id: string) {
+  async stop(wallet: string, id: string, deliverFullTarget = false) {
     return this.locked(async (tx) => {
       const session = await this.session(id, tx);
       this.owner(session, wallet);
       if (session.status !== 'charging') return this.present(session);
-      const deliveredWh = meteredWh(session, Date.now());
+      const deliveredWh = deliverFullTarget
+        ? session.targetWh
+        : meteredWh(session, Date.now());
       const [updated] = await tx
         .update(usageSessions)
         .set({
@@ -604,7 +606,13 @@ export class DeviceLedgerService {
       return this.present(updated!);
     });
   }
-  async pay(wallet: string, id: string, reference: unknown) {
+  async pay(
+    wallet: string,
+    id: string,
+    reference: unknown,
+    refreshContributors = false,
+    paymentMethod: 'usdc' | 'card' = 'usdc',
+  ) {
     const memoReference = memo(reference);
     return this.locked(async (tx) => {
       const session = await this.session(id, tx);
@@ -614,7 +622,15 @@ export class DeviceLedgerService {
         throw new ConflictException('Stop charging before paying.');
       await this.assertNoCardPayment(tx, id);
       await this.debit(tx, wallet, BigInt(session.amountUnits));
-      return this.recordPayment(tx, session, 'usdc', memoReference);
+      const contributors = refreshContributors
+        ? await this.contributors(tx, session.siteId)
+        : session.contributors;
+      return this.recordPayment(
+        tx,
+        { ...session, contributors },
+        paymentMethod,
+        memoReference,
+      );
     });
   }
   private async recordPayment(
@@ -639,7 +655,13 @@ export class DeviceLedgerService {
       });
     const [paid] = await tx
       .update(usageSessions)
-      .set({ status: 'paid', paidAt: now, memoReference, paymentMethod })
+      .set({
+        status: 'paid',
+        paidAt: now,
+        memoReference,
+        paymentMethod,
+        contributors: session.contributors,
+      })
       .where(eq(usageSessions.id, id))
       .returning();
     return this.present(paid!);

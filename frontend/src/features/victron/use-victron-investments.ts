@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../lib/api';
 import { useConnectedWallet } from '../wallet/use-connected-wallet';
 import { demoPost, portfolioSchema, claimSchema } from '../devices/device-api';
+export const YIELD_CHANNEL = 'treetino-yield';
 export interface InvestmentRecord {
   amountUsdc: number;
   investedAt: number;
@@ -29,9 +31,18 @@ export function useVictronInvestments(walletAddress: string | undefined) {
     queryFn: ({ signal }) =>
       api(`devices/portfolio/${walletAddress}`, portfolioSchema, { signal }),
     enabled: !!walletAddress,
-    refetchInterval: 5000,
-    staleTime: 1000,
+    refetchInterval: 800,
+    staleTime: 300,
   });
+  const { refetch } = query;
+  // Same-browser shortcut: the EV kiosk announces payouts so an open
+  // portfolio refreshes immediately instead of waiting for the next poll.
+  useEffect(() => {
+    if (!walletAddress || typeof BroadcastChannel === 'undefined') return;
+    const channel = new BroadcastChannel(YIELD_CHANNEL);
+    channel.onmessage = () => void refetch();
+    return () => channel.close();
+  }, [walletAddress, refetch]);
   const claimYield = async (siteId: number, memoReference?: string) => {
     if (!wallet || wallet.address !== walletAddress)
       throw new Error('Connect your wallet first.');

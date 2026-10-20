@@ -440,3 +440,111 @@ a {
   stroke-dasharray: 6 6;
   animation: conduitFlow 1.2s linear infinite;
 }
+
+/* ── EV outdoor kiosk (#charge/:siteId) ─────────────────────────────── */
+.kiosk-floor {
+  background-image:
+    linear-gradient(rgba(29, 78, 216, 0.38) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 78, 216, 0.38) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: perspective(520px) rotateX(62deg);
+  transform-origin: 50% 100%;
+  mask-image: linear-gradient(to top, black 10%, transparent 85%);
+  -webkit-mask-image: linear-gradient(to top, black 10%, transparent 85%);
+  opacity: 0.55;
+}
+@keyframes kiosk-word-in {
+  from {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(0.3em);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+.kiosk-word-in {
+  animation: kiosk-word-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes kiosk-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.kiosk-rise-in {
+  animation: kiosk-rise-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes kiosk-ripple {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+.kiosk-ripple {
+  animation: kiosk-ripple 2.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+.kiosk-ripple-delay {
+  animation-delay: 1.1s;
+}
+@keyframes kiosk-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.kiosk-spin,
+.kiosk-spin-fast {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: kiosk-spin 40s linear infinite;
+}
+.kiosk-spin-fast {
+  animation-duration: 0.9s;
+}
+@keyframes kiosk-sheen {
+  0%,
+  60% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(420%) skewX(-18deg);
+  }
+}
+.kiosk-sheen {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(142, 197, 255, 0.12),
+    transparent
+  );
+  animation: kiosk-sheen 4.5s ease-in-out infinite;
+}
+@keyframes kiosk-check {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.kiosk-check {
+  stroke-dasharray: 24;
+  animation: kiosk-check 0.45s 0.1s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-ripple,
+  .kiosk-sheen,
+  .kiosk-spin {
+    animation: none;
+  }
+}

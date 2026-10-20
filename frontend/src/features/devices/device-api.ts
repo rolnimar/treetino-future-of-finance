@@ -22,6 +22,10 @@ async function session(wallet: ConnectedWallet): Promise<ClientSession> {
     throw error;
   }
 }
+/** Signs the wallet in ahead of time so the first demo action is instant. */
+export async function prewarmDemoSession(wallet: ConnectedWallet) {
+  await session(wallet);
+}
 export async function demoPost<T>(
   wallet: ConnectedWallet,
   path: string,

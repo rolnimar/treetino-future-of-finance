@@ -82,11 +82,15 @@ export const DEMO_PERSONAS: DemoPersona[] = [
 ];
 
 const STORAGE_KEY = 'treetino_active_demo_persona';
+const SESSION_KEY = 'treetino_active_demo_persona_session';
 
 export function getActivePersona(): DemoPersona | null {
   if (typeof window === 'undefined') return null;
-  // If not running under automated webdriver/puppeteer, clear any stale demo persona
-  if (typeof navigator !== 'undefined' && !navigator.webdriver) {
+  if (
+    typeof navigator !== 'undefined' &&
+    !navigator.webdriver &&
+    sessionStorage.getItem(SESSION_KEY) !== '1'
+  ) {
     if (localStorage.getItem(STORAGE_KEY)) {
       localStorage.removeItem(STORAGE_KEY);
     }
@@ -101,7 +105,9 @@ export function setActivePersona(id: string | null): void {
   if (typeof window === 'undefined') return;
   if (!id) {
     localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
   } else {
+    sessionStorage.setItem(SESSION_KEY, '1');
     localStorage.setItem(STORAGE_KEY, id);
   }
   window.dispatchEvent(

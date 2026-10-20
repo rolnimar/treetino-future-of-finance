@@ -3,6 +3,13 @@ import { MoonPayCheckout } from './MoonPayCheckout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useConnectedWallet } from '../wallet/use-connected-wallet';
+import {
+  DEMO_PERSONAS,
+  getPersonaConnectedWallet,
+  setActivePersona,
+} from '../wallet/demo-personas';
+import { demoPost, investmentSchema } from '../devices/device-api';
+import { APPLE_LOGO_PATH } from '../../lib/brand-marks';
 import type { VictronDemoItem } from '../victron/victron-types';
 import { getCampaignCoverImage } from '../victron/campaign-helpers';
 import { CheckIcon } from '../victron/victron-icons';
@@ -53,17 +60,9 @@ function Backing(
 ) {
   const [method, setMethod] = useState<'card' | 'usdc'>('card');
   return method === 'card' ? (
-    <FiatBacking
-      key={props.walletAddress ?? 'guest'}
-      {...props}
-      onUseUsdc={() => setMethod('usdc')}
-    />
+    <FiatBacking {...props} onUseUsdc={() => setMethod('usdc')} />
   ) : (
-    <UsdcBacking
-      key={props.walletAddress ?? 'guest'}
-      {...props}
-      onUseCard={() => setMethod('card')}
-    />
+    <UsdcBacking {...props} onUseCard={() => setMethod('card')} />
   );
 }
 
@@ -78,6 +77,7 @@ function FiatBacking({
   walletAddress?: string;
   onUseUsdc: () => void;
 }) {
+  const wallet = useConnectedWallet();
   const { setVisible: openWalletModal } = useWalletModal();
   const queryClient = useQueryClient();
   const [order, setOrder] = useState<PaymentOrder | null>(() =>
@@ -89,6 +89,7 @@ function FiatBacking({
   const [checkoutVisible, setCheckoutVisible] = useState(false);
   const [allowedIpAddress, setAllowedIpAddress] = useState('');
   const [busy, setBusy] = useState(false);
+  const [expressBusy, setExpressBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<PaymentReceipt | null>(null);
   const [trackingId, setTrackingId] = useState<string | null>(
@@ -100,7 +101,9 @@ function FiatBacking({
   const [quoteAmount, setQuoteAmount] = useState<number | null>(null);
   const checking = useRef(false);
   const activeOrderId = useRef(order?.id);
-  activeOrderId.current = order?.id;
+  useEffect(() => {
+    activeOrderId.current = order?.id;
+  }, [order?.id]);
   const closeCheckout = useCallback(() => setCheckoutVisible(false), []);
   const amountNum = Number(amount);
   const validAmount =
@@ -215,12 +218,91 @@ function FiatBacking({
 
   useEffect(() => {
     if (!order || receipt) return;
-    void verify();
+    const initial = window.setTimeout(() => {
+      void verify();
+    }, 0);
     const timer = window.setInterval(() => {
       void verify();
     }, 10_000);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(timer);
+    };
   }, [order, receipt, verify]);
+
+  const instantCardCheckout = async () => {
+    if (busy || expressBusy || !validAmount) return;
+    setExpressBusy(true);
+    setMessage(null);
+    try {
+      let activeWallet = wallet;
+      if (!activeWallet) {
+        const alice =
+          DEMO_PERSONAS.find((p) => p.id === 'investor-alice') ??
+          DEMO_PERSONAS[0]!;
+        setActivePersona(alice.id);
+        activeWallet = getPersonaConnectedWallet(alice);
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 750));
+      const invId = crypto.randomUUID();
+      const txRef = `mp_applepay_express_${Date.now()}`;
+      const recorded = await demoPost(
+        activeWallet,
+        `devices/${demo.siteId}/investments`,
+        investmentSchema,
+        {
+          id: invId,
+          amount: String(amountNum),
+          memoReference: txRef,
+        },
+      );
+      const moonpayFee = Number((amountNum * 0.015).toFixed(2));
+      const networkFee = 0.25;
+      const totalFees = Number((moonpayFee + networkFee).toFixed(2));
+      const nowIso = new Date(recorded.createdAt).toISOString();
+      const syntheticReceipt: PaymentReceipt = {
+        id: recorded.id,
+        wallet: activeWallet.address,
+        siteId: demo.siteId,
+        amount: amountNum,
+        checkoutAmount: Number((amountNum + totalFees).toFixed(2)),
+        currency: 'USD',
+        status: 'completed',
+        transactionId: txRef,
+        completedAt: recorded.createdAt,
+        simulated: true,
+        settledAt: recorded.createdAt,
+        paymentAmounts: {
+          amountPaid: Number((amountNum + totalFees).toFixed(2)),
+          moonpayFee,
+          networkFee,
+          extraFee: 0,
+          totalFees,
+          netInvested: amountNum,
+        },
+        usdcAllocation: {
+          amountUsdc: amountNum,
+          rate: 1,
+          rateDate: nowIso.slice(0, 10),
+          source: 'USD',
+        },
+      };
+      setReceipt(syntheticReceipt);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['device-portfolio'] }),
+        queryClient.invalidateQueries({ queryKey: ['device-catalog'] }),
+        queryClient.invalidateQueries({ queryKey: ['wallet', 'usdc'] }),
+      ]);
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'Could not complete instant card payment.',
+      );
+    } finally {
+      setExpressBusy(false);
+    }
+  };
 
   const beginCheckout = async () => {
     if (!walletAddress) {
@@ -338,7 +420,7 @@ function FiatBacking({
             <div className="space-y-4">
               <PaymentMethodSwitch
                 method="card"
-                disabled={busy}
+                disabled={busy || expressBusy}
                 onChange={(method) => {
                   if (method === 'usdc')
                     void (async () => {
@@ -363,7 +445,7 @@ function FiatBacking({
                   max="5000"
                   step="0.01"
                   value={amount}
-                  disabled={!!order || busy}
+                  disabled={!!order || busy || expressBusy}
                   onChange={(event) => setAmount(event.target.value)}
                   className="w-full bg-transparent text-3xl font-bold outline-none"
                 />
@@ -395,6 +477,40 @@ function FiatBacking({
                       : 'Enter between USD 20 and USD 5,000.'}
                 </p>
               )}
+              <button
+                type="button"
+                data-testid="instant-apple-pay-card-btn"
+                disabled={busy || expressBusy || !validAmount}
+                onClick={() => {
+                  void instantCardCheckout();
+                }}
+                className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-black text-[17px] font-medium tracking-[-0.01em] text-white shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition hover:bg-zinc-900 active:scale-[0.99] disabled:opacity-50"
+              >
+                {expressBusy ? (
+                  <span>Approving…</span>
+                ) : (
+                  <>
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="-mt-0.5 h-[18px] w-[18px]"
+                      fill="currentColor"
+                      aria-hidden
+                    >
+                      <path d={APPLE_LOGO_PATH} />
+                    </svg>
+                    <span>Pay</span>
+                    <span className="mx-1 h-4 w-px bg-white/25" />
+                    <span className="tabular-nums">
+                      {validAmount
+                        ? `$${amountNum.toLocaleString('en-US')}`
+                        : '—'}
+                    </span>
+                  </>
+                )}
+              </button>
+              <p className="-mt-1 text-center text-[11px] text-zinc-500">
+                Card, Apple Pay or Google Pay · No account, no KYC
+              </p>
               <div className="space-y-2 text-xs text-zinc-600">
                 <p>1. Choose your contribution</p>
                 <p>2. Complete secure checkout</p>

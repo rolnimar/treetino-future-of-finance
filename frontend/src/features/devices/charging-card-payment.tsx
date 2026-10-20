@@ -101,7 +101,7 @@ export function ChargingCardPayment({
         );
       }
     },
-    [client, session.id, wallet.address, refresh],
+    [client, session.id, session.siteId, wallet.address, refresh],
   );
   useEffect(() => {
     if (order?.status === 'completed') void refresh();

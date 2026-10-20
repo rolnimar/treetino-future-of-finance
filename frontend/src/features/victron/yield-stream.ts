@@ -20,6 +20,8 @@ export function calculateAssetAccruedYield(
   _financials?: unknown,
   _now?: number,
 ): AccruedYieldResult {
+  void _financials;
+  void _now;
   const amount = holding?.claimableUsdc ?? 0,
     rate = holding?.hourlyRateUsdc ?? 0;
   return {

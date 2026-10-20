@@ -103,8 +103,16 @@ export class DevicesController {
   @Post('device-sessions/:id/stop')
   @ApiBearerAuth()
   @UseGuards(ClientGuard)
-  stop(@Req() req: ClientRequest, @Param('id') id: string) {
-    return this.ledger.stop(req.client.wallet, id);
+  stop(
+    @Req() req: ClientRequest,
+    @Param('id') id: string,
+    @Body() body?: { deliverFullTarget?: unknown },
+  ) {
+    return this.ledger.stop(
+      req.client.wallet,
+      id,
+      body?.deliverFullTarget === true,
+    );
   }
   @Post('device-sessions/:id/pay')
   @ApiBearerAuth()
@@ -112,9 +120,20 @@ export class DevicesController {
   pay(
     @Req() req: ClientRequest,
     @Param('id') id: string,
-    @Body() body: { memoReference?: unknown },
+    @Body()
+    body?: {
+      memoReference?: unknown;
+      refreshContributors?: unknown;
+      paymentMethod?: unknown;
+    },
   ) {
-    return this.ledger.pay(req.client.wallet, id, body?.memoReference);
+    return this.ledger.pay(
+      req.client.wallet,
+      id,
+      body?.memoReference,
+      body?.refreshContributors === true,
+      body?.paymentMethod === 'card' ? 'card' : 'usdc',
+    );
   }
   @Post('device-sessions/:id/cancel')
   @ApiBearerAuth()

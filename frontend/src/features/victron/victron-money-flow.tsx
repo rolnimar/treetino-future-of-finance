@@ -5,7 +5,6 @@ import { useLiveYieldStream } from './yield-stream';
 import { useConnectedWallet } from '../wallet/use-connected-wallet';
 import { usePublicTransactions } from '../marketplace/hooks/use-public-transactions';
 import { parseTokenAmount } from '../../chain/amounts';
-import { CheckIcon } from './victron-icons';
 
 interface VictronMoneyFlowProps {
   demo: VictronDemoItem;
